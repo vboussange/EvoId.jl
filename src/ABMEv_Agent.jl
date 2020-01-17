@@ -15,6 +15,18 @@ import Base.copy
 copy(a::Agent) = Agent(a.x_history,a.d,a.b)
 copy(m::Missing) = missing
 
+"""
+    function new_world_G(nagents::Int,p::Dict; spread = 1., offset = 0.)
+Returns an array of type Array{Union{Missing,Agent}} initialised with normal distribution.
+Only relevant for Gillepsie algorithm as of now.
+"""
+function new_world_G(nagents::Int,p::Dict; spread = 1., offset = 0.)
+    typeof(spread) <: Array ? spread = spread[:] : nothing;
+    typeof(offset) <: Array ? offset = offset[:] : nothing;
+    agent0 = [Agent( spread  .* randn(length(spread)) .+ offset) for i in 1:nagents]
+    world0 = vcat(agent0[:],repeat([missing],Int(p["NMax"] - nagents)))
+    return world0
+end
 
 # returns trait i of the agent
 get_x(a::Agent,i::Number) = a.x_history[Int(i):Int(i),end]

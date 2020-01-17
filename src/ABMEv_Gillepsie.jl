@@ -8,7 +8,6 @@ Used for Gillepsie setting
 function give_birth(a::Agent,p::Dict,reflected)
     new_a = copy(a)
     increment_x!(new_a,p,reflected=reflected)
-    # ! carefull you also need to change get_xhist
     return new_a
 end
 
@@ -25,7 +24,7 @@ function update_afterbirth_std!(world,C,idx::Int,p::Dict) where T
     end
     # Now updating new agent
     world[idx].d = sum(C[idx,:]) / p["K0"]
-    world[idx].b = K(traits[idx][:,end],1,p["n_K"],p["sigma_K"])
+    world[idx].b = K(traits[idx][:,end],1.,p["n_K"],p["sigma_K"])
 end
 
 function update_afterdeath_std!(world,C,idx::Int,p::Dict) where T

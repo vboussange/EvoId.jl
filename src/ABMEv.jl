@@ -16,7 +16,8 @@ module ABMEv
     export update_rates!
     export Agent,get_fitness,get_x,get_xarray,get_xhist,
         get_geo,get_b,get_d,increment_x!,get_inc_reflected,
-        split_move,split_merge_move,KK,tin
+        split_move,split_merge_move,KK,tin,new_world_G
     export copy,runWorld_store_WF,runWorld_store_G #,runWorld_G!,runWorld_WF!,
     export H_discrete,findclusters,var,covgeo,hamming
+    export update_afterbirth_std!,update_afterdeath_std!
 end

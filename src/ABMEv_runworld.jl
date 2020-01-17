@@ -19,7 +19,7 @@ function  update_rates_std!(world,C,p::Dict,t::Float64)
         # this could be imptrove since \alpha is symmetric, by using a symmetric matrix
         a.d = sum(C[i,:]) / p["K0"]
         # /!| not ideal to assign at every time step the birth rate that is constant
-        a.b = K(traits[i][:,end],1,p["n_K"],p["sigma_K"])
+        a.b = K(traits[i][:,end],1.,p["n_K"],p["sigma_K"])
     end
 end
 
@@ -189,7 +189,7 @@ Gillepsie process. Returns a tuple worldall,tspanarray
 function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
     # we store the value of world every 100 changes by default
     tspan = zeros(1)
-    i = 1;j=0;
+    i = 1;j=1;
     N=length(world0);
     tspanarray = [];
     ninit = Int(length(world0) - count(ismissing,world0))
@@ -197,15 +197,19 @@ function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
     # We decide that we store agents ninit events where ninit is the initial population
     # length of worldall should be changed at some point
     worldall = reshape(copy.(world0),N,1)
+    # we instantiate C as the biggest size it can take
     C = SharedArray{Float64}((N,N))
     update_rates_std!(skipmissing(world0),C,p,0.)
     while tspan[i]<p["tend"] &&  count(ismissing,world0) < p["NMax"] && count(ismissing,world0) > 0
+        # we save every ninit times
         if mod(i,ninit) == 1
-            # @info "saving world @ t = $(tspan[i])/ $(p["tend"])"
-            j+=1;
-            # worldall[1:Int(N - count(ismissing,world0)),j] .= copy.(collect(skipmissing(world0)));
-            # we are reallocating worldall everytime which is bad
-            worldall = hcat(worldall,copy.(world0))
+            @info "saving world @ t = $(tspan[i])/ $(p["tend"])"
+            j+=1;sw = size(worldall,2);
+            if sw < j
+                # we double the size of worldall
+                worldall = hcat(worldall,Array{Missing}(missing,N,sw))
+            end
+            worldall[1:Int(N - count(ismissing,world0)),j] .= copy.(collect(skipmissing(world0)));
             push!(tspanarray,tspan[i])
         end
         push!(tspan, tspan[end] + updateWorld_G!(world0,C,p,update_rates_std!,tspan,reflected))
