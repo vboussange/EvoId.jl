@@ -1,4 +1,4 @@
-using Plots
+import Plots:plot,@recipe,@series
 # function designed for Wright Fisher process
 @recipe function plot(world::Array{U},p;what=["x","H"],trait = 1) where U <: Union{Missing,Agent{T}} where T
     # We reduce time interval if it is too big
@@ -41,7 +41,7 @@ using Plots
             xlabel := "time"
             ylabel := "trait value"
             label := ""
-            markersize := 2.3/1000*size(world,1)
+            # markersize := 2.3/1000*size(world,1)
             tspan_ar[:],xarray[:]
         end
     end
@@ -57,7 +57,7 @@ using Plots
             ylabel := "geotrait"
             zlabel := "trait value"
             label := ""
-            markersize := 2.3/1000*size(world,1)
+            # markersize := 2.3/1000*size(world,1)
             tspan_ar,xarray[:],yarray[:]
         end
     end
@@ -73,7 +73,7 @@ using Plots
             ylabel := "position"
             zlabel := "trait value"
             label := ""
-            markersize := 2.3/1000*size(world,1)
+            # markersize := 2.3/1000*size(world,1)
             tspan_ar,xarray[:],yarray[:]
         end
     end
