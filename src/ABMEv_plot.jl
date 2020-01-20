@@ -1,10 +1,22 @@
 using Plots
 # function designed for Wright Fisher process
-@recipe function plot(world::Array{Agent{T}},p;what=["x","H"],trait = 1) where T
+@recipe function plot(world::Array{U},p;what=["x","H"],trait = 1) where U <: Union{Missing,Agent{T}} where T
+    # We reduce time interval if it is too big
+    if size(world,2)*size(world,1) > 1e6 && size(world,2) >= 200
+        p = copy(p)
+        idx_reduced = floor.(Int,range(1,size(world,2),length = 200))
+        p["tspan" ] = p["tspan"][idx_reduced]
+        world = world[:,idx_reduced]
+    end
     # here  we can take xhist because every agent is updated at the same time
     # world should correspond to a one dimensional array
-    N = size(world,1)
-    tspan = collect(1:Int(p["tend"]))
+    if count(ismissing,world) > 0
+        tspan_ar = vcat([p["tspan"][i]*ones(Int(p["NMax"] - count(ismissing,world[:,i]))) for i in 1:length(p["tspan"]) ]...);
+    else
+        tspan_ar = repeat(p["tspan"],inner = size(world,1))
+    end
+    # tspan = Float64.(tspan)
+    world = collect(skipmissing(world))
     if "x" in what
         @series begin
         xarray = get_xarray(world,trait)
@@ -15,8 +27,8 @@ using Plots
             xlabel := "time"
             ylabel := "trait value"
             label := ""
-            markersize := 2.3/1000*size(world,1)
-            repeat(tspan,inner = N),xarray[:]
+            # markersize := 2.3/1000*size(world,1)
+            tspan_ar[:],xarray[:]
         end
     end
     if "geo" in what
@@ -30,7 +42,7 @@ using Plots
             ylabel := "trait value"
             label := ""
             markersize := 2.3/1000*size(world,1)
-            repeat(tspan,inner = N),xarray[:]
+            tspan_ar[:],xarray[:]
         end
     end
     if "3dgeo" in what
@@ -46,7 +58,7 @@ using Plots
             zlabel := "trait value"
             label := ""
             markersize := 2.3/1000*size(world,1)
-            repeat(tspan,inner = N),xarray[:],yarray[:]
+            tspan_ar,xarray[:],yarray[:]
         end
     end
     if "3d" in what
@@ -62,7 +74,7 @@ using Plots
             zlabel := "trait value"
             label := ""
             markersize := 2.3/1000*size(world,1)
-            repeat(tspan,inner = N),xarray[:],yarray[:]
+            tspan_ar,xarray[:],yarray[:]
         end
     end
     # if "H" in what
@@ -81,7 +93,7 @@ using Plots
             label := "Variance"
             xlabel := "Time"
             ylabel := "Variance"
-            tspan,var(world,trait=trait)[:]
+            p["tspan"],var(world,trait=trait)[:]
         end
     end
     if "vargeo" in what
@@ -91,37 +103,7 @@ using Plots
             label := "Variance of geotrait"
             xlabel := "Time"
             ylabel := "Variance"
-            tspan,i->first(covgeo(world[:,Int(i)]))
-        end
-    end
-end
-
-@recipe function plot(world::Array{Union{Agent{T},Missing}},p;what=["x","H"],trait = 1) where T
-    # here world should correspond to a multidimensional array
-    xarray = vcat(get_x.(skipmissing(world),trait)...)
-    N = size(xarray,1)
-    tspan = p["tspan"]
-    tspanarray = vcat([tspan[i]*ones(Int(p["NMax"] - count(ismissing,world[:,i]))) for i in 1:length(tspan) ]...)
-    if "x" in what
-        @series begin
-            seriestype := :scatter
-            markercolor := "blue"
-            markerstrokewidth := 0
-            alpha :=.1
-            xlabel := "time"
-            ylabel := "trait value"
-            label := ""
-            markersize := 2.3/1000*size(world,1)
-            tspanarray,xarray
-        end
-    end
-    if "H" in what
-        @series begin
-            x = get_x.(world,trait)
-            linewidth := 2
-            seriestype := :line
-            label := "Interconnectedness"
-            tspan,N^2 / 2 .* [H_discrete(x[:,i]) for i in tspan]
+            p["tspan"],i->first(covgeo(world[:,Int(i)]))
         end
     end
 end

@@ -180,7 +180,7 @@ function runWorld_store_WF(p,world0;init = ([.0],),reflected=false,mode="std")
         world = @view worldall[:,i];newworld = @view worldall[:,i+1];
         updateWorld_WF!(world,newworld ,C,p,update_rates!,Float64(i),reflected)
     end
-    return worldall
+    return worldall,collect(0:Int(p["tend"]-1))
 end
 """
     function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
@@ -189,7 +189,7 @@ Gillepsie process. Returns a tuple worldall,tspanarray
 function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
     # we store the value of world every 100 changes by default
     tspan = zeros(1)
-    i = 1;j=1;
+    i = 1;j=0;
     N=length(world0);
     tspanarray = [];
     ninit = Int(length(world0) - count(ismissing,world0))
