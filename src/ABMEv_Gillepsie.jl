@@ -52,21 +52,25 @@ function updateWorld_G!(world,C,p,update_rates!,tspan,reflected)
     # Total rate of events
     U = sum(get_d.(world_alive) .+ get_b.(world_alive))
     dt = - log(rand(Float64))/U
-    events_weights = ProbabilityWeights(vcat(get_d.(world_alive),get_b.(world_alive)))
-    i_event = sample(events_weights)
-    # This is ok since length is a multiple of 2
-    I = Int(length(events_weights) / 2)
-    if i_event <= I
-        # DEATH EVENT
-        idx_offspring = idx_world[i_event]
-        world[idx_offspring] = missing
-        update_afterdeath_std!(world_alive,C,idx_offspring,p)
-    else
-        # birth event
-        idx_offspring = findfirst(ismissing,world)
-        world[idx_offspring] = give_birth(world[idx_world[i_event-I]],p,reflected)
-        update_afterbirth_std!(world_alive,C,idx_offspring,p)
+    if dt > 0.
+        events_weights = ProbabilityWeights(vcat(get_d.(world_alive),get_b.(world_alive)))
+        i_event = sample(events_weights)
+        # This is ok since length is a multiple of 2
+        I = Int(length(events_weights) / 2)
+        if i_event <= I
+            # DEATH EVENT
+            idx_offspring = idx_world[i_event]
+            world[idx_offspring] = missing
+            update_afterdeath_std!(world_alive,C,idx_offspring,p)
+        else
+            # birth event
+            idx_offspring = findfirst(ismissing,world)
+            world[idx_offspring] = give_birth(world[idx_world[i_event-I]],p,reflected)
+            update_afterbirth_std!(world_alive,C,idx_offspring,p)
 
+        end
+        return dt
+    else
+        return -1.
     end
-    return dt
 end

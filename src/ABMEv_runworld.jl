@@ -189,7 +189,7 @@ Gillepsie process. Returns a tuple worldall,tspanarray
 function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
     # we store the value of world every 100 changes by default
     tspan = zeros(1)
-    i = 1;j=0;
+    i = 1;j=0;dt = 1.
     N=length(world0);
     tspanarray = [];
     ninit = Int(length(world0) - count(ismissing,world0))
@@ -200,7 +200,7 @@ function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
     # we instantiate C as the biggest size it can take
     C = SharedArray{Float64}((N,N))
     update_rates_std!(skipmissing(world0),C,p,0.)
-    while tspan[i]<p["tend"] &&  count(ismissing,world0) < p["NMax"] && count(ismissing,world0) > 0
+    while tspan[i]<p["tend"] &&  dt > 0. && count(ismissing,world0) < p["NMax"] && count(ismissing,world0) > 0
         # we save every ninit times
         if mod(i,ninit) == 1
             @info "saving world @ t = $(tspan[i])/ $(p["tend"])"
@@ -212,7 +212,8 @@ function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
             worldall[1:Int(N - count(ismissing,world0)),j] .= copy.(collect(skipmissing(world0)));
             push!(tspanarray,tspan[i])
         end
-        push!(tspan, tspan[end] + updateWorld_G!(world0,C,p,update_rates_std!,tspan,reflected))
+        dt = updateWorld_G!(world0,C,p,update_rates_std!,tspan,reflected)
+        push!(tspan, tspan[end] + dt)
         i += 1
     end
     return worldall[:,1:j],tspanarray
