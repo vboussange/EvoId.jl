@@ -39,6 +39,7 @@ Fitness is defined as ```b - d```.
 - ```K0``` Carrying capacity
 - ```a``` only used for mode ```grad2D``` where growth rate is set such as $`\mu = a x_1`$
 > We are not sure if this is OK or not? Check it 
+[Grad2D kernel explained](https://gitlab.ethz.ch/bvictor/abmev/-/wikis/Grad2D)
 ### Gillepsie algorithm
 
 ```julia
