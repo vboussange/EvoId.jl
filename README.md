@@ -58,6 +58,8 @@ worldall,p_default["tspan"] = runWorld_store_G(p_default,world0)
 As of now, no mode is implemented.
 
 ### Wright Fisher algorithm
+#### Specific parameters
+- ```NMax``` Maximum number of individuals that can be attained. If attained, then the programm stops.
 ```julia
 p_default = Dict("K0" => 2000.,
         "D" => [2e-2], # this is the dispersion coefficient, that should be taken as constant
