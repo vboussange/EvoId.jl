@@ -10,7 +10,37 @@ To develop, you can add the dependencies in the project by doing
 using Pkg
 Pkg.activate("path_to_ABMEv")
 ```
+
+## Birth and Death mechanisms
+
+### Mutation
+If anisotropy in mutation, the following parameters should be declared as arrays where each entry corresponds to a dimension.
+- ```mu``` The probability of mutation.
+- ```D``` If mutation happens on the agent, the increment follows a Normal law $`\mathcal{N}_{\mu = 0, \sigma = D}`$
+### Birth
+#### Growth
+- Resource kernel is defined as 
+```math
+K(x) = K_0 \exp(-\sum_i^{N(t)} \frac{1}{\sigma_{K)i}^{n_K}}\sum_j^T (x_{i,j} - \mu)^{n_K})
+```
+- Dirth coefficient is defined as $`b(x) = K(x)`$
+### Death
+#### Competition
+- Competition between agent with trait ```x``` and ```y``` is defined as
+```math 
+\alpha(x,y) = \exp(-\sum_i^{N(t)} \frac{1}{\sigma_{\alpha_i}^{n_\alpha}}\sum_j^T (x_{i,j} - y_{i,j})^{n_\alpha})
+```
+- Death coefficient is defined as $`d(x^{(i)}) = \sum_j^{N(t)} \alpha(x^{(i)},x^{(j)})`$
+> We are not sure if the sum includes $`x^{(i)}`$ or not.
+### Fitness
+Fitness is defined as ```b - d```.
+
+## Parameter description
+- ```K0``` Carrying capacity
+- ```a``` only used for mode ```grad2D``` where growth rate is set such as $`\mu = a x_1`$
+> We are not sure if this is OK or not? Check it 
 ### Gillepsie algorithm
+
 ```julia
 p_default = Dict("K0" => 1000.,
         "D" => [1e-2 - 1e-3],
