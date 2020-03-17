@@ -79,6 +79,7 @@ world0 = vcat(agent0[:],repeat([missing],Int(p_default["NMax"] - na_init)))
 You have several options available concerning the resource implemented and competition:
 - ``` mode="std"``` is the standard mode
 - ``` mode="grad2D"``` corresponds to a an ecological gradient
+>We are not sure whether this corresponds to the following two images
 - ``` mode="mountain"``` corresponds to a scenario where a mountain arises (with an ecological gradient)
 - ``` mode="split"``` corresponds to a scenario where the resource is splitted in two
 - ``` mode="graph"``` this guy is probably not working
