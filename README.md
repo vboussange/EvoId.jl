@@ -95,7 +95,10 @@ using Distributed;addprocs()
 ```
 
 ### Plotting
-ABMEv comes with Plot recipes
+ABMEv comes with Plot recipes:
+`function plot(world::Array{U},p;what=["x","H"],trait = 1) where U <: Union{Missing,Agent{T}} where T`.
+
+An example to use it: 
 ```julia
 using Plots;pyplot()
 Plots.plot(worldall,p_default,what=["x"],trait=2)
