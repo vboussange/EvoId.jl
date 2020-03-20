@@ -12,7 +12,7 @@ module ABMEv
     include("ABMEv_plot.jl")
 
 
-    @reexport using Distributions,Plots
+    @reexport using Distributions
     export update_rates!
     export Agent,get_fitness,get_x,get_xarray,get_xhist,
         get_geo,get_b,get_d,increment_x!,get_inc_reflected,
