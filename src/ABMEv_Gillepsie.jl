@@ -11,33 +11,23 @@ function give_birth(a::Agent,p::Dict,reflected)
     return new_a
 end
 
-function update_afterbirth_std!(world,C,idx::Int,p::Dict) where T
-    traits = get_x.(world)
+function update_afterbirth_std!(world,idx_offspring,p::Dict) where T
     # updating competition only the two columns corresponding to agent idx
-    α = p["alpha"];K=p["K"]
-    for i in 1:length(traits)
-        C[i,idx] = α(traits[i],traits[idx])
-        C[idx,i] = C[i,idx]
-    end
-    # updating death rate only the two columns corresponding to agent idx
-    for (i,a) in enumerate(world)
-        a.d += C[i,idx]
+    α = p["alpha"];K=p["K"];
+    x_offspring = get_x(world[idx_offspring])
+    for a in skipmissing(world)
+        a.d += α(get_x(a),x_offspring)
     end
     # Now updating new agent
-    world[idx].d = sum(C[idx,:])
-    world[idx].b = K(traits[idx])
+    world[idx_offspring].d = sum(α.(get_x.(skipmissing(world)),Ref(x_offspring)))
+    world[idx_offspring].b = K(x_offspring)
 end
 
-function update_afterdeath_std!(world,C,idx::Int,p::Dict) where T
-    traits = get_x.(world)
+function update_afterdeath_std!(world,x_death,p::Dict) where T
+    α = p["alpha"]
     # updating death rate only the two columns corresponding to agent idx
-    for (i,a) in enumerate(world)
-        a.d -= C[i,idx]
-    end
-    # updating competition only the two columns corresponding to agent idx
-    for i in 1:length(traits)
-        C[i,idx] = .0
-        C[idx,i] = .0
+    for a in skipmissing(world)
+        a.d -= α(get_x(a),x_death)
     end
 end
 
@@ -46,7 +36,7 @@ end
 Updating rule for gillepsie setting.
 Returning dt drawn from an exponential distribution with parameter the total rates of events.
 """
-function updateWorld_G!(world,C,p,update_rates!,tspan,reflected)
+function updateWorld_G!(world,p,update_rates!,tspan,reflected)
     # total update world
     world_alive = skipmissing(world)
     idx_world = collect(eachindex(world_alive))
@@ -57,18 +47,21 @@ function updateWorld_G!(world,C,p,update_rates!,tspan,reflected)
         events_weights = ProbabilityWeights(vcat(get_d.(world_alive),get_b.(world_alive)))
         i_event = sample(events_weights)
         # This is ok since length is a multiple of 2
-        I = Int(length(events_weights) / 2)
-        if i_event <= I
+        N = length(world) - count(ismissing,world)
+        if i_event <= N
             # DEATH EVENT
+            # In this case i_event is also the index of the individual to die in the world_alive
             idx_offspring = idx_world[i_event]
+            x_death = get_x(world[idx_offspring])
+            update_afterdeath_std!(world,x_death,p)
             world[idx_offspring] = missing
-            update_afterdeath_std!(world_alive,C,idx_offspring,p)
         else
             # birth event
             idx_offspring = findfirst(ismissing,world)
-            world[idx_offspring] = give_birth(world[idx_world[i_event-I]],p,reflected)
-            update_afterbirth_std!(world_alive,C,idx_offspring,p)
-
+            # i_event - N is also the index of the individual to give birth in the world_alive
+            mum = world[idx_world[i_event-N]]
+            world[idx_offspring] = give_birth(mum,p,reflected)
+            update_afterbirth_std!(world,idx_offspring,p)
         end
         return dt
     else

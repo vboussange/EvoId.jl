@@ -6,26 +6,22 @@ This standard updates takes
     - competition kernels of the form α(x,y) and
     - carrying capacity of the form K(x)
 """
-function  update_rates_std!(world,C,p::Dict,t::Float64)
+function  update_rates_std!(world,p::Dict,t::Float64)
     α = p["alpha"];K=p["K"];
-    # Competition matrix
     traits = get_x.(world)
     # traits = get_xhist.(world)
     N = length(traits)
     # C = SharedArray{Float64}((N,N))
     # Here you should do a shared array to compute in parallel
-    @sync @distributed for i in 1:(N-1)
+    for i in 1:(N-1)
         for j in i+1:N
-            C[i,j] = α(traits[i],traits[j])
-            C[j,i] = C[i,j]
+            C = α(traits[i],traits[j])
+            world[i].d += C
+            world[j].d += C
         end
     end
     # Here we can do  it in parallel as well
     for (i,a) in enumerate(world)
-        # we only update death rate
-        # this could be imptrove since \alpha is symmetric, by using a symmetric matrix
-        a.d = sum(C[i,:])
-        # /!| not ideal to assign at every time step the birth rate that is constant
         a.b = K(traits[i])
     end
 end
@@ -205,9 +201,17 @@ function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
     # length of worldall should be changed at some point
     worldall = reshape(copy.(world0),N,1)
     # we instantiate C as the biggest size it can take
-    C = SharedArray{Float64}((N,N))
-    update_rates_std!(skipmissing(world0),C,p,0.)
-    while tspan[i]<p["tend"] &&  dt > 0. && count(ismissing,world0) < p["NMax"] && count(ismissing,world0) > 0
+    update_rates_std!(skipmissing(world0),p,0.)
+    while tspan[i]<p["tend"]
+        if dt < 0
+            throw("We obtained negative time step dt = $dt at event $i")
+        elseif count(ismissing,world0) == p["NMax"]
+            @info "All individuals have died :("
+            break
+        elseif count(ismissing,world0) == 0
+            @info "We have reached the maximum number of individuals allowed"
+            break
+        end
         # we save every ninit times
         if mod(i,ninit) == 1
             @info "saving world @ t = $(tspan[i])/ $(p["tend"])"
@@ -219,9 +223,10 @@ function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
             worldall[1:Int(N - count(ismissing,world0)),j] .= copy.(collect(skipmissing(world0)));
             push!(tspanarray,tspan[i])
         end
-        dt = updateWorld_G!(world0,C,p,update_rates_std!,tspan,reflected)
+        dt = updateWorld_G!(world0,p,update_rates_std!,tspan,reflected)
         push!(tspan, tspan[end] + dt)
         i += 1
     end
+    @info "simulation stopped at t=$(tspan[end])"
     return worldall[:,1:j],tspanarray
 end
