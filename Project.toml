@@ -2,3 +2,13 @@ name = "ABMEv"
 uuid = "837ac870-fb52-4b0c-9a0e-030f2f36f5ed"
 authors = ["Victor Boussange "]
 version = "0.1.0"
+
+[deps]
+Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+LightGraphs = "093fc24a-ae57-5d10-9952-331d41423f4d"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
+Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
+SharedArrays = "1a1011a3-84de-559e-8e89-a11a2f7dc383"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
