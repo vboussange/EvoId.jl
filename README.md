@@ -102,7 +102,25 @@ using Distributed;addprocs()
 @everywhere using ABMEv
 ```
 
-### Plotting
+## Properties of agents
+You can access properties of the agent using the following functions
+- `get_xarray(world::Array{Agent{T}},trait::Int) where T`
+
+Returns trait of every agents of world in the form of an array
+
+> TODO: describe the following accessors
+```julia
+get_x(a::Agent,i::Number) = a.x_history[Int(i):Int(i),end]
+get_x(a::Agent) = a.x_history[:,end]
+get_xhist(a::Agent,i::Number) = a.x_history[Int(i):Int(i),:]
+get_xhist(a::Agent) = a.x_history
+get_geo(a::Agent) = sum(get_xhist(a,1))
+get_d(a::Agent) = a.d
+get_b(a::Agent) = a.b
+get_fitness(a::Agent) = a.b - a.d
+```
+
+## Plotting
 ABMEv comes with Plot recipes:
 `function plot(world::Array{U},p;what=["x","H"],trait = 1) where U <: Union{Missing,Agent{T}} where T`.
 
