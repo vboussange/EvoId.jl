@@ -1,6 +1,13 @@
 # for now we consider that competition is local within an array
 
+"""
+    update_rates_std!(world,C,p::Dict,t::Float64)
+This standard updates takes
+    - competition kernels of the form α(x,y) and
+    - carrying capacity of the form K(x)
+"""
 function  update_rates_std!(world,C,p::Dict,t::Float64)
+    α = p["alpha"];K=p["K"];
     # Competition matrix
     traits = get_x.(world)
     # traits = get_xhist.(world)
@@ -9,7 +16,7 @@ function  update_rates_std!(world,C,p::Dict,t::Float64)
     # Here you should do a shared array to compute in parallel
     @sync @distributed for i in 1:(N-1)
         for j in i+1:N
-            C[i,j] = α(traits[i],traits[j],p["n_alpha"],p["sigma_a"])
+            C[i,j] = α(traits[i],traits[j])
             C[j,i] = C[i,j]
         end
     end
@@ -17,9 +24,9 @@ function  update_rates_std!(world,C,p::Dict,t::Float64)
     for (i,a) in enumerate(world)
         # we only update death rate
         # this could be imptrove since \alpha is symmetric, by using a symmetric matrix
-        a.d = sum(C[i,:]) / p["K0"]
+        a.d = sum(C[i,:])
         # /!| not ideal to assign at every time step the birth rate that is constant
-        a.b = K(traits[i][:,end],1.,p["n_K"],p["sigma_K"])
+        a.b = K(traits[i][:,end])
     end
 end
 

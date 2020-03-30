@@ -14,24 +14,25 @@ end
 function update_afterbirth_std!(world,C,idx::Int,p::Dict) where T
     traits = get_x.(world)
     # updating competition only the two columns corresponding to agent idx
+    α = p["alpha"];K=p["K"]
     for i in 1:length(traits)
-        C[i,idx] = α(traits[i],traits[idx],p["n_alpha"],p["sigma_a"])
+        C[i,idx] = α(traits[i],traits[idx])
         C[idx,i] = C[i,idx]
     end
     # updating death rate only the two columns corresponding to agent idx
     for (i,a) in enumerate(world)
-        a.d += C[i,idx] / p["K0"]
+        a.d += C[i,idx]
     end
     # Now updating new agent
-    world[idx].d = sum(C[idx,:]) / p["K0"]
-    world[idx].b = K(traits[idx][:,end],1.,p["n_K"],p["sigma_K"])
+    world[idx].d = sum(C[idx,:])
+    world[idx].b = K(traits[idx][:,end],1.)
 end
 
 function update_afterdeath_std!(world,C,idx::Int,p::Dict) where T
     traits = get_x.(world)
     # updating death rate only the two columns corresponding to agent idx
     for (i,a) in enumerate(world)
-        a.d -= C[i,idx] / p["K0"]
+        a.d -= C[i,idx]
     end
     # updating competition only the two columns corresponding to agent idx
     for i in 1:length(traits)

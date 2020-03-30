@@ -10,6 +10,7 @@ module ABMEv
     include("ABMEv_runworld.jl")
     include("ABMEv_metrics.jl")
     include("ABMEv_plot.jl")
+    include("ABMEv_utils.jl")
 
 
     @reexport using Distributions
@@ -20,4 +21,5 @@ module ABMEv
     export copy,runWorld_store_WF,runWorld_store_G #,runWorld_G!,runWorld_WF!,
     export H_discrete,findclusters,var,covgeo,hamming
     export update_afterbirth_std!,update_afterdeath_std!
+    export generalised_gaussian,gaussian
 end

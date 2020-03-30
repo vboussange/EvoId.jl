@@ -92,11 +92,16 @@ end
 # need to make sure that this is working correctly
 """
     α(a1::Array{Float64},a2::Array{Float64},n_alpha::Float64,sigma_a::Array{Float64})
-Gaussian competition kernel
+Generalised gaussian competition kernel
 """
 function α(a1::Array{Float64},a2::Array{Float64},n_alpha::Float64,sigma_a::Array{Float64})
-        return exp( -.5 sum(sum((a1 .- a2).^n_alpha,dims=2)./ sigma_a[:].^n_alpha))
+        return exp( -.5* sum(sum((a1 .- a2).^n_alpha,dims=2)./ sigma_a[:].^n_alpha))
 end
+"""
+    α(a1::Array{Float64},a2::Array{Float64},n_alpha::Float64,sigma_a::Array{Float64})
+Default Gaussian competition kernel
+"""
+α(a1::Array{Float64},a2::Array{Float64},sigma_a::Array{Float64}) = α(a1,a2,2,sigma_a)
 
 """
     K(x::Array{Float64},K0::Float64,μ::Array{Float64},sigma_K::Array{Float64})
