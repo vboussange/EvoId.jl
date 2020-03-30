@@ -1,4 +1,4 @@
-import Plots:plot,@recipe,@series
+using RecipesBase
 # function designed for Wright Fisher process
 @recipe function plot(world::Array{U},p;what=["x","H"],trait = 1) where U <: Union{Missing,Agent{T}} where T
     # We reduce time interval if it is too big
