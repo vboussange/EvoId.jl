@@ -12,17 +12,25 @@ Pkg.activate("path_to_ABMEv")
 ```
 
 ## Birth and Death mechanisms
+> We are always balanced between taking the integral of the competition and resource kernel as constant, or taking its maximum peak as constant.
+
+:poop:
+## Geotrait
+The geotrait is calculated *a posteriori*, and is not taken into account during the simulation.
+> It used to be but for the sake of simplicity we now forget about it.
 
 ### Mutation
 If anisotropy in mutation, the following parameters should be declared as arrays where each entry corresponds to a dimension.
 - ```mu``` The probability of mutation.
-- ```D``` If mutation happens on the agent, the increment follows a Normal law $`\mathcal{N}_{\mu = 0, \sigma = D}`$
+- ```D``` If mutation happens on the agent, the increment follows $\mathcal{N}_{ 0, D}$
 ### Birth
 #### Growth
-- Resource kernel is defined as 
+- Resource kernel for agent with trait $x$ is defined as 
 ```math
-K(x) = K_0 \exp(-\sum_i^{N(t)} \frac{1}{\sigma_{K)i}^{n_K}}\sum_j^T (x_{i,j} - \mu)^{n_K})
+K_{\mu,\sigma}(x) = K_0 \mathcal{N}_{\mu,\sigma}(x)
 ```
+with $\mu$ and $\sigma$ potentially vectors.
+> We just modified this in ABMEv_Agent.jl so you should check if it works.
 - Dirth coefficient is defined as $`b(x) = K(x)`$
 ### Death
 #### Competition

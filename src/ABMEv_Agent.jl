@@ -95,18 +95,27 @@ end
 Gaussian competition kernel
 """
 function α(a1::Array{Float64},a2::Array{Float64},n_alpha::Float64,sigma_a::Array{Float64})
-        return exp( - sum(sum((a1 .- a2).^n_alpha,dims=2)./ sigma_a[:].^n_alpha))
+        return exp( -.5 sum(sum((a1 .- a2).^n_alpha,dims=2)./ sigma_a[:].^n_alpha))
 end
 
 """
-    function K(x::Array{Float64},K0::Float64,n_K::Float64,sigma_K::Array{Float64};μ::Float64=.0)
+    K(x::Array{Float64},K0::Float64,μ::Array{Float64},sigma_K::Array{Float64})
 Gaussian resource kernel
 """
-function K(x::Array{Float64},K0::Float64,n_K::Float64,sigma_K::Array{Float64};μ::Float64=.0)
-    return K0*exp(-sum(sum((x .- μ).^n_K,dims=2)./sigma_K[:].^n_K))
+function K(x::Array{Float64},K0::Float64,μ::Array{Float64},sigma_K::Array{Float64})
+    # return K0*exp(-sum(sum((x .- μ).^n_K,dims=2)./sigma_K[:].^n_K))
+    return K0 * pdf(MvNormal(μ,sigma_K),x)
+end
+"""
+    K(x::Array{Float64},K0::Float64,sigma_K::Array{Float64})
+Gaussian resource kernel with mean 0.
+"""
+function K(x::Array{Float64},K0::Float64,sigma_K::Array{Float64})
+    # return K0*exp(-sum(sum((x .- μ).^n_K,dims=2)./sigma_K[:].^n_K))
+    return K0 * pdf(MvNormal(sigma_K),x)
 end
 
-KK(x::Array{Float64},K0::Float64,n_K::Float64,sigma_K::Array{Float64},μ1::Float64,μ2::Float64) = K(x,K0,n_K,sigma_K,μ=μ1) + K(x,K0,n_K,sigma_K,μ=μ2)
+KK(x::Array{Float64},K0::Float64,n_K::Float64,sigma_K::Array{Float64},μ1::Float64,μ2::Float64) = K(x,K0/2,μ1,sigma_K) + K(x,K0/2,μ2,sigma_K)
 
 """
     function tin(t::Float64,a::Float64,b::Float64)
