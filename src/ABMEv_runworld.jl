@@ -26,7 +26,7 @@ function  update_rates_std!(world,C,p::Dict,t::Float64)
         # this could be imptrove since \alpha is symmetric, by using a symmetric matrix
         a.d = sum(C[i,:])
         # /!| not ideal to assign at every time step the birth rate that is constant
-        a.b = K(traits[i][:,end])
+        a.b = K(traits[i])
     end
 end
 

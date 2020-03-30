@@ -25,7 +25,7 @@ function update_afterbirth_std!(world,C,idx::Int,p::Dict) where T
     end
     # Now updating new agent
     world[idx].d = sum(C[idx,:])
-    world[idx].b = K(traits[idx][:,end],1.)
+    world[idx].b = K(traits[idx])
 end
 
 function update_afterdeath_std!(world,C,idx::Int,p::Dict) where T
