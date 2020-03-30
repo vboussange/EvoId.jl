@@ -207,8 +207,11 @@ function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
     # we instantiate C as the biggest size it can take
     C = SharedArray{Float64}((N,N))
     update_rates_std!(skipmissing(world0),C,p,0.)
-    while tspan[i]<p["tend"] &&  dt > 0. && count(ismissing,world0) < p["NMax"] && count(ismissing,world0) > 0
+    while tspan[i]<p["tend"] && count(ismissing,world0) < p["NMax"] && count(ismissing,world0) > 0
         # we save every ninit times
+        if dt < 0
+            throw("We obtained negative time step dt = $dt at event $i")
+        end
         if mod(i,ninit) == 1
             @info "saving world @ t = $(tspan[i])/ $(p["tend"])"
             j+=1;sw = size(worldall,2);
