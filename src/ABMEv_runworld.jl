@@ -1,7 +1,7 @@
 # for now we consider that competition is local within an array
 
 """
-    update_rates_std!(world,C,p::Dict,t::Float64)
+    update_rates_std!(world,p::Dict,t::Float64)
 This standard updates takes
     - competition kernels of the form α(x,y) and
     - carrying capacity of the form K(x)
@@ -11,17 +11,18 @@ function  update_rates_std!(world,p::Dict,t::Float64)
     traits = get_x.(world)
     # traits = get_xhist.(world)
     N = length(traits)
-    # C = SharedArray{Float64}((N,N))
+    D = SharedArray{Float64}(N)
     # Here you should do a shared array to compute in parallel
-    for i in 1:(N-1)
+    @sync @distributed for i in 1:(N-1)
         for j in i+1:N
             C = α(traits[i],traits[j])
-            world[i].d += C
-            world[j].d += C
+            D[i] += C
+            D[j] += C
         end
     end
     # Here we can do  it in parallel as well
     for (i,a) in enumerate(world)
+        a.d = D[i]
         a.b = K(traits[i])
     end
 end
@@ -29,7 +30,7 @@ end
 function  update_rates_graph!(world,C,p::Dict,t::Float64)
     for e in edges(p["g"])
         # agents on e
-        aidx_e = findall(a -> get_x(a,1)==[e],world)
+        aidx_e = findall(a -> get_x(a,1)==e,world)
         na = length(aidx_e)
         for i in aidx_e
             world[i].d = na^2
@@ -161,7 +162,6 @@ Wright Fisher process. Returns an array worldall with every agents.
 function runWorld_store_WF(p,world0;init = ([.0],),reflected=false,mode="std")
     worldall = repeat(world0,inner = (1,length(1:Int(p["tend"]))))
     N=length(world0);
-    C = SharedArray{Float64}((N,N));
     newworld = copy.(world0)
     if mode == "std"
         update_rates! = update_rates_std!
@@ -181,7 +181,7 @@ function runWorld_store_WF(p,world0;init = ([.0],),reflected=false,mode="std")
     for i in 1:(Int(p["tend"])-1)
         # we have to take views, otherwise it does not affect worldall
         world = @view worldall[:,i];newworld = @view worldall[:,i+1];
-        updateWorld_WF!(world,newworld ,C,p,update_rates!,Float64(i),reflected)
+        updateWorld_WF!(world,newworld,p,update_rates!,Float64(i),reflected)
     end
     return worldall,collect(0:Int(p["tend"]-1))
 end
@@ -216,7 +216,8 @@ function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
         if mod(i,ninit) == 1
             @info "saving world @ t = $(tspan[i])/ $(p["tend"])"
             j+=1;sw = size(worldall,2);
-            if sw < j
+            # we use <= because we save at the end of the wile loop
+            if sw <= j
                 # we double the size of worldall
                 worldall = hcat(worldall,Array{Missing}(missing,N,sw))
             end
@@ -227,6 +228,9 @@ function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
         push!(tspan, tspan[end] + dt)
         i += 1
     end
-    @info "simulation stopped at t=$(tspan[end])"
+    # Saving laste time step
+    worldall[1:Int(N - count(ismissing,world0)),j] .= copy.(collect(skipmissing(world0)));
+    push!(tspanarray,tspan[i])
+    @info "simulation stopped at t=$(tspanarray[end])"
     return worldall[:,1:j],tspanarray
 end

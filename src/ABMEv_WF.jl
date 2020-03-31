@@ -3,9 +3,9 @@
         function updateWorld_WF!(world,newworld,C,p,update_rates!,t,reflected)
             If reflected=true, we reflect only first trait corresponding to geographic position
     """
-    function updateWorld_WF!(world,newworld,C,p,update_rates!,t,reflected)
+    function updateWorld_WF!(world,newworld,p,update_rates!,t,reflected)
         @debug "updating rates"
-        update_rates!(world,C,p,t);
+        update_rates!(world,p,t);
         # normalise to make sure that we have a probability vector
         fitness = get_fitness.(world)
         # we need to substract the minimum, otherwise fitness can be negative

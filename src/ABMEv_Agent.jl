@@ -9,8 +9,8 @@ end
 
 # Constructors
 
-Agent(xhist::Array) = Agent(reshape(xhist,:,1),0.,1.)
-Agent() = Agent([],0,1)
+Agent(xhist::Array{T}) where T <: Number = Agent{T}(reshape(xhist,:,1),0.,1.)
+Agent() = Agent(Float64[],0.,1.)
 import Base.copy
 copy(a::Agent) = Agent(a.x_history,a.d,a.b)
 copy(m::Missing) = missing
@@ -29,9 +29,9 @@ function new_world_G(nagents::Int,p::Dict; spread = 1., offset = 0.)
 end
 
 # returns trait i of the agent
-get_x(a::Agent,i::Number) = a.x_history[Int(i):Int(i),end]
+get_x(a::Agent,i::Number) = a.x_history[Int(i),end]
 get_x(a::Agent) = a.x_history[:,end]
-get_xhist(a::Agent,i::Number) = a.x_history[Int(i):Int(i),:]
+get_xhist(a::Agent,i::Number) = a.x_history[Int(i),:]
 get_xhist(a::Agent) = a.x_history
 get_geo(a::Agent) = sum(get_xhist(a,1))
 get_d(a::Agent) = a.d
@@ -42,11 +42,11 @@ get_fitness(a::Agent) = a.b - a.d
     get_xarray(world::Array{Agent{T}},trait::Int) where T
 Returns trait of every agents of world in the form of an array
 """
-get_xarray(world::Array{Agent{T}},trait::Int) where T = reshape(hcat(get_x.(world,trait)...),size(world,1),size(world,2))
+get_xarray(world::Array{Agent{T}},trait::Int) where T = reshape(hcat(get_x.(world,trait)),size(world,1),size(world,2))
 
 """
-    function increment_x!(a::Agent{Float64},p::Dict;reflected=false)
-This function increments current position by inc and updates xhist,
+increment_x!(a::Agent{Float64},p::Dict;reflected=false)
+    This function increments current position by inc and updates xhist,
     ONLY FOR CONTINUOUS DOMAINS
 """
 function increment_x!(a::Agent{Float64},p::Dict;reflected=false)
@@ -70,13 +70,15 @@ function increment_x!(a::Agent{Float64},p::Dict;reflected=false)
  """
  function increment_x!(a::Agent{Int64},p::Dict;reflected=false)
      # we have to add 1 otherwise it stays on the same edge
-     inc = randomwalk(p["g"],get_x(a,1)[1],Int(p["D"][1]) + 1)
+     inc = randomwalk(p["g"],get_x(a,1),Int(p["D"][1]) + 1)
      # the last coef of inc corresponds to last edge reached
      a.x_history = hcat(a.x_history, reshape(inc[end:end],:,1));
   end
 
 
 """
+get_inc_reflected(x::Float64,inc::Float64,s=-1,e=1)
+
     Here we increment the trajectory of trait 1 such that it follows a reflected brownian motion (1D)
     Careful though, we do not implement reflections
 """

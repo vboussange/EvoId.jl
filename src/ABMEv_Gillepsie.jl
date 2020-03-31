@@ -19,7 +19,7 @@ function update_afterbirth_std!(world,idx_offspring,p::Dict) where T
         a.d += α(get_x(a),x_offspring)
     end
     # Now updating new agent
-    world[idx_offspring].d = sum(α.(get_x.(skipmissing(world)),Ref(x_offspring)))
+    world[idx_offspring].d = sum(α.(get_x.(skipmissing(world)),Ref(x_offspring))) - α(x_offspring,x_offspring)
     world[idx_offspring].b = K(x_offspring)
 end
 
@@ -35,6 +35,8 @@ end
     function updateWorld_G!(world,C,tspan,p)
 Updating rule for gillepsie setting.
 Returning dt drawn from an exponential distribution with parameter the total rates of events.
+ # Args
+ tspan is for now not used but might be used for dynamic landscape
 """
 function updateWorld_G!(world,p,update_rates!,tspan,reflected)
     # total update world
