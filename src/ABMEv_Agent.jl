@@ -52,12 +52,13 @@ This function increments current position by inc and updates xhist,
 function increment_x!(a::Agent{Float64},p::Dict;reflected=false)
     tdim = length(p["D"])
     if reflected
-        inc = [get_inc_reflected(get_x(a)[1],p["D"][1] *randn())]
+        inc = [get_inc_reflected(get_x(a,1),p["D"][1] *randn())]
         if  tdim > 1
-            inc = vcat(inc,rand.(Binomial.(1,p["mu"][2:end])) .* p["D"][2:end] .* randn(tdim-1))
+            inc = vcat(inc,(rand(tdim-1) < p["mu"][2:end]) .* p["D"][2:end] .* randn(tdim-1))
         end
     else
-        inc = rand.(Binomial.(1,p["mu"][:])) .* p["D"][:] .* randn(length(tdim))
+        # inc = yes no mutation * mutation
+        inc = (rand(tdim) < vec(p["mu"])) .* vec(p["D"][:]) .* randn(tdim)
     end
     a.x_history = hcat(a.x_history, get_x(a) + reshape(inc,:,1));
  end

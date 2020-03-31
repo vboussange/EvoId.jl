@@ -8,11 +8,11 @@ K(X) = gaussian(X[1],0.,sigma_K)
 p_default = Dict(
         "alpha" => α,
         "K" => K,
-        "D" => [1e-2], # we let mutation constant and =1e-3
-        "mu" => [.1], # we consider there is a probability of 1 to have mutation
-        "tend" => 150.,
+        "D" => [1e-2],
+        "mu" => [.1],
+        "tend" => 1000.,
         "NMax" => Int(10000))
-na_init = 150
+na_init = 200
 world0 = new_world_G(na_init,p_default,spread = .01, offset = -.25)
 @time worldall,p_default["tspan"] = runWorld_store_G(p_default,world0)
 # ======================================================================
