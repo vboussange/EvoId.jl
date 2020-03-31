@@ -55,3 +55,27 @@ import ABMEv:update_rates_std!,updateWorld_G!
 @btime updateWorld_G!(world0,p_default,update_rates_std!,tspan,true)
 @btime update_afterbirth_std!(skipmissing(world0),1,p_default)
 @btime update_afterdeath_std!(skipmissing(world0),[].8],p_default)
+
+## parallelisation Gillepsie
+# For now Gillepsie can not really be parallelised
+using Distributed;addprocs(exeflags="--project")
+@everywhere begin
+        using ABMEv
+        sigma_a = 1.251;
+        K0 = 1000;
+        K(X) = 1 - 0.125 * sum(X.^2)
+        α(X,Y) = gaussian(X[1],Y[1],sigma_a)/K0
+end
+p = Dict(
+        "alpha" => α,
+        "K" => K,
+        "D" => [1e-2],
+        "mu" => [.1],
+        "tend" => 10.,
+        "NMax" => Int(10000))
+na_init = K0
+world0 = new_world_G(na_init,p,spread = .01, offset = -.25)
+tspan=zeros(1)
+# using BenchmarkTools
+# update_afterbirth_std!(skipmissing(world0),1,p)
+# @btime update_afterdeath_std!(skipmissing(world0),[.8],p_default)

@@ -1,5 +1,11 @@
+cd(@__DIR__)
+using Random;Random.seed!(0)
+using JLD2
+
 using Revise,ABMEv,Test
 import ABMEv:update_rates_std!
+
+
 a = 0;
 sigma_K = .9;
 sigma_a = .7;
@@ -17,24 +23,25 @@ p_default = Dict(
 na_init = K0
 world0 = new_world_G(na_init,p_default,spread = .01)
 worldall,p_default["tspan"] = runWorld_store_G(p_default,world0)
-world_alive = collect(skipmissing(world0))
+world_alive_test = collect(skipmissing(worldall[:,end]))
+# @save "gillepsie_test.jld2" world_alive
+@load "gillepsie_test.jld2" world_alive
+## Testing
 @testset "testing global functioning" begin
         @test size(worldall,2) > 1
         @test p_default["tspan"][end] >= p_default["tend"]
 end
+## Comparing simulation
+xarray = get_xarray(world_alive,1);xarray_test = get_xarray(world_alive_test,1);
+@test xarray ≈ xarray_test
 
 @testset "testing update rates matrix" begin
         bs_end = get_b.(world_alive);ds_end = get_d.(world_alive)
         update_rates_std!(world_alive,p_default,0.);
         bs_recalculated = get_b.(world_alive);ds_recalculated = get_d.(world_alive);
-                @testset "birth coefficient" begin
-                        for i in 1:length(bs_end)
-                        @test bs_end[i] ≈ bs_recalculated[i];
-                end
-                end
-                @testset "death coefficient" begin
-                        for i in 1:length(bs_end)
-                        @test ds_end[i] ≈ ds_recalculated[i];
-                end
-                end
+
+        @test bs_end ≈ bs_recalculated;
+
+        @test ds_end ≈ ds_recalculated;
+
 end
