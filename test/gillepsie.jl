@@ -1,8 +1,5 @@
 cd(@__DIR__)
-using Random;Random.seed!(0)
-using JLD2
-
-using Revise,ABMEv,Test
+Random.seed!(0)
 import ABMEv:update_rates_std!
 
 
@@ -27,21 +24,23 @@ world_alive_test = collect(skipmissing(worldall[:,end]))
 # @save "gillepsie_test.jld2" world_alive
 @load "gillepsie_test.jld2" world_alive
 ## Testing
-@testset "testing global functioning" begin
-        @test size(worldall,2) > 1
-        @test p_default["tspan"][end] >= p_default["tend"]
-end
-## Comparing simulation
-xarray = get_xarray(world_alive,1);xarray_test = get_xarray(world_alive_test,1);
-@test xarray ≈ xarray_test
+@testset "Gillepsie Algorithm" begin
+        @testset "Testing global functioning" begin
+                @test size(worldall,2) > 1
+                @test p_default["tspan"][end] >= p_default["tend"]
+        end
+        ## Comparing simulation
+        xarray = get_xarray(world_alive,1);xarray_test = get_xarray(world_alive_test,1);
+        @test xarray ≈ xarray_test
 
-@testset "testing update rates matrix" begin
-        bs_end = get_b.(world_alive);ds_end = get_d.(world_alive)
-        update_rates_std!(world_alive,p_default,0.);
-        bs_recalculated = get_b.(world_alive);ds_recalculated = get_d.(world_alive);
+        @testset "Testing update rates matrix" begin
+                bs_end = get_b.(world_alive);ds_end = get_d.(world_alive)
+                update_rates_std!(world_alive,p_default,0.);
+                bs_recalculated = get_b.(world_alive);ds_recalculated = get_d.(world_alive);
 
-        @test bs_end ≈ bs_recalculated;
+                @test bs_end ≈ bs_recalculated;
 
-        @test ds_end ≈ ds_recalculated;
+                @test ds_end ≈ ds_recalculated;
 
+        end
 end

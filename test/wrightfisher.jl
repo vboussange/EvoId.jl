@@ -1,7 +1,5 @@
 using Random;Random.seed!(0)
-using Test
 cd(@__DIR__)
-using Revise,ABMEv
 
 ## 1D Simulation
 a = 0;
@@ -23,9 +21,9 @@ agents = [Agent( [1e-2]  .* randn(1) .- .5) for i in 1:K0]
 @time worldall_test,p["tspan"] = runWorld_store_WF(p,agents,reflected=false);
 
 ## load to  compare simulation
-using JLD2
 # @save "wrightfisher_test.jld2" worldall p
 @load "wrightfisher_test.jld2" worldall
 xarray = get_xarray(worldall,1); xarray_test = get_xarray(worldall_test,1)
-
-@test xarray ≈ xarray_test
+@testset "Wright Fisher Algorithm" begin
+        @test xarray ≈ xarray_test
+end

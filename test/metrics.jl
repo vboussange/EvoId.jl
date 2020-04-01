@@ -1,10 +1,8 @@
-using ABMEv,Revise,Test
 
 K0 = 1000; σ = 1e-1
 agents1 = [Agent( [σ]  .* randn(1) .- .5) for i in 1:K0]
 agents2 = [Agent( [σ σ]  .* randn(2) .- .5) for i in 1:K0]
 
-world
 ## testing variance
 @testset "Testing metrics" begin
     @test first(var(agents1)) ≈ (σ).^2 atol=0.001
@@ -19,7 +17,7 @@ world
      end
 
      # not sure this is the bestway of testing
-     # there is a problem here but we do not know hor to
+     # there is a problem here
      @testset "covgeo2d" begin
          cmat = covgeo(agents2,2);
          smat = [σ^2 σ^2; σ^2 σ^2]
