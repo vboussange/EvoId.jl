@@ -1,31 +1,28 @@
 # for now we consider that competition is local within an array
 
 """
-    update_rates_std!(world,C,p::Dict,t::Float64)
+    update_rates_std!(world,p::Dict,t::Float64)
 This standard updates takes
     - competition kernels of the form α(x,y) and
     - carrying capacity of the form K(x)
 """
-function  update_rates_std!(world,C,p::Dict,t::Float64)
+function  update_rates_std!(world,p::Dict,t::Float64)
     α = p["alpha"];K=p["K"];
-    # Competition matrix
     traits = get_x.(world)
     # traits = get_xhist.(world)
     N = length(traits)
-    # C = SharedArray{Float64}((N,N))
+    D = SharedArray{Float64}(N)
     # Here you should do a shared array to compute in parallel
     @sync @distributed for i in 1:(N-1)
         for j in i+1:N
-            C[i,j] = α(traits[i],traits[j])
-            C[j,i] = C[i,j]
+            C = α(traits[i],traits[j])
+            D[i] += C
+            D[j] += C
         end
     end
     # Here we can do  it in parallel as well
     for (i,a) in enumerate(world)
-        # we only update death rate
-        # this could be imptrove since \alpha is symmetric, by using a symmetric matrix
-        a.d = sum(C[i,:])
-        # /!| not ideal to assign at every time step the birth rate that is constant
+        a.d = D[i]
         a.b = K(traits[i])
     end
 end
@@ -33,7 +30,7 @@ end
 function  update_rates_graph!(world,C,p::Dict,t::Float64)
     for e in edges(p["g"])
         # agents on e
-        aidx_e = findall(a -> get_x(a,1)==[e],world)
+        aidx_e = findall(a -> get_x(a,1)==e,world)
         na = length(aidx_e)
         for i in aidx_e
             world[i].d = na^2
@@ -165,7 +162,6 @@ Wright Fisher process. Returns an array worldall with every agents.
 function runWorld_store_WF(p,world0;init = ([.0],),reflected=false,mode="std")
     worldall = repeat(world0,inner = (1,length(1:Int(p["tend"]))))
     N=length(world0);
-    C = SharedArray{Float64}((N,N));
     newworld = copy.(world0)
     if mode == "std"
         update_rates! = update_rates_std!
@@ -185,7 +181,7 @@ function runWorld_store_WF(p,world0;init = ([.0],),reflected=false,mode="std")
     for i in 1:(Int(p["tend"])-1)
         # we have to take views, otherwise it does not affect worldall
         world = @view worldall[:,i];newworld = @view worldall[:,i+1];
-        updateWorld_WF!(world,newworld ,C,p,update_rates!,Float64(i),reflected)
+        updateWorld_WF!(world,newworld,p,update_rates!,Float64(i),reflected)
     end
     return worldall,collect(0:Int(p["tend"]-1))
 end
@@ -205,9 +201,23 @@ function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
     # length of worldall should be changed at some point
     worldall = reshape(copy.(world0),N,1)
     # we instantiate C as the biggest size it can take
+<<<<<<< HEAD
     C = SharedArray{Float64}((N,N))
     update_rates_std!(skipmissing(world0),C,p,0.)
     while tspan[i]<p["tend"] && count(ismissing,world0) < p["NMax"] && count(ismissing,world0) > 0
+=======
+    update_rates_std!(skipmissing(world0),p,0.)
+    while tspan[i]<p["tend"]
+        if dt < 0
+            throw("We obtained negative time step dt = $dt at event $i")
+        elseif count(ismissing,world0) == p["NMax"]
+            @info "All individuals have died :("
+            break
+        elseif count(ismissing,world0) == 0
+            @info "We have reached the maximum number of individuals allowed"
+            break
+        end
+>>>>>>> origin/no_C_matrix
         # we save every ninit times
         if dt < 0
             throw("We obtained negative time step dt = $dt at event $i")
@@ -215,16 +225,21 @@ function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
         if mod(i,ninit) == 1
             @info "saving world @ t = $(tspan[i])/ $(p["tend"])"
             j+=1;sw = size(worldall,2);
-            if sw < j
+            # we use <= because we save at the end of the wile loop
+            if sw <= j
                 # we double the size of worldall
                 worldall = hcat(worldall,Array{Missing}(missing,N,sw))
             end
             worldall[1:Int(N - count(ismissing,world0)),j] .= copy.(collect(skipmissing(world0)));
             push!(tspanarray,tspan[i])
         end
-        dt = updateWorld_G!(world0,C,p,update_rates_std!,tspan,reflected)
+        dt = updateWorld_G!(world0,p,update_rates_std!,tspan,reflected)
         push!(tspan, tspan[end] + dt)
         i += 1
     end
+    # Saving laste time step
+    worldall[1:Int(N - count(ismissing,world0)),j] .= copy.(collect(skipmissing(world0)));
+    push!(tspanarray,tspan[i])
+    @info "simulation stopped at t=$(tspanarray[end])"
     return worldall[:,1:j],tspanarray
 end

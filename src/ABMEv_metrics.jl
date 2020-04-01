@@ -50,7 +50,7 @@ If trait > 0, returns the covariance matrix, with first row geotrait and second 
 # Arguments
 
 """
-function var(world::Array{Agent};trait=1)
+function var(world::Array{Agent{T}};trait=1) where T
     xarray = get_xarray(world,trait)
     return var(xarray,dims=1)
 end
@@ -65,7 +65,7 @@ If trait > 0, returns the covariance matrix, with first row geotrait and second 
 function covgeo(world::Array{Agent{T},1},trait = 0) where T
     xarray = get_geo.(world)
     if trait > 0
-        xstd = reshape(hcat(get_x.(world,trait)...),size(world,1),size(world,2))
+        xstd = reshape(get_x.(world,trait),size(world,1),size(world,2))
         xarray = hcat(xarray,xstd)
     end
     return cov(xarray)
