@@ -1,6 +1,12 @@
 # ABMEv.jl Documentation
 This is a suite for simulating an Agent Based Model that captures the evolutionary dynamics of a population in a multidimensional space.
 
+## Installation
+```julia
+using Pkg;
+Pkg.add("https://gitlab.ethz.ch/bvictor/abmev.git")
+```
+This will download latest version from git repo and download all dependencies.
 ## Getting started
 ```julia
 using ABMEv
