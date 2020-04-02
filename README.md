@@ -16,6 +16,34 @@ Pkg.add("ABMEv#no_C_matrix")
 ```julia
 using ABMEv
 ```
+
+## Parameters of the simulation
+Parameters are stored in the parameter dictionary `p`
+### General parameters
+- ```reflected=>true``` if ```true``` then reflection occurs on the first trait -which should stand for geographic position- in the domain $` [-1,1] `$
+- ```"alpha" => α``` is the competition function
+-```"K" => K``` is the birth rate
+- ```"tend" => 1.5``` is the time to end simulation
+
+:warning: Check how to define functions α and K in the algorithm section.
+### Mutation
+If anisotropy in mutation, the following parameters should be declared as arrays where each entry corresponds to a dimension.
+- ```mu``` The probability of mutation.
+- ```D``` If mutation happens on the agent, the increment follows $`\mathcal{N}_{ 0, D}`$
+### Birth
+#### Growth
+- ```K``` is the birth coefficient ( $`b(x) = K(x)`$ )
+### Death
+#### Competition
+- Competition between agent with trait ```x``` and ```y``` is defined as
+```α(x,y)```
+- Death coefficient is defined as $`d(x^{(i)}) = \sum_j^{N(t)} \alpha(x^{(i)},x^{(j)})`$
+### Fitness
+Fitness is defined internally as ```b - d```.
+> TODO ```b``` here is confounded with ```K```.
+
+
+## Launching simulation
 Two type of simulation algorithm can be used
 
 ### Gillepsie algorithm
@@ -79,7 +107,7 @@ You can run your script in parallel, which makes sense for large populations. To
 using Distributed;addprocs()
 @everywhere using ABMEv
 ```
-
+Parallelism only works with Wright Fisher model.
 ## Properties of agents
 You can access properties of the agent using the following functions
 - `get_xarray(world::Array{Agent{T}},trait::Int) where T`
@@ -123,38 +151,6 @@ using Pkg
 Pkg.dev("path_to_ABMEv_dir")
 ```
 You can also do the same trick with directly the gitlab address, cf [https://docs.julialang.org/en/v1/stdlib/Pkg/index.html](Pkg.jl)
-
-## How does it implement mechanisms ?
-
-### Mutation
-If anisotropy in mutation, the following parameters should be declared as arrays where each entry corresponds to a dimension.
-- ```mu``` The probability of mutation.
-- ```D``` If mutation happens on the agent, the increment follows $\mathcal{N}_{ 0, D}$
-### Birth
-#### Growth
-- Resource kernel for agent with trait $x$ is defined as 
-```math
-K_{\mu,\sigma}(x) = K_0 \mathcal{N}_{\mu,\sigma}(x)
-```
-with $\mu$ and $\sigma$ potentially vectors.
-> We just modified this in ABMEv_Agent.jl so you should check if it works.
-- Dirth coefficient is defined as $`b(x) = K(x)`$
-### Death
-#### Competition
-- Competition between agent with trait ```x``` and ```y``` is defined as
-```math 
-\alpha(x,y) = \exp(-\sum_i^{N(t)} \frac{1}{\sigma_{\alpha_i}^{n_\alpha}}\sum_j^T (x_{i,j} - y_{i,j})^{n_\alpha})
-```
-- Death coefficient is defined as $`d(x^{(i)}) = \sum_j^{N(t)} \alpha(x^{(i)},x^{(j)})`$
-> We are not sure if the sum includes $`x^{(i)}`$ or not.
-### Fitness
-Fitness is defined as ```b - d```.
-
-## Parameter description
-- ```K0``` Carrying capacity
-- ```a``` only used for mode ```grad2D``` where growth rate is set such as $`\mu = a x_1`$
-> We are not sure if this is OK or not? Check it 
-[Grad2D kernel explained](https://gitlab.ethz.ch/bvictor/abmev/-/wikis/Grad2D)
 
 ## References
 - [Champagnat and Ferriere founding article](https://linkinghub.elsevier.com/retrieve/pii/S0040580905001632)
