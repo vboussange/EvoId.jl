@@ -77,7 +77,6 @@ You have several options available concerning the resource implemented and compe
 You can run your script in parallel, which makes sense for large populations. To do so:
 ```julia
 using Distributed;addprocs()
-@everywhere push!(LOAD_PATH,homedir()*"path_to_ABMEv")
 @everywhere using ABMEv
 ```
 
