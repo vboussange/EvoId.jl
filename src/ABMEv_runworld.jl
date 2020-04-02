@@ -194,12 +194,14 @@ If specified p["dt_saving"] determines the time step to save the simulation. If 
 function runWorld_store_G(p,world0)
     # we store the value of world every 100 changes by default
     tspan = zeros(1)
-    i = 1;j=0;dt = 1.
+    i = 1;j=1;dt = 1.
     N=length(world0);
     tspanarray = zeros(1);
     dt_saving = haskey(p,"dt_saving") ? p["dt_saving"] : p["tend"] + 1.
     # Array that stores the agents
-    worldall = reshape(copy.(world0),N,1)
+    worldall = reshape(copy.(world0),N,1);
+    # We add a second row for final time step
+    worldall = hcat(worldall,Array{Missing}(missing,N,1))
     # we instantiate C as the biggest size it can take
     update_rates_std!(skipmissing(world0),p,0.)
     while tspan[i]<p["tend"]
@@ -227,7 +229,8 @@ function runWorld_store_G(p,world0)
         push!(tspan, tspan[end] + dt)
         i += 1
     end
-    # Saving laste time step
+    # Saving last time step
+    j+=1
     worldall[1:Int(N - count(ismissing,world0)),j] .= copy.(collect(skipmissing(world0)));
     push!(tspanarray,tspan[i])
     @info "simulation stopped at t=$(tspanarray[end])"
