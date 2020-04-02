@@ -1,9 +1,9 @@
 # In this file lie the function for WF algorithm
     """
-        function updateWorld_WF!(world,newworld,C,p,update_rates!,t,reflected)
-            If reflected=true, we reflect only first trait corresponding to geographic position
+        function updateWorld_WF!(world,newworld,C,p,update_rates!,t)
+            If p["reflected"]=true, we reflect only first trait corresponding to geographic position
     """
-    function updateWorld_WF!(world,newworld,p,update_rates!,t,reflected)
+    function updateWorld_WF!(world,newworld,p,update_rates!,t)
         @debug "updating rates"
         update_rates!(world,p,t);
         # normalise to make sure that we have a probability vector
@@ -21,6 +21,6 @@
         # we introduce randomness here
         @debug "incrementing offsprings traits"
         for w in newworld
-            increment_x!(w,p,reflected=reflected)
+            increment_x!(w,p)
         end
     end

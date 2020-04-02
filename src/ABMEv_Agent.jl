@@ -45,12 +45,13 @@ Returns trait of every agents of world in the form of an array
 get_xarray(world::Array{Agent{T}},trait::Int) where T = reshape(hcat(get_x.(world,trait)),size(world,1),size(world,2))
 
 """
-increment_x!(a::Agent{Float64},p::Dict;reflected=false)
+increment_x!(a::Agent{Float64},p::Dict)
     This function increments current position by inc and updates xhist,
     ONLY FOR CONTINUOUS DOMAINS
 """
-function increment_x!(a::Agent{Float64},p::Dict;reflected=false)
+function increment_x!(a::Agent{Float64},p::Dict)
     tdim = length(p["D"])
+    reflected = haskey(p,"reflected") ? p["reflected"] : false
     if reflected
         inc = [get_inc_reflected(get_x(a,1),p["D"][1] *randn())]
         if  tdim > 1
@@ -68,7 +69,7 @@ function increment_x!(a::Agent{Float64},p::Dict;reflected=false)
  This function increments current position by inc and updates xhist,
      ONLY FOR GRAPH TYPE DOMAINS
  """
- function increment_x!(a::Agent{Int64},p::Dict;reflected=false)
+ function increment_x!(a::Agent{Int64},p::Dict)
      # we have to add 1 otherwise it stays on the same edge
      inc = randomwalk(p["g"],get_x(a,1),Int(p["D"][1]) + 1)
      # the last coef of inc corresponds to last edge reached

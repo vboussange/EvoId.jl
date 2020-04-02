@@ -156,10 +156,10 @@ function  update_rates_std_split!(world,C,p::Dict,t::Float64)
     end
 end
 """
-    function runWorld_store_WF(p,world0;init = ([.0],),reflected=false,mode="std")
+    function runWorld_store_WF(p,world0;mode="std")
 Wright Fisher process. Returns an array worldall with every agents.
 """
-function runWorld_store_WF(p,world0;init = ([.0],),reflected=false,mode="std")
+function runWorld_store_WF(p,world0;mode="std")
     worldall = repeat(world0,inner = (1,length(1:Int(p["tend"]))))
     N=length(world0);
     newworld = copy.(world0)
@@ -181,24 +181,24 @@ function runWorld_store_WF(p,world0;init = ([.0],),reflected=false,mode="std")
     for i in 1:(Int(p["tend"])-1)
         # we have to take views, otherwise it does not affect worldall
         world = @view worldall[:,i];newworld = @view worldall[:,i+1];
-        updateWorld_WF!(world,newworld,p,update_rates!,Float64(i),reflected)
+        updateWorld_WF!(world,newworld,p,update_rates!,Float64(i))
     end
     return worldall,collect(0:Int(p["tend"]-1))
 end
 """
-    function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
+    function runWorld_store_G(p,world0)
 Gillepsie process. Returns a tuple worldall,tspanarray
+If specified p["dt_saving"] determines the time step to save the simulation. If not only last time step is saved
+
 """
-function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
+function runWorld_store_G(p,world0)
     # we store the value of world every 100 changes by default
     tspan = zeros(1)
     i = 1;j=0;dt = 1.
     N=length(world0);
-    tspanarray = [];
-    ninit = Int(length(world0) - count(ismissing,world0))
-    # Array that stores the agents.
-    # We decide that we store agents ninit events where ninit is the initial population
-    # length of worldall should be changed at some point
+    tspanarray = zeros(1);
+    dt_saving = haskey(p,"dt_saving") ? p["dt_saving"] : p["tend"] + 1.
+    # Array that stores the agents
     worldall = reshape(copy.(world0),N,1)
     # we instantiate C as the biggest size it can take
     update_rates_std!(skipmissing(world0),p,0.)
@@ -212,8 +212,7 @@ function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
             @info "We have reached the maximum number of individuals allowed"
             break
         end
-        # we save every ninit times
-        if mod(i,ninit) == 1
+        if  tspan[end] - tspanarray[end] >= dt_saving
             @info "saving world @ t = $(tspan[i])/ $(p["tend"])"
             j+=1;sw = size(worldall,2);
             # we use <= because we save at the end of the wile loop
@@ -224,7 +223,7 @@ function runWorld_store_G(p,world0;init = ([.0],),reflected=false)
             worldall[1:Int(N - count(ismissing,world0)),j] .= copy.(collect(skipmissing(world0)));
             push!(tspanarray,tspan[i])
         end
-        dt = updateWorld_G!(world0,p,update_rates_std!,tspan,reflected)
+        dt = updateWorld_G!(world0,p,update_rates_std!,tspan)
         push!(tspan, tspan[end] + dt)
         i += 1
     end

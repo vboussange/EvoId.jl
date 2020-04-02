@@ -5,9 +5,9 @@
     give_birth(a::Agent,p)
 Used for Gillepsie setting
 """
-function give_birth(a::Agent,p::Dict,reflected)
+function give_birth(a::Agent,p::Dict)
     new_a = copy(a)
-    increment_x!(new_a,p,reflected=reflected)
+    increment_x!(new_a,p)
     return new_a
 end
 
@@ -32,13 +32,13 @@ function update_afterdeath_std!(world,x_death,p::Dict) where T
 end
 
 """
-    function updateWorld_G!(world,C,tspan,p)
+    function updateWorld_G!(world,tspan,p)
 Updating rule for gillepsie setting.
 Returning dt drawn from an exponential distribution with parameter the total rates of events.
  # Args
  tspan is for now not used but might be used for dynamic landscape
 """
-function updateWorld_G!(world,p,update_rates!,tspan,reflected)
+function updateWorld_G!(world,p,update_rates!,tspan)
     # total update world
     world_alive = skipmissing(world)
     idx_world = collect(eachindex(world_alive))
@@ -62,7 +62,7 @@ function updateWorld_G!(world,p,update_rates!,tspan,reflected)
             idx_offspring = findfirst(ismissing,world)
             # i_event - N is also the index of the individual to give birth in the world_alive
             mum = world[idx_world[i_event-N]]
-            world[idx_offspring] = give_birth(mum,p,reflected)
+            world[idx_offspring] = give_birth(mum,p)
             update_afterbirth_std!(world,idx_offspring,p)
         end
         return dt
