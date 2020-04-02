@@ -16,49 +16,7 @@ Pkg.add("ABMEv#no_C_matrix")
 ```julia
 using ABMEv
 ```
-To develop, you can add the dependencies in the project by doing
-```julia
-using Pkg
-Pkg.activate("path_to_ABMEv")
-```
 
-## Birth and Death mechanisms
-> We are always balanced between taking the integral of the competition and resource kernel as constant, or taking its maximum peak as constant.
-
-:poop:
-## Geotrait
-The geotrait is calculated *a posteriori*, and is not taken into account during the simulation.
-> It used to be but for the sake of simplicity we now forget about it.
-
-### Mutation
-If anisotropy in mutation, the following parameters should be declared as arrays where each entry corresponds to a dimension.
-- ```mu``` The probability of mutation.
-- ```D``` If mutation happens on the agent, the increment follows $\mathcal{N}_{ 0, D}$
-### Birth
-#### Growth
-- Resource kernel for agent with trait $x$ is defined as 
-```math
-K_{\mu,\sigma}(x) = K_0 \mathcal{N}_{\mu,\sigma}(x)
-```
-with $\mu$ and $\sigma$ potentially vectors.
-> We just modified this in ABMEv_Agent.jl so you should check if it works.
-- Dirth coefficient is defined as $`b(x) = K(x)`$
-### Death
-#### Competition
-- Competition between agent with trait ```x``` and ```y``` is defined as
-```math 
-\alpha(x,y) = \exp(-\sum_i^{N(t)} \frac{1}{\sigma_{\alpha_i}^{n_\alpha}}\sum_j^T (x_{i,j} - y_{i,j})^{n_\alpha})
-```
-- Death coefficient is defined as $`d(x^{(i)}) = \sum_j^{N(t)} \alpha(x^{(i)},x^{(j)})`$
-> We are not sure if the sum includes $`x^{(i)}`$ or not.
-### Fitness
-Fitness is defined as ```b - d```.
-
-## Parameter description
-- ```K0``` Carrying capacity
-- ```a``` only used for mode ```grad2D``` where growth rate is set such as $`\mu = a x_1`$
-> We are not sure if this is OK or not? Check it 
-[Grad2D kernel explained](https://gitlab.ethz.ch/bvictor/abmev/-/wikis/Grad2D)
 ### Gillepsie algorithm
 
 ```julia
@@ -104,6 +62,35 @@ You have several options available concerning the resource implemented and compe
 - ``` mode="split"``` corresponds to a scenario where the resource is splitted in two
 - ``` mode="graph"``` this guy is probably not working
 
+### Mutation
+If anisotropy in mutation, the following parameters should be declared as arrays where each entry corresponds to a dimension.
+- ```mu``` The probability of mutation.
+- ```D``` If mutation happens on the agent, the increment follows $\mathcal{N}_{ 0, D}$
+### Birth
+#### Growth
+- Resource kernel for agent with trait $x$ is defined as 
+```math
+K_{\mu,\sigma}(x) = K_0 \mathcal{N}_{\mu,\sigma}(x)
+```
+with $\mu$ and $\sigma$ potentially vectors.
+> We just modified this in ABMEv_Agent.jl so you should check if it works.
+- Dirth coefficient is defined as $`b(x) = K(x)`$
+### Death
+#### Competition
+- Competition between agent with trait ```x``` and ```y``` is defined as
+```math 
+\alpha(x,y) = \exp(-\sum_i^{N(t)} \frac{1}{\sigma_{\alpha_i}^{n_\alpha}}\sum_j^T (x_{i,j} - y_{i,j})^{n_\alpha})
+```
+- Death coefficient is defined as $`d(x^{(i)}) = \sum_j^{N(t)} \alpha(x^{(i)},x^{(j)})`$
+> We are not sure if the sum includes $`x^{(i)}`$ or not.
+### Fitness
+Fitness is defined as ```b - d```.
+
+## Parameter description
+- ```K0``` Carrying capacity
+- ```a``` only used for mode ```grad2D``` where growth rate is set such as $`\mu = a x_1`$
+> We are not sure if this is OK or not? Check it 
+[Grad2D kernel explained](https://gitlab.ethz.ch/bvictor/abmev/-/wikis/Grad2D)
 
 ### Parallelism
 You can run your script in parallel, which makes sense for large populations. To do so:
@@ -147,6 +134,16 @@ You can specify what you want to plot in the array ```what```:
 - ```3d``` plots a 3d diagram with first and second component as x and y axis
 - ```var``` plots the variance of the  component specified by ```trait=2```
 - ```vargeo``` plots the variance of the geotrait
+
+## Developping the code
+I recommend to first clone your branch in the directory you like best, and then to 
+To develop, you ca
+```julia
+using Pkg
+Pkg.dev("path_to_ABMEv_dir")
+```
+You can also do the same trick with directly the gitlab address, cf [https://docs.julialang.org/en/v1/stdlib/Pkg/index.html](Pkg.jl)
+
 ## References
 - [Champagnat and Ferriere founding article](https://linkinghub.elsevier.com/retrieve/pii/S0040580905001632)
 - [Champagnat and Ferriere second article - 2008](https://www.tandfonline.com/doi/full/10.1080/15326340802437710)
