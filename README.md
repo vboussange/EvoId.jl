@@ -150,7 +150,7 @@ To develop, you ca
 using Pkg
 Pkg.dev("path_to_ABMEv_dir")
 ```
-You can also do the same trick with directly the gitlab address, cf [https://docs.julialang.org/en/v1/stdlib/Pkg/index.html](Pkg.jl)
+You can also do the same trick with directly the gitlab address, cf [Pkg.jl](https://docs.julialang.org/en/v1/stdlib/Pkg/index.html)
 
 ## References
 - [Champagnat and Ferriere founding article](https://linkinghub.elsevier.com/retrieve/pii/S0040580905001632)
