@@ -18,7 +18,7 @@ p = Dict(
         "tend" => 10.)
 na_init = K0
 agents = [Agent( [1e-2]  .* randn(1) .- .5) for i in 1:K0]
-@time worldall_test,p["tspan"] = runWorld_store_WF(p,agents);
+worldall_test,p["tspan"] = runWorld_store_WF(p,agents);
 
 ## load to  compare simulation
 # @save "wrightfisher_test.jld2" worldall p
