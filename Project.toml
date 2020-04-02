@@ -1,7 +1,7 @@
 name = "ABMEv"
 uuid = "837ac870-fb52-4b0c-9a0e-030f2f36f5ed"
 authors = ["Victor Boussange "]
-version = "0.1.2"
+version = "0.1.3"
 
 [deps]
 Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
