@@ -16,43 +16,53 @@ Pkg.add("ABMEv#no_C_matrix")
 ```julia
 using ABMEv
 ```
+Two type of simulation algorithm can be used
 
 ### Gillepsie algorithm
 
 ```julia
-p_default = Dict("K0" => 1000.,
-        "D" => [1e-2 - 1e-3],
-        "mu" => [1. .1],
-        "sigma_a" => [5e-1; 7e-1],
-        "sigma_K" => [9e-1; 9e-1],
-        "n_alpha" => 2.,
-        "n_K" => 2.,
-        "tend" => 150.,
-        "NMax" => Int(2e3))
-na_init = 500
+a = 0;
+sigma_K = .9;
+sigma_a = .7;
+K0 = 1000;
+K(X) = gaussian(X[1],0.,sigma_K)
+α(X,Y) = gaussian(X[1],Y[1],sigma_a)/K0
+p_default = Dict(
+        "alpha" => α,
+        "K" => K,
+        "D" => [1e-2],
+        "mu" => [.1],
+        "tend" => 1.5,
+        "NMax" => Int(10000))
+na_init = K0
 world0 = new_world_G(na_init,p_default,spread = [.01 .01], offset = [-.5 -.5])
 worldall,p_default["tspan"] = runWorld_store_G(p_default,world0)
 ```
 As of now, no mode is implemented.
+#### Specific parameters
+
+- ```dt_saving = 10.```
+will allow to save the world every 10. time steps. If not specified, the algorithm will return first and last time step world.
+- ```NMax``` Maximum number of individuals that can be attained. If attained, then the programm stops.
 
 ### Wright Fisher algorithm
-#### Specific parameters
-- ```NMax``` Maximum number of individuals that can be attained. If attained, then the programm stops.
 ```julia
-p_default = Dict("K0" => 2000.,
-        "D" => [2e-2], # this is the dispersion coefficient, that should be taken as constant
-        "mu" => [1.],
-        "sigma_a" => [2e0],
-        "sigma_K" => [1e0],
-        "a" => .95,
-        "n_alpha" => 2.,
-        "n_K" => 2.,
-        "tend" => 10.,
-        "NMax" => Int(1e4))
-na_init = p_default["K0"]
-agent0 = [Agent([-.5 + .01  * randn()]) for i in 1:na_init]
-world0 = vcat(agent0[:],repeat([missing],Int(p_default["NMax"] - na_init)))
-(worldall , p_default["tspan"]) = runWorld_store_WF(p_default,agent0,mode="std")
+sigma_K = .9;
+sigma_a = 1.251;
+K0 = 1000;
+# K(X) = gaussian(X[1],0.,sigma_K)
+K(X) = 1 - 0.125 * sum(X.^2)
+α(X,Y) = gaussian(X[1],Y[1],sigma_a)/K0
+# α(X,Y) = 0.
+p = Dict(
+        "alpha" => α,
+        "K" => K,
+        "D" => [1e-2],
+        "mu" => [.1],
+        "tend" => 10.)
+na_init = K0
+agents = [Agent( [1e-2]  .* randn(1) .- .5) for i in 1:K0]
+@time worldall_test,p["tspan"] = runWorld_store_WF(p,agents,mode="std");
 ```
 You have several options available concerning the resource implemented and competition:
 - ``` mode="std"``` is the standard mode
@@ -62,35 +72,6 @@ You have several options available concerning the resource implemented and compe
 - ``` mode="split"``` corresponds to a scenario where the resource is splitted in two
 - ``` mode="graph"``` this guy is probably not working
 
-### Mutation
-If anisotropy in mutation, the following parameters should be declared as arrays where each entry corresponds to a dimension.
-- ```mu``` The probability of mutation.
-- ```D``` If mutation happens on the agent, the increment follows $\mathcal{N}_{ 0, D}$
-### Birth
-#### Growth
-- Resource kernel for agent with trait $x$ is defined as 
-```math
-K_{\mu,\sigma}(x) = K_0 \mathcal{N}_{\mu,\sigma}(x)
-```
-with $\mu$ and $\sigma$ potentially vectors.
-> We just modified this in ABMEv_Agent.jl so you should check if it works.
-- Dirth coefficient is defined as $`b(x) = K(x)`$
-### Death
-#### Competition
-- Competition between agent with trait ```x``` and ```y``` is defined as
-```math 
-\alpha(x,y) = \exp(-\sum_i^{N(t)} \frac{1}{\sigma_{\alpha_i}^{n_\alpha}}\sum_j^T (x_{i,j} - y_{i,j})^{n_\alpha})
-```
-- Death coefficient is defined as $`d(x^{(i)}) = \sum_j^{N(t)} \alpha(x^{(i)},x^{(j)})`$
-> We are not sure if the sum includes $`x^{(i)}`$ or not.
-### Fitness
-Fitness is defined as ```b - d```.
-
-## Parameter description
-- ```K0``` Carrying capacity
-- ```a``` only used for mode ```grad2D``` where growth rate is set such as $`\mu = a x_1`$
-> We are not sure if this is OK or not? Check it 
-[Grad2D kernel explained](https://gitlab.ethz.ch/bvictor/abmev/-/wikis/Grad2D)
 
 ### Parallelism
 You can run your script in parallel, which makes sense for large populations. To do so:
@@ -143,6 +124,38 @@ using Pkg
 Pkg.dev("path_to_ABMEv_dir")
 ```
 You can also do the same trick with directly the gitlab address, cf [https://docs.julialang.org/en/v1/stdlib/Pkg/index.html](Pkg.jl)
+
+## How does it implement mechanisms ?
+
+### Mutation
+If anisotropy in mutation, the following parameters should be declared as arrays where each entry corresponds to a dimension.
+- ```mu``` The probability of mutation.
+- ```D``` If mutation happens on the agent, the increment follows $\mathcal{N}_{ 0, D}$
+### Birth
+#### Growth
+- Resource kernel for agent with trait $x$ is defined as 
+```math
+K_{\mu,\sigma}(x) = K_0 \mathcal{N}_{\mu,\sigma}(x)
+```
+with $\mu$ and $\sigma$ potentially vectors.
+> We just modified this in ABMEv_Agent.jl so you should check if it works.
+- Dirth coefficient is defined as $`b(x) = K(x)`$
+### Death
+#### Competition
+- Competition between agent with trait ```x``` and ```y``` is defined as
+```math 
+\alpha(x,y) = \exp(-\sum_i^{N(t)} \frac{1}{\sigma_{\alpha_i}^{n_\alpha}}\sum_j^T (x_{i,j} - y_{i,j})^{n_\alpha})
+```
+- Death coefficient is defined as $`d(x^{(i)}) = \sum_j^{N(t)} \alpha(x^{(i)},x^{(j)})`$
+> We are not sure if the sum includes $`x^{(i)}`$ or not.
+### Fitness
+Fitness is defined as ```b - d```.
+
+## Parameter description
+- ```K0``` Carrying capacity
+- ```a``` only used for mode ```grad2D``` where growth rate is set such as $`\mu = a x_1`$
+> We are not sure if this is OK or not? Check it 
+[Grad2D kernel explained](https://gitlab.ethz.ch/bvictor/abmev/-/wikis/Grad2D)
 
 ## References
 - [Champagnat and Ferriere founding article](https://linkinghub.elsevier.com/retrieve/pii/S0040580905001632)
