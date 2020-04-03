@@ -50,7 +50,8 @@ If trait > 0, returns the covariance matrix, with first row geotrait and second 
 # Arguments
 
 """
-function var(world::Array{Agent{T}};trait=1) where T
+function var(world::Array{U,1};trait=1) where U <: Union{Missing,Agent{T}} where T
+    world = collect(skipmissing(world))
     xarray = get_xarray(world,trait)
     return var(xarray,dims=1)
 end
@@ -62,7 +63,8 @@ If trait > 0, returns the covariance matrix, with first row geotrait and second 
 # Arguments
 
 """
-function covgeo(world::Array{Agent{T},1},trait = 0) where T
+function covgeo(world::Array{U,1},trait = 0) where U <: Union{Missing,Agent{T}} where T
+    world = collect(skipmissing(world))
     xarray = get_geo.(world)
     if trait > 0
         xstd = reshape(get_x.(world,trait),size(world,1),size(world,2))
