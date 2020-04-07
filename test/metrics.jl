@@ -20,10 +20,8 @@ agents2 = [Agent( [σ σ]  .* randn(2) .- .5) for i in 1:K0]
      # there is a problem here
      @testset "covgeo2d" begin
          cmat = covgeo(agents2,2);
-         smat = [σ^2 σ^2; σ^2 σ^2]
-          for i in 1:length(cmat)
-              @test cmat[i] ≈ smat[i] atol=0.001
-          end
+         smat = [σ^2 0; 0 σ^2]
+         @test cmat ≈ smat atol=0.01
       end
 end
 

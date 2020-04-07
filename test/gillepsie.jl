@@ -30,8 +30,10 @@ world_alive_test = collect(skipmissing(worldall[:,end]))
                 @test p_default["tspan"][end] >= p_default["tend"]
         end
         ## Comparing simulation
-        xarray = get_xarray(world_alive,1);xarray_test = get_xarray(world_alive_test,1);
-        @test xarray ≈ xarray_test
+        @testset "Matching new vs old results " begin
+                xarray = get_xarray(world_alive,1);xarray_test = get_xarray(world_alive_test,1);
+                @test xarray ≈ xarray_test
+        end
 
         @testset "Testing update rates matrix" begin
                 bs_end = get_b.(world_alive);ds_end = get_d.(world_alive)

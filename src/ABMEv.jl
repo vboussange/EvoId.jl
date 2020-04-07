@@ -2,7 +2,7 @@ __precompile__()
 
 module ABMEv
     using Distributions,LinearAlgebra,Reexport,StatsBase
-    using SharedArrays,Distributed,LightGraphs
+    using LightGraphs
 
     include("ABMEv_Agent.jl")
     include("ABMEv_WF.jl")

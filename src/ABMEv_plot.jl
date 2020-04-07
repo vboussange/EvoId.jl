@@ -8,8 +8,6 @@ using RecipesBase
         p["tspan" ] = p["tspan"][idx_reduced]
         world = world[:,idx_reduced]
     end
-    # here  we can take xhist because every agent is updated at the same time
-    # world should correspond to a one dimensional array
     if count(ismissing,world) > 0
         tspan_ar = vcat([p["tspan"][i]*ones(Int(p["NMax"] - count(ismissing,world[:,i]))) for i in 1:length(p["tspan"]) ]...);
     else
@@ -106,4 +104,14 @@ using RecipesBase
             p["tspan"],i->first(covgeo(world[:,Int(i)]))
         end
     end
+    # if "density_t" in what
+    #     @series begin
+    #         linewidth := 2
+    #         seriestype := :plot3d
+    #         label := "Variance of geotrait"
+    #         xlabel := "Time"
+    #         ylabel := "Variance"
+    #         p["tspan"],i->first(covgeo(world[:,Int(i)]))
+    #     end
+    # end
 end

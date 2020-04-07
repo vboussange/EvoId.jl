@@ -11,9 +11,9 @@ function  update_rates_std!(world,p::Dict,t::Float64)
     traits = get_x.(world)
     # traits = get_xhist.(world)
     N = length(traits)
-    D = SharedArray{Float64}(N)
+    D = zeros(N)
     # Here you should do a shared array to compute in parallel
-    @sync @distributed for i in 1:(N-1)
+    for i in 1:(N-1)
         for j in i+1:N
             C = α(traits[i],traits[j])
             D[i] += C
@@ -46,7 +46,7 @@ function  update_rates_2D!(world,C,p::Dict,t::Float64)
     N = length(traits)
     # C = SharedArray{Float64}((N,N))
     # Here you should do a shared array to compute in parallel
-    @sync @distributed for i in 1:(N-1)
+    for i in 1:(N-1)
         C[i,i] = 1.
         for j in i+1:N
             # be careful, for xhist what is return is an array hence no need of []
@@ -80,7 +80,7 @@ function  update_rates_grad2D!(world,C,p::Dict,t::Float64)
     N = length(traits)
     # C = SharedArray{Float64}((N,N))
     # Here you should do a shared array to compute in parallel
-    @sync @distributed for i in 1:(N-1)
+    for i in 1:(N-1)
         C[i,i] = 1.
         for j in i+1:N
             # be careful, for xhist what is return is an array hence no need of []
@@ -104,7 +104,7 @@ function  update_rates_mountain!(world,C,p::Dict,t::Float64)
     N = length(traits)
     # C = SharedArray{Float64}((N,N))
     # Here you should do a shared array to compute in parallel
-    @sync @distributed for i in 1:(N-1)
+    for i in 1:(N-1)
         C[i,i] = 1.
         for j in i+1:N
             # be careful, for xhist what is return is an array hence no need of []
@@ -137,7 +137,7 @@ function  update_rates_std_split!(world,C,p::Dict,t::Float64)
     N = length(traits)
     # C = SharedArray{Float64}((N,N))
     # Here you should do a shared array to compute in parallel
-    @sync @distributed for i in 1:(N-1)
+    for i in 1:(N-1)
         C[i,i] = 1.
         for j in i+1:N
             C[i,j] = α(traits[i],traits[j],p["n_alpha"],p["sigma_a"])
