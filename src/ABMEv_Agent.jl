@@ -60,9 +60,9 @@ and return the last generations, dropping the youngest ones
 """
 function get_xhist(world::Vector{Agent{T}},geotrait = false) where T
     hist = minimum(get_nancestors.(world))
-    ntraits = get_dim(first(worldall));
-    xhist = zeros(length(worldall), hist, ntraits + geotrait);
-    for (i,a) in enumerate(worldall)
+    ntraits = get_dim(first(world));
+    xhist = zeros(length(world), hist, ntraits + geotrait);
+    for (i,a) in enumerate(world)
         xhist[i,:,1:end-geotrait] = get_xhist(a)[:,end-hist+1:end]';
         if geotrait
             xhist[i,:,ntraits+geotrait] = cumsum(get_xhist(a,1))[end-hist+1:end]
