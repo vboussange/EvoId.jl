@@ -37,12 +37,40 @@ get_geo(a::Agent) = sum(get_xhist(a,1))
 get_d(a::Agent) = a.d
 get_b(a::Agent) = a.b
 get_fitness(a::Agent) = a.b - a.d
-
+get_dim(a::Agent) = size(a.x_history,1)
+get_nancestors(a::Agent) = size(a.x_history,2)
 """
     get_xarray(world::Array{Agent{T}},trait::Int) where T
-Returns trait of every agents of world in the form of an array
+Returns trait of every agents of world in the form of an array which dimensions corresponds to the input.
+Particularly suited for an array world corresponding to a timeseries.
+
 """
 get_xarray(world::Array{Agent{T}},trait::Int) where T = reshape(hcat(get_x.(world,trait)),size(world,1),size(world,2))
+
+"""
+    get_xhist(world::Vector{Agent{T}},geotrait = false)
+Returns the trait history of every agents of world in the form of an 3 dimensional array,
+with
+- first dimension as the agent index
+- second as time index
+- third as trait index
+If geotrait = true, then a last trait dimension is added, corresponding to geotrait.
+Note that because number of ancestors are different between agents, we return an array which size corresponds to the minimum of agents ancestors,
+and return the last generations, dropping the youngest ones
+"""
+function get_xhist(world::Vector{Agent{T}},geotrait = false) where T
+    hist = minimum(get_nancestors.(world))
+    ntraits = get_dim(first(worldall));
+    xhist = zeros(length(worldall), hist, ntraits + geotrait);
+    for (i,a) in enumerate(worldall)
+        xhist[i,:,1:end-geotrait] = get_xhist(a)[:,end-hist+1:end]';
+        if geotrait
+            xhist[i,:,ntraits+geotrait] = cumsum(get_xhist(a,1))[end-hist+1:end]
+        end
+    end
+    return xhist
+end
+
 
 """
 increment_x!(a::Agent{Float64},p::Dict)
