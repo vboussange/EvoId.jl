@@ -12,14 +12,14 @@ end
 
 # Constructors
 # This  constructor should be used when one wants to impose the type of the agent (e.g. Mixed)
-Agent{T}(xhist::Array{U}) where T = Agent{T,U}(reshape(xhist,:,1),0.,1.)
+Agent{T}(xhist::Array{U}) where {T,U} = Agent{T,U}(reshape(xhist,:,1),0.,1.)
 
 # This constructor is used by default
-Agent(xhist::Array{U}) where U <: Number = Agent{StdAgent}(xhist)
+Agent(xhist::Array{U}) where {U <: Number} = Agent{StdAgent}(xhist)
 
 Agent() = Agent(Float64[],0.,1.)
 import Base.copy
-copy(a::Agent) = Agent(a.x_history,a.d,a.b)
+copy(a::Agent{T,U}) where {T,U} = Agent{T,U}(a.x_history,a.d,a.b)
 copy(m::Missing) = missing
 
 """
@@ -52,7 +52,7 @@ Returns trait of every agents of world in the form of an array which dimensions 
 Particularly suited for an array world corresponding to a timeseries.
 
 """
-get_xarray(world::Array{Agent},trait::Int) = reshape(hcat(get_x.(world,trait)),size(world,1),size(world,2))
+get_xarray(world::Array{T},trait::Int) where {T <: Agent}= reshape(hcat(get_x.(world,trait)),size(world,1),size(world,2))
 
 """
     get_xhist(world::Vector{Agent},geotrait = false)
@@ -84,7 +84,7 @@ increment_x!(a::Agent{StdAgent,U},p::Dict)
     This function increments agent by random numbers specified in p
     ONLY FOR CONTINUOUS DOMAINS
 """
-function increment_x!(a::Agent{StdAgent,U},p::Dict)
+function increment_x!(a::Agent{StdAgent,U},p::Dict) where U
     tdim = length(p["D"])
     reflected = haskey(p,"reflected") ? p["reflected"] : false
     if reflected
@@ -104,19 +104,15 @@ function increment_x!(a::Agent{StdAgent,U},p::Dict)
  This function increments first trait of agent with integer values, that are automatically reflected between 1 and p["nodes"].
      ONLY FOR GRAPH TYPE DOMAINS
  """
-#  function increment_x!(a::Agent{Mixed},p::Dict)
-#      tdim = length(p["D"])
-#          inc = [get_inc_reflected(get_x(a,1),p["D"][1] *randn(),1,p["nodes"])]
-#          if  tdim > 1
-#              inc = vcat(inc,(rand(tdim-1) < p["mu"][2:end]) .* p["D"][2:end] .* randn(tdim-1))
-#          end
-#      else
-#          # inc = yes no mutation * mutation
-#          inc = (rand(tdim) < vec(p["mu"])) .* vec(p["D"][:]) .* randn(tdim)
-#      end
-#      a.x_history = hcat(a.x_history, get_x(a) + reshape(inc,:,1));
-#   end
-# end
+ function increment_x!(a::Agent{MixedAgent,U},p::Dict) where U
+     tdim = length(p["D"])
+     inc = [round(get_inc_reflected(get_x(a,1),p["D"][1] *randn(),1,p["nodes"]))]
+     if  tdim > 1
+         inc = vcat(inc,(rand(tdim-1) < p["mu"][2:end]) .* p["D"][2:end] .* randn(tdim-1))
+     end
+     a.x_history = hcat(a.x_history, get_x(a) + reshape(inc,:,1));
+end
+
 
 
 """

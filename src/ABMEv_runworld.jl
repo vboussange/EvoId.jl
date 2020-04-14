@@ -193,7 +193,7 @@ If specified p["dt_saving"] determines the time step to save the simulation. If 
 """
 function runWorld_store_G(p,world0)
     # we store the value of world every 100 changes by default
-    tspan = zeros(1)
+    t = .0
     i = 1;j=1;dt = 1.
     N=length(world0);
     tspanarray = zeros(1);
@@ -204,7 +204,7 @@ function runWorld_store_G(p,world0)
     worldall = hcat(worldall,Array{Missing}(missing,N,1))
     # we instantiate C as the biggest size it can take
     update_rates_std!(skipmissing(world0),p,0.)
-    while tspan[i]<p["tend"]
+    while t<p["tend"]
         if dt < 0
             throw("We obtained negative time step dt = $dt at event $i")
         elseif count(ismissing,world0) == p["NMax"]
@@ -214,8 +214,8 @@ function runWorld_store_G(p,world0)
             @info "We have reached the maximum number of individuals allowed"
             break
         end
-        if  tspan[end] - tspanarray[end] >= dt_saving
-            @info "saving world @ t = $(tspan[i])/ $(p["tend"])"
+        if  t - tspanarray[end] >= dt_saving
+            @info "saving world @ t = $(t)/ $(p["tend"])"
             j+=1;sw = size(worldall,2);
             # we use <= because we save at the end of the wile loop
             if sw <= j
@@ -223,16 +223,16 @@ function runWorld_store_G(p,world0)
                 worldall = hcat(worldall,Array{Missing}(missing,N,sw))
             end
             worldall[1:Int(N - count(ismissing,world0)),j] .= copy.(collect(skipmissing(world0)));
-            push!(tspanarray,tspan[i])
+            push!(tspanarray,t)
         end
-        dt = updateWorld_G!(world0,p,update_rates_std!,tspan)
-        push!(tspan, tspan[end] + dt)
+        dt = updateWorld_G!(world0,p,update_rates_std!,t)
+        t +=  dt
         i += 1
     end
     # Saving last time step
     j+=1
     worldall[1:Int(N - count(ismissing,world0)),j] .= copy.(collect(skipmissing(world0)));
-    push!(tspanarray,tspan[i])
-    @info "simulation stopped at t=$(tspanarray[end])"
+    push!(tspanarray,t)
+    @info "simulation stopped at t=$(tspanarray[end]), after $(i) generations"
     return worldall[:,1:j],tspanarray
 end
