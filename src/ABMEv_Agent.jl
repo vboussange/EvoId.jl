@@ -107,18 +107,17 @@ function increment_x!(a::Agent{Float64},p::Dict)
 
 """
 get_inc_reflected(x::Float64,inc::Float64,s=-1,e=1)
-
     Here we increment the trajectory of trait 1 such that it follows a reflected brownian motion (1D)
-    Careful though, we do not implement reflections
 """
 function get_inc_reflected(x::Float64,inc::Float64,s=-1,e=1)
     if x + inc < s
-        return 2 * ( s - x ) - inc
+        inc = 2 * ( s - x ) - inc
     elseif  x + inc > e
-        return 2 * ( e - x ) - inc
+        inc = 2 * ( e - x ) - inc
     else
         return inc
     end
+    get_inc_reflected(x,inc,s,e)
 end
 
 # need to make sure that this is working correctly
