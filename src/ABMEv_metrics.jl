@@ -63,7 +63,7 @@ If trait > 0, returns the covariance matrix, with first row geotrait and second 
 # Arguments
 
 """
-function covgeo(world::Array{U,1},trait = 0) where U <: Union{Missing,Agent{T}} where T
+function covgeo(world::Array{U,1},trait = 0) where U <: Union{Missing,Agent}
     world = collect(skipmissing(world))
     xarray = get_geo.(world)
     if trait > 0
@@ -79,7 +79,7 @@ Returns a matrix H where H_ij = hamming(a_i,a_j).
 The hamming distance is taken through the whole history
 and functional space of the agents.
 """
-function hamming(world::Array{Agent{T},1}) where T <: Int
+function hamming(world::Array{Agent,1}) where T <: Int
     N = size(world,1)
     H = zeros(N,N)
     for (i,a) in enumerate(world)

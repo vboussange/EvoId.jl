@@ -1,6 +1,6 @@
 using RecipesBase
 # function designed for Wright Fisher process
-@recipe function plot(world::Array{U},p;what=["x","H"],trait = 1) where U <: Union{Missing,Agent{T}} where T
+@recipe function plot(world::Array{U},p;what=["x","H"],trait = 1) where U <: Union{Missing,Agent}
     # We reduce time interval if it is too big
     if size(world,2)*size(world,1) > 1e6 && size(world,2) >= 200
         p = copy(p)
