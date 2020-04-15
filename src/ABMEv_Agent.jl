@@ -65,7 +65,7 @@ If geotrait = true, then a last trait dimension is added, corresponding to geotr
 Note that because number of ancestors are different between agents, we return an array which size corresponds to the minimum of agents ancestors,
 and return the last generations, dropping the youngest ones
 """
-function get_xhist(world::Vector{Agent},geotrait = false)
+function get_xhist(world::Vector{T},geotrait = false) where {T <: Agent}
     hist = minimum(get_nancestors.(world))
     ntraits = get_dim(first(world));
     xhist = zeros(length(world), hist, ntraits + geotrait);
