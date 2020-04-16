@@ -10,6 +10,7 @@ end
 """
 gaussian(x::Number,mu::Number,sigma::Number) = generalised_gaussian(x,mu,sigma,2.)
 
+import DSP.conv
 """
     ma(x::Array{T},f) where T <: Number
 Moving average over array x, using f as the filter, i.e. the number of points to average on. Better choosing an odd number
