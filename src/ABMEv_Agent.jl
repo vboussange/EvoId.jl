@@ -48,11 +48,24 @@ get_dim(a::Agent) = size(a.x_history,1)
 get_nancestors(a::Agent) = size(a.x_history,2)
 """
     get_xarray(world::Array{Agent},trait::Int)
+Mainly works for WF-type world
 Returns trait of every agents of world in the form of an array which dimensions corresponds to the input.
 Particularly suited for an array world corresponding to a timeseries.
 
 """
 get_xarray(world::Array{T},trait::Int) where {T <: Agent}= reshape(hcat(get_x.(world,trait)),size(world,1),size(world,2))
+
+"""
+    get_xarray(world::Array{Agent,1})
+Returns every traits of every agents of world in the form of an array
+If geotrait = true, then a last trait dimension is added, corresponding to geotrait.
+"""
+function get_xarray(world::Array{T,1},geotrait=false) where {T <: Agent}
+    xarray = hcat(get_x.(world)...)
+    if geotrait
+        xarray = vcat( xarray, get_geo.(world)')
+    end
+end
 
 """
     get_xhist(world::Vector{Agent},geotrait = false)
@@ -178,4 +191,22 @@ end
 
 function split_merge_move(t)
     return .0 + 1/30*(t-10.)*tin(t,10.,40.) + tin(t,40.,70.) + (1- 1/30*(t-70.))*tin(t,70.,100.)
+end
+
+"""
+    world2df(world::Array{T,1}; geotrait = false) where {T <: Agent}
+Converts the array of agent world to a datafram, where each column corresponds to a trait of the
+agent, and an extra column captures fitness.
+Each row corresponds to an agent
+"""
+function world2df(world::Array{T,1}; geotrait = false) where {T <: Agent}
+    xx = get_xarray(world)
+    dfw = DataFrame(:f => get_fitness.(world))
+    for i in 1:size(xx,1)
+        dfw[Meta.parse("x$i")] = xx[i,:]
+    end
+    if geotrait
+        dfw[:geo] = get_geo.(world)
+    end
+    return dfw
 end

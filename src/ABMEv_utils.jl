@@ -20,3 +20,7 @@ function ma(x::Array{T},f) where T <: Number
     _s = Int((f-1)/2)
     return conv(x,ones(f)./f)[_s:_s+_N-1]
 end
+
+import Plots:cgrad
+const eth_grad_small = cgrad([colorant"#1F407A", RGB(0.671,0.851,0.914),RGB(1.0,1.0,0.749), RGB(0.992,0.682,0.38),RGB(0.647,0.0,0.149),],[.0,.1])
+const eth_grad_std = cgrad([colorant"#1F407A", RGB(0.671,0.851,0.914),RGB(1.0,1.0,0.749), RGB(0.992,0.682,0.38),RGB(0.647,0.0,0.149),],[.0,1.])

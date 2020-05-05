@@ -1,8 +1,10 @@
 using RecipesBase
-# function designed for Wright Fisher process
+using Colors
+import KernelDensity:kde,pdf
 @recipe function plot(world::Array{U},p;what=["x","H"],trait = 1) where U <: Union{Missing,Agent}
+    tot_dim = size(world,2)*size(world,1)
     # We reduce time interval if it is too big
-    if size(world,2)*size(world,1) > 1e6 && size(world,2) >= 200
+    if tot_dim > 1e6 && size(world,2) >= 200
         p = copy(p)
         idx_reduced = floor.(Int,range(1,size(world,2),length = 200))
         p["tspan" ] = p["tspan"][idx_reduced]
@@ -14,24 +16,31 @@ using RecipesBase
         tspan_ar = repeat(p["tspan"],inner = size(world,1))
     end
     # tspan = Float64.(tspan)
-    world = collect(skipmissing(world))
+    world_sm = collect(skipmissing(world))
     if "x" in what
+        d_i = []
+        for i in 1:size(world,2)
+            x = get_x.(skipmissing(world[:,i]),trait)
+            append!(d_i,pdf(kde(x),x))
+        end
         @series begin
-        xarray = get_xarray(world,trait)
+        xarray = get_xarray(world_sm,trait)
             seriestype := :scatter
-            markercolor := "blue"
+            markercolor := eth_grad_small[d_i ./ maximum(d_i)]
+            # markercolor := :blue
             markerstrokewidth := 0
-            alpha :=.1
+            alpha :=1.
             xlabel := "time"
             ylabel := "trait value"
             label := ""
-            # markersize := 2.3/1000*size(world,1)
+            grid := false
+            # markersize := 2.3/1000*size(world_sm,1)
             tspan_ar[:],xarray[:]
         end
     end
     if "geo" in what
         @series begin
-        xarray = get_geo.(world)
+        xarray = get_geo.(world_sm)
             seriestype := :scatter
             markercolor := "blue"
             markerstrokewidth := 0
@@ -39,14 +48,14 @@ using RecipesBase
             xlabel := "time"
             ylabel := "trait value"
             label := ""
-            # markersize := 2.3/1000*size(world,1)
+            # markersize := 2.3/1000*size(world_sm,1)
             tspan_ar[:],xarray[:]
         end
     end
     if "3dgeo" in what
         @series begin
-        xarray = get_geo.(world)
-        yarray = get_xarray(world,2)
+        xarray = get_geo.(world_sm)
+        yarray = get_xarray(world_sm,2)
             seriestype := :scatter3d
             markercolor := "blue"
             markerstrokewidth := 0
@@ -55,14 +64,14 @@ using RecipesBase
             ylabel := "geotrait"
             zlabel := "trait value"
             label := ""
-            # markersize := 2.3/1000*size(world,1)
+            # markersize := 2.3/1000*size(world_sm,1)
             tspan_ar,xarray[:],yarray[:]
         end
     end
     if "3d" in what
         @series begin
-        xarray = get_xarray(world,1)
-        yarray = get_xarray(world,2)
+        xarray = get_xarray(world_sm,1)
+        yarray = get_xarray(world_sm,2)
             seriestype := :scatter3d
             markercolor := "blue"
             markerstrokewidth := 0
@@ -71,13 +80,13 @@ using RecipesBase
             ylabel := "position"
             zlabel := "trait value"
             label := ""
-            # markersize := 2.3/1000*size(world,1)
+            # markersize := 2.3/1000*size(world_sm,1)
             tspan_ar,xarray[:],yarray[:]
         end
     end
     # if "H" in what
     #     @series begin
-    #         x = get_x.(world,trait)
+    #         x = get_x.(world_sm,trait)
     #         linewidth := 2
     #         seriestype := :line
     #         label := "Interconnectedness"
@@ -91,7 +100,7 @@ using RecipesBase
             label := "Variance"
             xlabel := "Time"
             ylabel := "Variance"
-            p["tspan"],var(world,trait=trait)[:]
+            p["tspan"],var(world_sm,trait=trait)[:]
         end
     end
     if "vargeo" in what
@@ -101,7 +110,7 @@ using RecipesBase
             label := "Variance of geotrait"
             xlabel := "Time"
             ylabel := "Variance"
-            p["tspan"],i->first(covgeo(world[:,Int(i)]))
+            p["tspan"],i->first(covgeo(world_sm[:,Int(i)]))
         end
     end
     # if "density_t" in what
@@ -111,7 +120,7 @@ using RecipesBase
     #         label := "Variance of geotrait"
     #         xlabel := "Time"
     #         ylabel := "Variance"
-    #         p["tspan"],i->first(covgeo(world[:,Int(i)]))
+    #         p["tspan"],i->first(covgeo(world_sm[:,Int(i)]))
     #     end
     # end
 end

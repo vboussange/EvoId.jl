@@ -13,13 +13,13 @@ module ABMEv
     include("ABMEv_utils.jl")
 
 
-    @reexport using Distributions
+    @reexport using Distributions, DataFrames
     export update_rates!
     export MixedAgent,StdAgent,Agent,get_fitness,get_x,get_dim,get_nancestors,get_xarray,get_xhist,
-        get_geo,get_b,get_d,increment_x!,get_inc_reflected,
+        get_geo,get_b,get_d,increment_x!,get_inc_reflected,world2df
         split_move,split_merge_move,KK,tin,new_world_G
     export copy,runWorld_store_WF,runWorld_store_G #,runWorld_G!,runWorld_WF!,
     export H_discrete,findclusters,var,covgeo,hamming
     export update_afterbirth_std!,update_afterdeath_std!
-    export generalised_gaussian,gaussian,ma
+    export generalised_gaussian,gaussian,ma,eth_grad_std
 end
