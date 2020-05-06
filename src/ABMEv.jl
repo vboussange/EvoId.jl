@@ -16,7 +16,7 @@ module ABMEv
     @reexport using Distributions, DataFrames
     export update_rates!
     export MixedAgent,StdAgent,Agent,get_fitness,get_x,get_dim,get_nancestors,get_xarray,get_xhist,
-        get_geo,get_b,get_d,increment_x!,get_inc_reflected,world2df
+        get_geo,get_b,get_d,increment_x!,get_inc_reflected,world2df,
         split_move,split_merge_move,tin,new_world_G
     export copy,runWorld_store_WF,runWorld_store_G #,runWorld_G!,runWorld_WF!,
     export H_discrete,findclusters,var,covgeo,hamming
