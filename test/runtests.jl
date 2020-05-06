@@ -2,7 +2,7 @@ using ABMEv, Test, JLD2,Random
 
 @testset "ABMEv" begin
     include("gillepsie.jl")
-    include("wrightfisher.jl")
+    # include("wrightfisher.jl")
     include("metrics.jl")
     # we might want to put this in a separate file at some point
     @testset "Reflection" begin
