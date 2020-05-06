@@ -38,6 +38,31 @@ import KernelDensity:kde,pdf
             tspan_ar[:],xarray[:]
         end
     end
+    # we use this for discrete agents
+    # world should be a one dimensional vector, corresponding to one time step only
+    if "xs" in what
+        d_i = []
+        world_df_g = groupby(world2df(world_sm),:x1)
+        for world_df in world_df_g
+            x = world_df.x2
+            append!(d_i,pdf(kde(x),x))
+        end
+        # TODO: we stopped here
+        @series begin
+        xarray = get_xarray(world_sm,trait)
+            seriestype := :scatter
+            markercolor := eth_grad_small[d_i ./ maximum(d_i)]
+            # markercolor := :blue
+            markerstrokewidth := 0
+            alpha :=1.
+            xlabel := "time"
+            ylabel := "trait value"
+            label := ""
+            grid := false
+            # markersize := 2.3/1000*size(world_sm,1)
+            tspan_ar[:],xarray[:]
+        end
+    end
     if "geo" in what
         @series begin
         xarray = get_geo.(world_sm)

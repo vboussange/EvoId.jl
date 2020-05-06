@@ -60,7 +60,7 @@ get_xarray(world::Array{T},trait::Int) where {T <: Agent}= reshape(hcat(get_x.(w
 Returns every traits of every agents of world in the form of an array
 If geotrait = true, then a last trait dimension is added, corresponding to geotrait.
 """
-function get_xarray(world::Array{T,1},geotrait=false) where {T <: Agent}
+function get_xarray(world::Array{T,1},geotrait::Bool=false) where {T <: Agent}
     xarray = hcat(get_x.(world)...)
     if geotrait
         xarray = vcat( xarray, get_geo.(world)')
@@ -91,6 +91,25 @@ function get_xhist(world::Vector{T},geotrait = false) where {T <: Agent}
     return xhist
 end
 
+"""
+    world2df(world::Array{T,1}; geotrait = false) where {T <: Agent}
+Converts the array of agent world to a datafram, where each column corresponds to a trait of the
+agent, and an extra column captures fitness.
+Each row corresponds to an agent
+"""
+function world2df(world::Array{T,1}; geotrait = false) where {T <: Agent}
+    xx = get_xarray(world)
+    dfw = DataFrame(:f => get_fitness.(world))
+    for i in 1:size(xx,1)
+        dfw[Meta.parse("x$i")] = xx[i,:]
+    end
+    if geotrait
+        dfw[:g] = get_geo.(world)
+    end
+    return dfw
+end
+
+
 
 """
 increment_x!(a::Agent{StdAgent,U},p::Dict)
@@ -115,7 +134,8 @@ function increment_x!(a::Agent{StdAgent,U},p::Dict) where U
  """
      function increment_x!(a::Agent{MixedAgent,U},p::Dict)
  This function increments first trait of agent with integer values, that are automatically reflected between 1 and p["nodes"].
-     ONLY FOR GRAPH TYPE DOMAINS
+Other traits are incremented as usual.
+TODO : make it work for a graph type landscape, where domain is not a line anymore.
  """
  function increment_x!(a::Agent{MixedAgent,U},p::Dict) where U
      tdim = length(p["D"])
@@ -143,39 +163,6 @@ function get_inc_reflected(x::Number,inc::Number,s=-1,e=1)
     get_inc_reflected(x,inc,s,e)
 end
 
-# need to make sure that this is working correctly
-"""
-    α(a1::Array{Number},a2::Array{Number},n_alpha::Number,sigma_a::Array{Number})
-Generalised gaussian competition kernel
-"""
-function α(a1::Array{Number},a2::Array{Number},n_alpha::Number,sigma_a::Array{Number})
-        return exp( -.5* sum(sum((a1 .- a2).^n_alpha,dims=2)./ sigma_a[:].^n_alpha))
-end
-"""
-    α(a1::Array{Number},a2::Array{Number},n_alpha::Number,sigma_a::Array{Number})
-Default Gaussian competition kernel
-"""
-α(a1::Array{Number},a2::Array{Number},sigma_a::Array{Number}) = α(a1,a2,2,sigma_a)
-
-"""
-    K(x::Array{Number},K0::Number,μ::Array{Number},sigma_K::Array{Number})
-Gaussian resource kernel
-"""
-function K(x::Array{Number},K0::Number,μ::Array{Number},sigma_K::Array{Number})
-    # return K0*exp(-sum(sum((x .- μ).^n_K,dims=2)./sigma_K[:].^n_K))
-    return K0 * pdf(MvNormal(μ,sigma_K),x)
-end
-"""
-    K(x::Array{Number},K0::Number,sigma_K::Array{Number})
-Gaussian resource kernel with mean 0.
-"""
-function K(x::Array{Number},K0::Number,sigma_K::Array{Number})
-    # return K0*exp(-sum(sum((x .- μ).^n_K,dims=2)./sigma_K[:].^n_K))
-    return K0 * pdf(MvNormal(sigma_K),x)
-end
-
-KK(x::Array{Number},K0::Number,n_K::Number,sigma_K::Array{Number},μ1::Number,μ2::Number) = K(x,K0/2,μ1,sigma_K) + K(x,K0/2,μ2,sigma_K)
-
 """
     function tin(t::Number,a::Number,b::Number)
 if t in [a,b) returns 1. else returns 0
@@ -191,22 +178,4 @@ end
 
 function split_merge_move(t)
     return .0 + 1/30*(t-10.)*tin(t,10.,40.) + tin(t,40.,70.) + (1- 1/30*(t-70.))*tin(t,70.,100.)
-end
-
-"""
-    world2df(world::Array{T,1}; geotrait = false) where {T <: Agent}
-Converts the array of agent world to a datafram, where each column corresponds to a trait of the
-agent, and an extra column captures fitness.
-Each row corresponds to an agent
-"""
-function world2df(world::Array{T,1}; geotrait = false) where {T <: Agent}
-    xx = get_xarray(world)
-    dfw = DataFrame(:f => get_fitness.(world))
-    for i in 1:size(xx,1)
-        dfw[Meta.parse("x$i")] = xx[i,:]
-    end
-    if geotrait
-        dfw[:geo] = get_geo.(world)
-    end
-    return dfw
 end

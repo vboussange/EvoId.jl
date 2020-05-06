@@ -17,13 +17,26 @@ Pkg.add("ABMEv#no_C_matrix")
 using ABMEv
 ```
 
+## The `Agent` structure
+This package is an Agent Based Model, where the atomic structure is the `Agent`, which is defined by a history of traits, a death rate and a birth rate.
+```julia
+mutable struct Agent{T,U}
+    # history of traits for geotraits
+    x_history::Array{U}
+    # death rate
+    d::Float64
+    #birth rate
+    b::Float64
+end
+```
+For more understanding of the composite types `T,U`, check the wiki: Gillepsie / Agent Type.
 ## Parameters of the simulation
 Parameters are stored in the parameter dictionary `p`
 ### General parameters
-- ```reflected=>true``` if ```true``` then reflection occurs on the first trait -which should stand for geographic position- in the domain $` [-1,1] `$
-- ```"alpha" => α``` is the competition function
--```"K" => K``` is the birth rate
-- ```"tend" => 1.5``` is the time to end simulation
+- ```"reflected"=>true```: if ```true``` then reflection occurs on the first trait -which should stand for geographic position. Depending on the agent type, reflections occurs in the domain $` [-1,1] `$ or between nodes 1 and `p["nodes"]`
+- ```"alpha" => α```: is the competition function
+- ```"K" => K```: is the birth rate
+- ```"tend" => 1.5```: is the time to end simulation
 
 :warning: Check how to define functions α and K in the algorithm section.
 ### Mutation
@@ -49,22 +62,31 @@ Two type of simulation algorithm can be used
 ### Gillepsie algorithm
 
 ```julia
-a = 0;
-sigma_K = .9;
-sigma_a = .7;
-K0 = 1000;
-K(X) = gaussian(X[1],0.,sigma_K)
-α(X,Y) = gaussian(X[1],Y[1],sigma_a)/K0
-p_default = Dict(
-        "alpha" => α,
-        "K" => K,
-        "D" => [1e-2],
-        "mu" => [.1],
-        "tend" => 1.5,
-        "NMax" => Int(10000))
-na_init = K0
-world0 = new_world_G(na_init,p_default,spread = [.01 .01], offset = [-.5 -.5])
-worldall,p_default["tspan"] = runWorld_store_G(p_default,world0)
+using ABMEv
+## Defining parameters
+sigma_K = 1.; #bandwith of resource
+sigma_a = 1.2; #bandwith of competition
+K0 = 1000 #carrying capacity
+K(X) = gaussian(X[1],0,Float32(sigma_K)) #birth
+alpha(X,Y) = gaussian(X[1],Y[1],Float32(sigma_a)) / Float32(K0) #competition
+D = [1e-2] #mutation range
+mu = [1.] #probability of mutation
+NMax = 2000 #number of individual
+dt_saving = 1.0 #time step saving
+tend = 1000.
+using UnPack
+p = Dict{String,Any}()
+@pack! p = K,alpha,D,mu,NMax,dt_saving,tend
+
+## Initial conditions
+agent0 = [Agent(.1 .* randn(Float32,1)) for i in 1:K0]
+world0 = vcat(agent0[:],repeat([missing],Int(p["NMax"] - K0)))
+
+## launch simulation
+worldall,p["tspan"] = runWorld_store_G(p,world0);
+
+using Plots
+Plots.plot(worldall,p)
 ```
 As of now, no mode is implemented.
 #### Specific parameters
@@ -112,18 +134,45 @@ Parallelism only works with Wright Fisher model.
 You can access properties of the agent using the following functions
 - `get_xarray(world::Array{Agent{T}},trait::Int) where T`
 
-Returns trait of every agents of world in the form of an array
+Returns trait of every agents of `world` in the form of an array which dimensions corresponds to the input.
+Particularly suited for an array `world` corresponding to one time step, or a time series from a **Wright Fisher simulation**.
+>TODO: implement the possibility of getting geotrait
 
+- `get_xarray(world::Array{T,1},geotrait=false) where {T <: Agent}`
+
+Returns every traits of every agents of world in the form of an array
+If geotrait = true, then a last trait dimension is added, corresponding to geotrait.
+
+- `get_xhist(world::Vector{Agent},geotrait = false)`
+
+Returns the trait history of every agents of world in the form of an 3 dimensional array,
+with
+- - first dimension as the agent index
+- - second as time index
+- - third as trait index
+If geotrait = true, then a last trait dimension is added, corresponding to geotrait.
+Note that because number of ancestors are different between agents, we return an array which size corresponds to the minimum of agents ancestors,
+and return the last generations, dropping the youngest ones
+
+- `world2df(world::Array{T,1}; geotrait = false) where {T <: Agent}`
+
+Converts the array of agent world to a datafram, where each column corresponds to a trait of the
+agent, and an extra column captures fitness.
+Each row corresponds to an agent
+
+### Other accessors
 > TODO: describe the following accessors
 ```julia
-get_x(a::Agent,i::Number) = a.x_history[Int(i):Int(i),end]
+get_x(a::Agent,i::Number) = a.x_history[Int(i),end]
 get_x(a::Agent) = a.x_history[:,end]
-get_xhist(a::Agent,i::Number) = a.x_history[Int(i):Int(i),:]
+get_xhist(a::Agent,i::Number) = a.x_history[Int(i),:]
 get_xhist(a::Agent) = a.x_history
 get_geo(a::Agent) = sum(get_xhist(a,1))
 get_d(a::Agent) = a.d
 get_b(a::Agent) = a.b
 get_fitness(a::Agent) = a.b - a.d
+get_dim(a::Agent) = size(a.x_history,1)
+get_nancestors(a::Agent) = size(a.x_history,2)
 ```
 
 ## Plotting
@@ -136,12 +185,13 @@ using Plots;pyplot()
 Plots.plot(worldall,p_default,what=["x"],trait=2)
 ```
 You can specify what you want to plot in the array ```what```:
-- ```x``` plots the component specified by ```trait=2```
-- ```geo``` plots geotrait, computed from first component
-- ```3dgeo``` plots a 3d diagram with x axis as geotrait and y axis as the second component
-- ```3d``` plots a 3d diagram with first and second component as x and y axis
-- ```var``` plots the variance of the  component specified by ```trait=2```
-- ```vargeo``` plots the variance of the geotrait
+- ```"x"``` returns a scatter plot `(xaxis = time, yaxis = trait value)` where trait component is specified by ```trait=2```
+- `"xs"` only works for agent type `MixedAgent`, because it needs a discrete geographical space. It returns a scatter plot `(xaxis = geographical component, yaxis = trait value)`
+- ```"geo"``` returns a scatter plot where trait is the *geotrait* computed from first component
+- ```"3dgeo"``` plots a 3d diagram with x axis as geotrait and y axis as the second component
+- ```"3d"``` plots a 3d diagram with first and second component as x and y axis
+- ```"var"``` plots the variance of the  component specified by ```trait=2``` :question: with respect to time?
+- ```"vargeo"``` plots the variance of the geotrait 
 
 ## Developping the code
 I recommend to first clone your branch in the directory you like best, and then to 
