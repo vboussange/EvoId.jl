@@ -65,6 +65,7 @@ function get_xarray(world::Array{T,1},geotrait::Bool=false) where {T <: Agent}
     if geotrait
         xarray = vcat( xarray, get_geo.(world)')
     end
+    return xarray
 end
 
 """

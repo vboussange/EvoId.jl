@@ -1,7 +1,17 @@
 using RecipesBase
 using Colors
 import KernelDensity:kde,pdf
-@recipe function plot(world::Array{U},p;what=["x","H"],trait = 1) where U <: Union{Missing,Agent}
+"""
+    function plot(world::Array{U},p;what=["x","H"],trait = 1,tplot = false) where U <: Union{Missing,Agent}
+
+# ARGS
+- `what = ["x","H"]`: the plots you want to obtain
+- `trait = 1`: the trait that will plotted regarding what you asked
+- `tplot = false` used when calling xs, as it plots a snapshot of the world at a particular time
+It should correspond to an integer, as it indexes the column to plot
+"""
+
+@recipe function plot(world::Array{U},p;what=["x","H"],trait = 1,tplot = 0) where U <: Union{Missing,Agent}
     tot_dim = size(world,2)*size(world,1)
     # We reduce time interval if it is too big
     if tot_dim > 1e6 && size(world,2) >= 200
@@ -41,26 +51,27 @@ import KernelDensity:kde,pdf
     # we use this for discrete agents
     # world should be a one dimensional vector, corresponding to one time step only
     if "xs" in what
-        d_i = []
-        world_df_g = groupby(world2df(world_sm),:x1)
+        d_i = []; xt_array = []; x1_array = []
+        world_df_g = groupby(world2df(collect(skipmissing(world[:, tplot > 0 ? tplot : size(world,2) ]))),:x1)
         for world_df in world_df_g
-            x = world_df.x2
+            x = world_df.x2 ; x1 =  world_df.x1
             append!(d_i,pdf(kde(x),x))
+            append!(xt_array,x)
+            append!(x1_array,x1)
         end
         # TODO: we stopped here
         @series begin
-        xarray = get_xarray(world_sm,trait)
             seriestype := :scatter
             markercolor := eth_grad_small[d_i ./ maximum(d_i)]
             # markercolor := :blue
             markerstrokewidth := 0
-            alpha :=1.
-            xlabel := "time"
-            ylabel := "trait value"
+            alpha := 1.
+            xaxis := "geographical position"
+            yaxis := "trait value"
             label := ""
             grid := false
-            # markersize := 2.3/1000*size(world_sm,1)
-            tspan_ar[:],xarray[:]
+            markersize := 10
+            x1_array[:],xt_array[:]
         end
     end
     if "geo" in what
