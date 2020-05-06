@@ -14,12 +14,12 @@ It should correspond to an integer, as it indexes the column to plot
 @recipe function plot(world::Array{U},p;what=["x","H"],trait = 1,tplot = 0) where U <: Union{Missing,Agent}
     tot_dim = size(world,2)*size(world,1)
     # We reduce time interval if it is too big
-    if tot_dim > 1e6 && size(world,2) >= 200
-        p = copy(p)
-        idx_reduced = floor.(Int,range(1,size(world,2),length = 200))
-        p["tspan" ] = p["tspan"][idx_reduced]
-        world = world[:,idx_reduced]
-    end
+    # if tot_dim > 1e6 && size(world,2) >= 200
+    #     p = copy(p)
+    #     idx_reduced = floor.(Int,range(1,size(world,2),length = 200))
+    #     p["tspan" ] = p["tspan"][idx_reduced]
+    #     world = world[:,idx_reduced]
+    # end
     if count(ismissing,world) > 0
         tspan_ar = vcat([p["tspan"][i]*ones(Int(p["NMax"] - count(ismissing,world[:,i]))) for i in 1:length(p["tspan"]) ]...);
     else
@@ -39,7 +39,7 @@ It should correspond to an integer, as it indexes the column to plot
             markercolor := eth_grad_small[d_i ./ maximum(d_i)]
             # markercolor := :blue
             markerstrokewidth := 0
-            alpha :=1.
+            seriesalpha :=1.
             xlabel := "time"
             ylabel := "trait value"
             label := ""
@@ -65,12 +65,12 @@ It should correspond to an integer, as it indexes the column to plot
             markercolor := eth_grad_small[d_i ./ maximum(d_i)]
             # markercolor := :blue
             markerstrokewidth := 0
-            alpha := 1.
+            seriesalpha := 1.
             xaxis := "geographical position"
             yaxis := "trait value"
             label := ""
             grid := false
-            markersize := 10
+            # markersize := 10
             x1_array[:],xt_array[:]
         end
     end
@@ -80,7 +80,7 @@ It should correspond to an integer, as it indexes the column to plot
             seriestype := :scatter
             markercolor := "blue"
             markerstrokewidth := 0
-            alpha :=.1
+            seriesalpha :=.1
             xlabel := "time"
             ylabel := "trait value"
             label := ""
@@ -95,7 +95,7 @@ It should correspond to an integer, as it indexes the column to plot
             seriestype := :scatter3d
             markercolor := "blue"
             markerstrokewidth := 0
-            alpha :=.1
+            seriesalpha :=.1
             xlabel := "time"
             ylabel := "geotrait"
             zlabel := "trait value"
@@ -111,7 +111,7 @@ It should correspond to an integer, as it indexes the column to plot
             seriestype := :scatter3d
             markercolor := "blue"
             markerstrokewidth := 0
-            alpha :=.1
+            seriesalpha :=.1
             xlabel := "time"
             ylabel := "position"
             zlabel := "trait value"
