@@ -70,3 +70,10 @@ function updateWorld_G!(world,p,update_rates!,t)
         return -1.
     end
 end
+
+"""
+    clean_world(world::Array{T}) where {T <: Agent}
+Get rid of missing value in `world`
+"""
+#TODO : put some type specs here
+clean_world(world) = collect(skipmissing(world))

@@ -42,6 +42,7 @@ function findclusters(v::Vector,allextrema =true)
 end
 
 import Statistics.var
+# TODO: rename this to gamma diversity
 """
     var(world::Array{Agent};trait=:)
 If trait = 0, returns the variance of the geotrait,
@@ -88,4 +89,25 @@ function hamming(world::Array{Agent,1}) where T <: Int
             end
     end
     return H
+end
+"""
+    get_alpha_div(world::Array{U,1};trait=1) where U <: Union{Missing,Agent{T}} where T
+# Arguments
+"""
+function get_alpha_div(world::Array{U,1};trait=1) where U <: Union{Missing,Agent{T}} where T
+    _xall_df = world2df(world,geotrait=true)
+    xall_per_patch = groupby(_xall_df, :x1,sort=true)
+    #TODO: to be continued
+end
+
+"""
+    get_beta_div(world::Array{U,1};trait=1) where U <: Union{Missing,Agent{T}} where T
+# Arguments
+"""
+function get_beta_div(world::Array{U,1};trait=1) where U <: Union{Missing,Agent{T}} where T
+    _xall_df = world2df(world,geotrait=true)
+    xall_per_patch = groupby(_xall_df, :x1,sort=true)
+    sbar_i = [mean(xp.x2) for xp in xall_per_patch]
+
+    #TODO: to be continued
 end

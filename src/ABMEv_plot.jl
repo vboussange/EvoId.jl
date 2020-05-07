@@ -6,9 +6,13 @@ import KernelDensity:kde,pdf
 
 # ARGS
 - `what = ["x","H"]`: the plots you want to obtain
-- `trait = 1`: the trait that will plotted regarding what you asked
+- `trait = 1`: the trait that will plotted regarding what you asked. `trait = 0` will plot the geotrait
 - `tplot = false` used when calling xs, as it plots a snapshot of the world at a particular time
 It should correspond to an integer, as it indexes the column to plot
+
+# Options available
+- `"x"`
+- `"xs"`
 """
 
 @recipe function plot(world::Array{U},p;what=["x","H"],trait = 1,tplot = 0) where U <: Union{Missing,Agent}
@@ -52,9 +56,15 @@ It should correspond to an integer, as it indexes the column to plot
     # world should be a one dimensional vector, corresponding to one time step only
     if "xs" in what
         d_i = []; xt_array = []; x1_array = []
-        world_df_g = groupby(world2df(collect(skipmissing(world[:, tplot > 0 ? tplot : size(world,2) ]))),:x1)
+        world_df_g = groupby(world2df(collect(skipmissing(world[:, tplot > 0 ? tplot : size(world,2) ])),geotrait=true),:x1)
         for world_df in world_df_g
-            x = world_df.x2 ; x1 =  world_df.x1
+            if trait == 0
+                x = world_df.g
+            else
+                # fitness occupies first spot
+                x = world_df[:,trait+1] ;
+            end
+            x1 =  world_df.x1;
             append!(d_i,pdf(kde(x),x))
             append!(xt_array,x)
             append!(x1_array,x1)
@@ -72,20 +82,6 @@ It should correspond to an integer, as it indexes the column to plot
             grid := false
             # markersize := 10
             x1_array[:],xt_array[:]
-        end
-    end
-    if "geo" in what
-        @series begin
-        xarray = get_geo.(world_sm)
-            seriestype := :scatter
-            markercolor := "blue"
-            markerstrokewidth := 0
-            seriesalpha :=.1
-            xlabel := "time"
-            ylabel := "trait value"
-            label := ""
-            # markersize := 2.3/1000*size(world_sm,1)
-            tspan_ar[:],xarray[:]
         end
     end
     if "3dgeo" in what

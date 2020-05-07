@@ -36,11 +36,11 @@ function new_world_G(nagents::Int,p::Dict; spread = 1., offset = 0.)
 end
 
 # returns trait i of the agent
-get_x(a::Agent,i::Number) = a.x_history[Int(i),end]
-get_x(a::Agent) = a.x_history[:,end]
 get_xhist(a::Agent,i::Number) = a.x_history[Int(i),:]
 get_xhist(a::Agent) = a.x_history
+get_x(a::Agent) = a.x_history[:,end]
 get_geo(a::Agent) = sum(get_xhist(a,1))
+get_x(a::Agent,i::Number) = i > 0 ? a.x_history[Int(i),end] : get_geo(a)
 get_d(a::Agent) = a.d
 get_b(a::Agent) = a.b
 get_fitness(a::Agent) = a.b - a.d
@@ -48,12 +48,13 @@ get_dim(a::Agent) = size(a.x_history,1)
 get_nancestors(a::Agent) = size(a.x_history,2)
 """
     get_xarray(world::Array{Agent},trait::Int)
+If trait = 0 , we return the geotrait.
 Mainly works for WF-type world
 Returns trait of every agents of world in the form of an array which dimensions corresponds to the input.
 Particularly suited for an array world corresponding to a timeseries.
 
 """
-get_xarray(world::Array{T},trait::Int) where {T <: Agent}= reshape(hcat(get_x.(world,trait)),size(world,1),size(world,2))
+get_xarray(world::Array{T},trait::Int) where {T <: Agent} = trait > 0 ? reshape(hcat(get_x.(world,trait)),size(world,1),size(world,2)) : reshape(hcat(get_geo.(world)),size(world,1),size(world,2))
 
 """
     get_xarray(world::Array{Agent,1})
