@@ -35,11 +35,11 @@ It should correspond to an integer, as it indexes the column to plot
     if "x" in what
         d_i = []
         for i in 1:size(world,2)
-            x = get_x.(clean_world(world[:,i]),tend,trait)
+            x = get_x(clean_world(world[:,i]),p["tspan"][i],trait)[:]
             append!(d_i,pdf(kde(x),x))
         end
         @series begin
-        xarray = get_xarray(world_sm,tend,trait)
+        xarray = get_x.(world_sm,tspan_ar[:],trait)
             seriestype := :scatter
             markercolor := eth_grad_small[d_i ./ maximum(d_i)]
             # markercolor := :blue
@@ -103,7 +103,7 @@ It should correspond to an integer, as it indexes the column to plot
     end
     if "3d" in what
         @series begin
-        xarray = get_xarray(world_sm,1)
+        xarray = get_x(world_sm,1)
         yarray = get_x(world_sm,2)
             seriestype := :scatter3d
             markercolor := "blue"
