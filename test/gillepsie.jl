@@ -20,7 +20,7 @@ p_default = Dict(
 na_init = K0
 world0 = new_world_G(na_init,p_default,spread = .01)
 worldall,p_default["tspan"] = runWorld_store_G(p_default,world0)
-world_alive_test = collect(skipmissing(worldall[:,end]))
+world_alive_test = clean_world(worldall[:,end])
 # @save "gillepsie_test.jld2" world_alive
 @load "gillepsie_test.jld2" world_alive
 ## Testing
@@ -31,7 +31,7 @@ world_alive_test = collect(skipmissing(worldall[:,end]))
         end
         ## Comparing simulation
         @testset "Matching new vs old results " begin
-                xarray = get_xarray(world_alive,1);xarray_test = get_xarray(world_alive_test,1);
+                xarray = get_x(world_alive,1);xarray_test = get_x(world_alive_test,1);
                 @test xarray ≈ xarray_test
         end
 

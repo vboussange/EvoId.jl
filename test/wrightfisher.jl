@@ -23,7 +23,7 @@ worldall_test,p["tspan"] = runWorld_store_WF(p,agents);
 ## load to  compare simulation
 # @save "wrightfisher_test.jld2" worldall p
 @load "wrightfisher_test.jld2" worldall
-xarray = get_xarray(worldall,1); xarray_test = get_xarray(worldall_test,1)
+xarray = get_x(worldall,1); xarray_test = get_x(worldall_test,1)
 @testset "Wright Fisher Algorithm" begin
         @test xarray ≈ xarray_test
 end

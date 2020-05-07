@@ -5,9 +5,9 @@
     give_birth(a::Agent,p)
 Used for Gillepsie setting
 """
-function give_birth(a::Agent,p::Dict)
+function give_birth(a::Agent,t,p::Dict)
     new_a = copy(a)
-    increment_x!(new_a,p)
+    increment_x!(new_a,t,p)
     return new_a
 end
 
@@ -62,7 +62,7 @@ function updateWorld_G!(world,p,update_rates!,t)
             idx_offspring = findfirst(ismissing,world)
             # i_event - N is also the index of the individual to give birth in the world_alive
             mum = world[idx_world[i_event-N]]
-            world[idx_offspring] = give_birth(mum,p)
+            world[idx_offspring] = give_birth(mum,t+dt,p)
             update_afterbirth_std!(world,idx_offspring,p)
         end
         return dt

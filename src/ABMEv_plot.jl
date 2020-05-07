@@ -30,15 +30,16 @@ It should correspond to an integer, as it indexes the column to plot
         tspan_ar = repeat(p["tspan"],inner = size(world,1))
     end
     # tspan = Float64.(tspan)
-    world_sm = collect(skipmissing(world))
+    tend = p["tspan"][tplot > 0 ? tplot : size(world,2)]
+    world_sm = clean_world(world)
     if "x" in what
         d_i = []
         for i in 1:size(world,2)
-            x = get_x.(skipmissing(world[:,i]),trait)
+            x = get_x.(clean_world(world[:,i]),tend,trait)
             append!(d_i,pdf(kde(x),x))
         end
         @series begin
-        xarray = get_xarray(world_sm,trait)
+        xarray = get_xarray(world_sm,tend,trait)
             seriestype := :scatter
             markercolor := eth_grad_small[d_i ./ maximum(d_i)]
             # markercolor := :blue
@@ -56,7 +57,7 @@ It should correspond to an integer, as it indexes the column to plot
     # world should be a one dimensional vector, corresponding to one time step only
     if "xs" in what
         d_i = []; xt_array = []; x1_array = []
-        world_df_g = groupby(world2df(collect(skipmissing(world[:, tplot > 0 ? tplot : size(world,2) ])),geotrait=true),:x1)
+        world_df_g = groupby(world2df(clean_world(world[:, tplot > 0 ? tplot : size(world,2) ]),tend,true),:x1)
         for world_df in world_df_g
             if trait == 0
                 x = world_df.g
@@ -86,8 +87,8 @@ It should correspond to an integer, as it indexes the column to plot
     end
     if "3dgeo" in what
         @series begin
-        xarray = get_geo.(world_sm)
-        yarray = get_xarray(world_sm,2)
+        xarray = get_geo.(world_sm,tspan_ar)
+        yarray = get_x(world_sm,2)
             seriestype := :scatter3d
             markercolor := "blue"
             markerstrokewidth := 0
@@ -103,7 +104,7 @@ It should correspond to an integer, as it indexes the column to plot
     if "3d" in what
         @series begin
         xarray = get_xarray(world_sm,1)
-        yarray = get_xarray(world_sm,2)
+        yarray = get_x(world_sm,2)
             seriestype := :scatter3d
             markercolor := "blue"
             markerstrokewidth := 0

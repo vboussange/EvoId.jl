@@ -31,7 +31,7 @@ agents = [Agent( [1e-2]  .* randn(1) .- .5) for i in 1:K0]
 # using JLD2
 # @save "wrightfisher_test.jld2" worldall p
 # @load "wrightfisher_test.jld2" worldall
-# xarray = get_xarray(worldall,1); xarray_test = get_xarray(worldall_test,1)
+# xarray = get_x(worldall,1); xarray_test = get_x(worldall_test,1)
 
 
 # @test xarray ≈ xarray_test

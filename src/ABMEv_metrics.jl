@@ -53,7 +53,7 @@ If trait > 0, returns the covariance matrix, with first row geotrait and second 
 """
 function var(world::Array{U,1};trait=1) where U <: Union{Missing,Agent{T}} where T
     world = collect(skipmissing(world))
-    xarray = get_xarray(world,trait)
+    xarray = get_x(world,trait)
     return var(xarray,dims=1)
 end
 """
@@ -64,9 +64,9 @@ If trait > 0, returns the covariance matrix, with first row geotrait and second 
 # Arguments
 
 """
-function covgeo(world::Array{U,1},trait = 0) where U <: Union{Missing,Agent}
+function covgeo(world::Array{U,1},t::Number,trait = 0) where U <: Union{Missing,Agent}
     world = collect(skipmissing(world))
-    xarray = get_geo.(world)
+    xarray = get_geo.(world,t)
     if trait > 0
         xstd = reshape(get_x.(world,trait),size(world,1),size(world,2))
         xarray = hcat(xarray,xstd)

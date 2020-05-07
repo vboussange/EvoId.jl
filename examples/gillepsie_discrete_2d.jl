@@ -1,4 +1,3 @@
-
 using ABMEv,UnPack
 cd(@__DIR__)
 using Dates
@@ -16,7 +15,7 @@ K0 = 1000
 K(X) = gaussian(X[2],X[1] * a,sigma_K) / nodes
 alpha(X,Y) = (X[1] ≈ Y[1]) * gaussian(X[2],Y[2],sigma_a) / K0
 NMax = 5000
-tend = 3000.
+tend = 1.
 reflected = true;
 dt_saving = 15.
 
