@@ -91,23 +91,32 @@ function hamming(world::Array{Agent,1}) where T <: Int
     return H
 end
 """
-    get_alpha_div(world::Array{U,1};trait=1) where U <: Union{Missing,Agent{T}} where T
+    get_alpha_div(world::Array{U,1},trait=1) where U <: Union{Missing,Agent}
+Mean of the local variance of `trait` per patch
 # Arguments
 """
-function get_alpha_div(world::Array{U,1};trait=1) where U <: Union{Missing,Agent{T}} where T
-    _xall_df = world2df(world,geotrait=true)
+function get_alpha_div(world::Array{U,1},trait=1) where U <: Union{Missing,Agent}
+    _xall_df = world2df(world,true)
     xall_per_patch = groupby(_xall_df, :x1,sort=true)
-    #TODO: to be continued
+    if trait == 0
+        return mean([var(xp.g) for xp in xall_per_patch])
+    else
+        return mean([var(xp[:,trait+1]) for xp in xall_per_patch])
+    end
 end
 
 """
-    get_beta_div(world::Array{U,1};trait=1) where U <: Union{Missing,Agent{T}} where T
+    get_beta_div(world::Array{U,1},trait=1) where U <: Union{Missing,Agent}
+Variance of the mean of `trait` per patch
 # Arguments
 """
-function get_beta_div(world::Array{U,1};trait=1) where U <: Union{Missing,Agent{T}} where T
-    _xall_df = world2df(world,geotrait=true)
+function get_beta_div(world::Array{U,1},trait=1) where U <: Union{Missing,Agent}
+    _xall_df = world2df(world,true)
     xall_per_patch = groupby(_xall_df, :x1,sort=true)
-    sbar_i = [mean(xp.x2) for xp in xall_per_patch]
-
-    #TODO: to be continued
+    if trait == 0
+        sbar_i = [mean(xp.g) for xp in xall_per_patch]
+    else
+        sbar_i = [mean(xp[:,trait+1]) for xp in xall_per_patch]
+    end
+    return var(sbar_i)
 end
