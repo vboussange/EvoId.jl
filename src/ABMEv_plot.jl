@@ -24,13 +24,15 @@ It should correspond to an integer, as it indexes the column to plot
     #     p["tspan" ] = p["tspan"][idx_reduced]
     #     world = world[:,idx_reduced]
     # end
-    if count(ismissing,world) > 0
+    # second condition is to make sure that the world corresponds to all the time steps
+    # If not, then we can not get "x"
+    if count(ismissing,world) > 0 && length(p["tspan"]) == size(world,2)
         tspan_ar = vcat([p["tspan"][i]*ones(Int(p["NMax"] - count(ismissing,world[:,i]))) for i in 1:length(p["tspan"]) ]...);
     else
         tspan_ar = repeat(p["tspan"],inner = size(world,1))
     end
     # tspan = Float64.(tspan)
-    tend = p["tspan"][tplot > 0 ? tplot : size(world,2)]
+    tend = p["tspan"][tplot > 0 ? tplot : length(p["tspan"])]
     world_sm = clean_world(world)
     if "x" in what
         d_i = []
@@ -57,10 +59,11 @@ It should correspond to an integer, as it indexes the column to plot
     # world should be a one dimensional vector, corresponding to one time step only
     if "xs" in what
         d_i = []; xt_array = []; x1_array = []
-        world_df_g = groupby(world2df(clean_world(world[:, tplot > 0 ? tplot : size(world,2) ]),tend,true),:x1)
+        world_df_all = world2df(clean_world(world[:, tplot > 0 ? tplot : size(world,2) ]),tend,true)
+        world_df_g = groupby(world_df_all,:x1)
         for world_df in world_df_g
             if trait == 0
-                x = world_df.g
+                x = Float64.(world_df.g)
             else
                 # fitness occupies first spot
                 x = world_df[:,trait+1] ;
@@ -76,12 +79,13 @@ It should correspond to an integer, as it indexes the column to plot
             markercolor := eth_grad_small[d_i ./ maximum(d_i)]
             # markercolor := :blue
             markerstrokewidth := 0
-            seriesalpha := 1.
+            # seriesalpha := 1.
             xaxis := "geographical position"
+            xticks :=  sort!(unique(world_df_all.x1))
             yaxis := "trait value"
             label := ""
             grid := false
-            # markersize := 10
+            marker := (:rect,20,1.)
             x1_array[:],xt_array[:]
         end
     end

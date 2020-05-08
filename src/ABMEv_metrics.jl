@@ -66,9 +66,9 @@ If trait > 0, returns the covariance matrix, with first row geotrait and second 
 """
 function covgeo(world::Array{U,1},t::Number,trait = 0) where U <: Union{Missing,Agent}
     world = collect(skipmissing(world))
-    xarray = get_geo.(world,t)
+    xarray = Float64.(get_geo.(world,t))
     if trait > 0
-        xstd = reshape(get_x.(world,trait),size(world,1),size(world,2))
+        xstd = reshape(Float64.(get_x.(world,trait)),size(world,1),size(world,2))
         xarray = hcat(xarray,xstd)
     end
     return cov(xarray)
@@ -91,32 +91,34 @@ function hamming(world::Array{Agent,1}) where T <: Int
     return H
 end
 """
-    get_alpha_div(world::Array{U,1},trait=1) where U <: Union{Missing,Agent}
+    get_alpha_div(world::Array{U,1},t::Number,trait=1) where U <: Union{Missing,Agent}
 Mean of the local variance of `trait` per patch
 # Arguments
 """
-function get_alpha_div(world::Array{U,1},trait=1) where U <: Union{Missing,Agent}
-    _xall_df = world2df(world,true)
+function get_alpha_div(world::Array{U,1},t::Number,trait=1) where U <: Union{Missing,Agent}
+    _xall_df = world2df(world,t,true)
     xall_per_patch = groupby(_xall_df, :x1,sort=true)
     if trait == 0
-        return mean([var(xp.g) for xp in xall_per_patch])
+        # need to convert to Float64, otherwise infinite variance
+        return mean([var(Float64.(xp.g)) for xp in xall_per_patch])
     else
-        return mean([var(xp[:,trait+1]) for xp in xall_per_patch])
+        return mean([var(Float64.(xp[:,trait+1])) for xp in xall_per_patch])
     end
 end
 
 """
-    get_beta_div(world::Array{U,1},trait=1) where U <: Union{Missing,Agent}
+    get_beta_div(world::Array{U,1},t::Number,trait=1) where U <: Union{Missing,Agent}
 Variance of the mean of `trait` per patch
 # Arguments
 """
-function get_beta_div(world::Array{U,1},trait=1) where U <: Union{Missing,Agent}
-    _xall_df = world2df(world,true)
+function get_beta_div(world::Array{U,1},t::Number,trait=1) where U <: Union{Missing,Agent}
+    _xall_df = world2df(world,t,true)
     xall_per_patch = groupby(_xall_df, :x1,sort=true)
     if trait == 0
-        sbar_i = [mean(xp.g) for xp in xall_per_patch]
+        # need to convert to Float64, otherwise infinite variance
+        sbar_i = [mean(Float64.(xp.g)) for xp in xall_per_patch]
     else
-        sbar_i = [mean(xp[:,trait+1]) for xp in xall_per_patch]
+        sbar_i = [mean(Float64.(xp[:,trait+1])) for xp in xall_per_patch]
     end
     return var(sbar_i)
 end
