@@ -38,8 +38,6 @@ function new_world_G(nagents::Int,p::Dict; spread = 1., offset = 0.)
 end
 
 # returns trait i of the agent
-get_xhist(a::Agent,i::Number) = a.x_history[Int(i),:]
-get_xhist(a::Agent) = a.x_history
 get_x(a::Agent) = a.x_history[:,end]
 function get_geo(a::Agent{U,T},t::Number) where {U,T}
     tarray = vcat(a.t_history[2:end],convert(T,t))
@@ -49,27 +47,26 @@ end
 # This method can acces geotrait, while the second not
 get_x(a::Agent,t::Number,i::Integer) = i > 0 ? a.x_history[Int(i),end] : get_geo(a,t)
 get_x(a::Agent,i::Integer) = a.x_history[Int(i),end]
+get_xhist(a::Agent,i::Number) = a.x_history[Int(i),:]
+get_xhist(a::Agent) = a.x_history
 get_d(a::Agent) = a.d
 get_b(a::Agent) = a.b
 get_fitness(a::Agent) = a.b - a.d
 get_dim(a::Agent) = size(a.x_history,1)
 get_nancestors(a::Agent) = size(a.x_history,2)
+
+get_x(world::Array{T},trait::Integer) where {T <: Agent} = trait > 0 ? reshape(hcat(get_x.(world,trait)),size(world,1),size(world,2)) : throw(ErrorException("Not the right method, need `t` as an argument"))
 """
-    get_xarray(world::Array{Agent},trait::Int)
-Mainly works for WF-type world
+    get_x(world::Array{T},t::Number,trait::Integer) where {T <: Agent} 
 Returns trait of every agents of world in the form of an array which dimensions corresponds to the input.
 If trait = 0 , we return the geotrait.
-Particularly suited for an array world corresponding to a timeseries.
 
 """
-get_x(world::Array{T},trait::Integer) where {T <: Agent} = trait > 0 ? reshape(hcat(get_x.(world,trait)),size(world,1),size(world,2)) : throw(ErrorException("Not the right method, need `t` as an argument"))
-
 get_x(world::Array{T},t::Number,trait::Integer) where {T <: Agent} = trait > 0 ? reshape(hcat(get_x.(world,trait)),size(world,1),size(world,2)) : reshape(hcat(get_geo.(world,t)),size(world,1),size(world,2))
 
 """
     get_xarray(world::Array{Agent,1})
 Returns every traits of every agents of world in the form of an array
-If geotrait = true, then a last trait dimension is added, corresponding to geotrait.
 """
 function get_xarray(world::Array{T,1}) where {T <: Agent}
     return hcat(get_x.(world)...)
@@ -83,26 +80,26 @@ function get_xarray(world::Array{T,1},t::Number,geotrait::Bool=false) where {T <
     return xarray
 end
 
-"""
-    get_xhist(world::Vector{Agent},geotrait = false)
-Returns the trait history of every agents of world in the form of an 3 dimensional array,
-with
-- first dimension as the agent index
-- second as time index
-- third as trait index
-If geotrait = true, then a last trait dimension is added, corresponding to geotrait.
-Note that because number of ancestors are different between agents, we return an array which size corresponds to the minimum of agents ancestors,
-and return the last generations, dropping the youngest ones
-"""
-function get_xhist(world::Vector{T}) where {T <: Agent}
-    hist = minimum(get_nancestors.(world))
-    ntraits = get_dim(first(world));
-    xhist = zeros(length(world), hist, ntraits + geotrait);
-    for (i,a) in enumerate(world)
-        xhist[i,:,1:end-geotrait] = get_xhist(a)[:,end-hist+1:end]';
-    end
-    return xhist
-end
+# """
+#     get_xhist(world::Vector{Agent},geotrait = false)
+# Returns the trait history of every agents of world in the form of an 3 dimensional array,
+# with
+# - first dimension as the agent index
+# - second as time index
+# - third as trait index
+# If geotrait = true, then a last trait dimension is added, corresponding to geotrait.
+# Note that because number of ancestors are different between agents, we return an array which size corresponds to the minimum of agents ancestors,
+# and return the last generations, dropping the youngest ones
+# """
+# function get_xhist(world::Vector{T}) where {T <: Agent}
+#     hist = minimum(get_nancestors.(world))
+#     ntraits = get_dim(first(world));
+#     xhist = zeros(length(world), hist, ntraits + geotrait);
+#     for (i,a) in enumerate(world)
+#         xhist[i,:,1:end-geotrait] = get_xhist(a)[:,end-hist+1:end]';
+#     end
+#     return xhist
+# end
 
 # TODO: This method broken, when one ask for the geotraits
 # function get_xhist(world::Vector{T},t::Number,geotrait = false) where {T <: Agent}
