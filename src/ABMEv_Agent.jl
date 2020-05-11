@@ -57,7 +57,7 @@ get_nancestors(a::Agent) = size(a.x_history,2)
 
 get_x(world::Array{T},trait::Integer) where {T <: Agent} = trait > 0 ? reshape(hcat(get_x.(world,trait)),size(world,1),size(world,2)) : throw(ErrorException("Not the right method, need `t` as an argument"))
 """
-    get_x(world::Array{T},t::Number,trait::Integer) where {T <: Agent} 
+    get_x(world::Array{T},t::Number,trait::Integer) where {T <: Agent}
 Returns trait of every agents of world in the form of an array which dimensions corresponds to the input.
 If trait = 0 , we return the geotrait.
 
@@ -149,9 +149,9 @@ end
 
 
 """
-increment_x!(a::Agent{StdAgent,U},t::U,p::Dict) where U
-    This function increments agent by random numbers specified in p
-    ONLY FOR CONTINUOUS DOMAINS
+    function increment_x!(a::Agent{StdAgent,U},t::U,p::Dict) where U
+This function increments agent by random numbers specified in p
+ONLY FOR CONTINUOUS DOMAINS
 """
 function increment_x!(a::Agent{StdAgent,U},t,p::Dict) where U
     tdim = length(p["D"])
