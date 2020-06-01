@@ -120,5 +120,5 @@ function get_beta_div(world::Array{U,1},t::Number,trait=1) where U <: Union{Miss
     else
         sbar_i = [mean(Float64.(xp[:,trait+1])) for xp in xall_per_patch]
     end
-    return var(sbar_i,,corrected=false)
+    return var(sbar_i,corrected=false)
 end
