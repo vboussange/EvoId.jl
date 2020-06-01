@@ -54,7 +54,7 @@ If trait > 0, returns the covariance matrix, with first row geotrait and second 
 function var(world::Array{U,1};trait=1) where U <: Union{Missing,Agent{T}} where T
     world = collect(skipmissing(world))
     xarray = get_x(world,trait)
-    return var(xarray,dims=1)
+    return var(xarray,dims=1,corrected=false)
 end
 """
     covgeo(world::Array{Agent,1},trait = 0)
@@ -71,7 +71,7 @@ function covgeo(world::Array{U,1},t::Number,trait = 0) where U <: Union{Missing,
         xstd = reshape(Float64.(get_x.(world,trait)),size(world,1),size(world,2))
         xarray = hcat(xarray,xstd)
     end
-    return cov(xarray)
+    return cov(xarray,corrected=false)
 end
 
 """
@@ -100,9 +100,9 @@ function get_alpha_div(world::Array{U,1},t::Number,trait=1) where U <: Union{Mis
     xall_per_patch = groupby(_xall_df, :x1,sort=true)
     if trait == 0
         # need to convert to Float64, otherwise infinite variance
-        return mean([var(Float64.(xp.g)) for xp in xall_per_patch])
+        return mean([var(Float64.(xp.g),corrected=false) for xp in xall_per_patch])
     else
-        return mean([var(Float64.(xp[:,trait+1])) for xp in xall_per_patch])
+        return mean([var(Float64.(xp[:,trait+1]),corrected=false) for xp in xall_per_patch])
     end
 end
 
@@ -120,5 +120,5 @@ function get_beta_div(world::Array{U,1},t::Number,trait=1) where U <: Union{Miss
     else
         sbar_i = [mean(Float64.(xp[:,trait+1])) for xp in xall_per_patch]
     end
-    return var(sbar_i)
+    return var(sbar_i,,corrected=false)
 end
