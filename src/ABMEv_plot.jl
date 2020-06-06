@@ -7,7 +7,7 @@ import KernelDensity:kde,pdf
 # ARGS
 - `what = ["x","H"]`: the plots you want to obtain
 - `trait = 1`: the trait that will plotted regarding what you asked. `trait = 0` will plot the geotrait
-- `tplot = false` used when calling xs, as it plots a snapshot of the world at a particular time
+- `tplot = 0` used when calling xs, as it plots a snapshot of the world at a particular time
 It should correspond to an integer, as it indexes the column to plot
 
 # Options available
@@ -89,12 +89,51 @@ It should correspond to an integer, as it indexes the column to plot
             x1_array[:],xt_array[:]
         end
     end
+    if "gs" in what
+        _world = clean_world(world[:, tplot > 0 ? tplot : length(p["tspan"]) ])
+        y = get_x(_world,tend,2)[:]
+        x = get_x(_world,tend,0)[:]
+        X = hcat(x,y)
+        d = kde(X)
+        # by density
+        d_i = diag(pdf(d,X[:,1],X[:,2]))
+        # by value
+        # d_i = y
+        d_i = (d_i .- minimum(d_i)) ./ (maximum(d_i) .- minimum(d_i))
+        # TODO: we stopped here
+        @series begin
+            seriestype := :scatter
+            markercolor := eth_grad_small[d_i]
+            # markercolor := :blue
+            markerstrokewidth := 0
+            # seriesalpha := 1.
+            xaxis := "geotrait"
+            yaxis := "trait value"
+            label := ""
+            grid := false
+            # marker := (:rect,20,1.)
+            x,y
+        end
+    end
     if "3dgeo" in what
+        d_i = []
+        for i in 1:size(world,2)
+            _world = clean_world(world[:,i])
+            x = get_x(_world,p["tspan"][i],2)[:]
+            y = get_x(_world,p["tspan"][i],0)[:]
+            X = hcat(x,y)
+            # d = kde(X)
+            # di_temp = diag(pdf(d,X[:,1],X[:,2]))
+            di_temp = y
+            di_temp = (di_temp .- minimum(di_temp)) ./ (maximum(di_temp) .- minimum(di_temp))
+            # here we normalise with respect to maximum value at each time step
+            append!(d_i,di_temp)
+        end
         @series begin
         xarray = get_geo.(world_sm,tspan_ar)
         yarray = get_x(world_sm,2)
             seriestype := :scatter3d
-            markercolor := "blue"
+            markercolor := eth_grad_std[d_i ./ 1.]
             markerstrokewidth := 0
             seriesalpha :=.1
             xlabel := "time"
@@ -106,11 +145,21 @@ It should correspond to an integer, as it indexes the column to plot
         end
     end
     if "3d" in what
+        d_i = []
+        for i in 1:size(world,2)
+            x = get_x(clean_world(world[:,i]),p["tspan"][i],1)[:]
+            y = get_x(clean_world(world[:,i]),p["tspan"][i],2)[:]
+            X = hcat(x,y)
+            d = kde(X)
+            di_temp = diag(pdf(d,X[:,1],X[:,2]))
+            di_temp = (di_temp .- minimum(di_temp)) ./ (maximum(di_temp) .- minimum(di_temp))
+            append!(d_i,di_temp)
+        end
         @series begin
         xarray = get_x(world_sm,1)
         yarray = get_x(world_sm,2)
             seriestype := :scatter3d
-            markercolor := "blue"
+            markercolor := eth_grad_small[d_i ./ maximum(d_i)]
             markerstrokewidth := 0
             seriesalpha :=.1
             xlabel := "time"
