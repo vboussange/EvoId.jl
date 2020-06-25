@@ -219,6 +219,9 @@ You can also do the same trick with directly the gitlab address, cf [Pkg.jl](htt
 ## References
 - [Champagnat and Ferriere founding article](https://linkinghub.elsevier.com/retrieve/pii/S0040580905001632)
 - [Champagnat and Ferriere second article - 2008](https://www.tandfonline.com/doi/full/10.1080/15326340802437710)
-- 
+
 ## Similar packages:
 [Agents.jl](https://juliadynamics.github.io/Agents.jl/) It would be worth to have a look! It has been designed by Ali R. Vahdati, from UZH.
+
+## Future directions
+Make use of CUDA.jl to accelerate the simulations wih the use of GPU.
