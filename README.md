@@ -224,4 +224,5 @@ You can also do the same trick with directly the gitlab address, cf [Pkg.jl](htt
 [Agents.jl](https://juliadynamics.github.io/Agents.jl/) It would be worth to have a look! It has been designed by Ali R. Vahdati, from UZH.
 
 ## Future directions
-Make use of CUDA.jl to accelerate the simulations wih the use of GPU.
+- Try to improve parallelism with the help of Threads.@Threads and @inbounds (cf [tutorial](https://juliagpu.gitlab.io/CUDA.jl/tutorials/introduction/#Introduction-1) )
+- Make use of CUDA.jl to accelerate the simulations wih the use of GPU.
