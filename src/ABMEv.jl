@@ -21,5 +21,6 @@ module ABMEv
     export copy,runWorld_store_WF,runWorld_store_G,clean_world #,runWorld_G!,runWorld_WF!,
     export H_discrete,findclusters,var,covgeo,hamming,get_beta_div, get_alpha_div
     export update_afterbirth_std!,update_afterdeath_std!
-    export generalised_gaussian,gaussian,ma,geomsmooth,arithsmooth,eth_grad_std
+    export generalised_gaussian,gaussian,ma,geomsmooth,arithsmooth,eth_grad_std,
+        DiversityFunction,geomsmooth2D,arithsmooth2D,interpolate_df
 end
