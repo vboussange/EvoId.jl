@@ -41,6 +41,9 @@ It should correspond to an integer, as it indexes the column to plot
             append!(d_i,pdf(kde(x),x))
         end
         @series begin
+            if length(world_sm) !== length(tspan_ar[:])
+                throw(DimensionMismatch("You want to plot a world with missing data"))
+            end
         xarray = get_x.(world_sm,tspan_ar[:],trait)
             seriestype := :scatter
             markercolor := eth_grad_small[d_i ./ maximum(d_i)]

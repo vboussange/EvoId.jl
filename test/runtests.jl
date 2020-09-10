@@ -4,6 +4,8 @@ using ABMEv, Test, JLD2,Random
     include("gillepsie.jl")
     # include("wrightfisher.jl")
     include("metrics.jl")
+    include("utilstest.jl")
+
     # we might want to put this in a separate file at some point
     @testset "Reflection" begin
         @test get_inc_reflected(0.,2.0) ≈ .0

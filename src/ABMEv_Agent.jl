@@ -116,7 +116,7 @@ end
 # end
 
 
-function world2df(world::Array{T,1}) where {T <: Agent}
+function world2df(world::Array{T,1},geotrait=false) where {T <: Agent}
     xx = get_xarray(world)
     dfw = DataFrame(:f => get_fitness.(world))
     for i in 1:size(xx,1)
