@@ -46,7 +46,7 @@ const eth_grad_small = cgrad([colorant"#1F407A", RGB(0.671,0.851,0.914),RGB(1.0,
 const eth_grad_std = cgrad([colorant"#1F407A", RGB(0.671,0.851,0.914),RGB(1.0,1.0,0.749), RGB(0.992,0.682,0.38),RGB(0.647,0.0,0.149),],[.0,1.])
 
 # This is all about interpolations
-using Interpolations
+import Interpolations:interpolate,Gridded,Linear
 struct DiversityFunction
     x
     y
@@ -93,4 +93,17 @@ function interpolate_df(df,xlab,ylab,zlab)
     xa = unique(df[xlab]); ya = unique(df[ylab])
     A = reshape(df[zlab],length(xa),length(ya))
     return DiversityFunction(xa,ya,interpolate((xa,ya),A,Gridded(Linear())))
+end
+
+import DataFrames.groupby
+"""
+    function groupby(f, list::Array)
+returns a dictionary that group `list` elements by value of function `f`
+"""
+groupby(f, list::Array) = begin
+  groups = Dict()
+  for v in list
+    push!(get!(groups, f(v), []), v)
+  end
+  groups
 end

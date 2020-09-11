@@ -5,7 +5,7 @@ mutable struct Agent{T,U}
     # history of traits for geotraits
     x_history::Array{U}
     # birth time of ancestors
-    t_history::Array{U,1}
+    t_history::Array{Float64,1}
     # death rate
     d::Float64
     #birth rate
@@ -49,6 +49,7 @@ get_x(a::Agent,t::Number,i::Integer) = i > 0 ? a.x_history[Int(i),end] : get_geo
 get_x(a::Agent,i::Integer) = a.x_history[Int(i),end]
 get_xhist(a::Agent,i::Number) = a.x_history[Int(i),:]
 get_xhist(a::Agent) = a.x_history
+get_thist(a::Agent) = a.t_history
 get_d(a::Agent) = a.d
 get_b(a::Agent) = a.b
 get_fitness(a::Agent) = a.b - a.d
