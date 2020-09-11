@@ -133,7 +133,17 @@ function get_hamming_dist_hist(a1,a2,trait=1,time = 0)
         xhist = zeros(2,length(ttot))
         for (i,a) in enumerate([a1,a2])
                 _thist = get_thist(a)
-                _xhist = get_xhist(a,trait)
+                # Here we check that there is no redundancy of thist because of casting errors
+                # In the future, we should remove this check, as the type of time has been set to Float64
+                # Hence there should be no more problems of this type
+                ttrue = _thist[2:end] .- _thist[1:end-1] .> 0
+                if count(ttrue) < length(_thist) - 1
+                    _tt = vcat(ttrue,true)
+                    _thist = _thist[_tt] # we drop the position that was occupied for dt = .0
+                    _xhist = get_xhist(a,trait)[_tt]
+                else
+                    _xhist = get_xhist(a,trait)
+                end
                 k = 0
                 _l = length(_thist)
                 for j in 1:(_l - 1)
