@@ -124,10 +124,49 @@ function get_beta_div(world::Array{U,1},t::Number,trait=1) where U <: Union{Miss
 end
 
 """
-    function get_hamming_dist_hist(a1,a2,time,trait=1)
-Returns a metric corresponding to the exact time agents have been isolated to each other
+    function get_xhist_mat(world,trait=1,time = 0)
+returns `xhist,ttot`, where `xhist` is a matrix with dimension `lenght(world)` x `length(thist)`,
+which consists of geographical history of ancestors at every time step.
+If `time` is specified and is higher that the highest time step in world,
+then the last column of xhist corresponds to actual position of agents
 """
-function get_hamming_dist_hist(a1,a2,trait=1,time = 0)
+
+function get_xhist_mat(world,trait=1,time = 0)
+        thist = vcat(get_thist.(world)...)
+        ttot = sort!(unique(thist))
+        xhist = zeros(length(world),length(ttot))
+        for (i,a) in enumerate(world)
+                _thist = get_thist(a)
+                _xhist = get_xhist(a,trait)
+                k = 0
+                _l = length(_thist)
+                for j in 1:(_l - 1)
+                        xhist[i,j+k] = _xhist[j]
+                                while _thist[j+1] > ttot[j+k+1]
+                                        k+=1
+                                        xhist[i,j+k] = _xhist[j]
+                                        if j+k == length(ttot)
+                                                break
+                                        end
+                                end
+                end
+                xhist[i,_l+k:end] .= _xhist[end]
+        end
+        tt = 0
+        time > ttot[end] ? ttot = vcat(ttot,time) : tt = 1
+        return xhist[:,1:end-tt],ttot
+end
+
+"""
+    function get_dist_hist(a1,a2,dist,trait=1,time = 0)
+
+Returns the integral of the distance `dist` through time of `trait` between `a1.x` and `a2.x`.
+
+```math
+\\int d(x_1,x_2,t)dt
+```
+"""
+function get_dist_hist(a1,a2,dist,trait=1,time = 0)
         thist = vcat(get_thist(a1),get_thist(a2))
         ttot = sort!(unique(thist))
         xhist = zeros(2,length(ttot))
@@ -160,38 +199,42 @@ function get_hamming_dist_hist(a1,a2,trait=1,time = 0)
         end
         tt = 0
         time > ttot[end] ? ttot = vcat(ttot,time) : tt = 1
-        return sum((xhist[1,1:end-tt] .!= xhist[2,1:end-tt])[:] .* (ttot[2:end] .- ttot[1:end-1]))
-        # return xhist
-        # return (thist[2:end] .- thist[1:end-1])
+        return sum(dist.(xhist[1,1:end-tt],xhist[2,1:end-tt])[:] .* (ttot[2:end] .- ttot[1:end-1]))
 end
 
+
+
 """
-    function get_pairwise_average_isolation(world,trait=1,time = 0)
+    function et_pairwise_average_isolation(world,dist,trait=1)
 Returns the average pairwise isolation by time between all agents of `world`,
 using metrics `get_hamming_dist_hist`
 """
-function get_pairwise_average_isolation(world,trait=1,time = 0)
+function get_pairwise_average_isolation(world,dist,trait=1)
         N = size(world,1)
         D = zeros(N)
+        time = maximum(get_t.(world))
         # Here you should do a shared array to compute in parallel
         Threads.@threads for i in 1:(N-1)
                 for j in i+1:N
-                            C = get_hamming_dist_hist(world[i],world[j],trait,time)
+                            C = get_dist_hist(world[i],world[j],dist,trait,time)
                             D[i] += C
                             D[j] += C
                 end
         end
-        return sum(D) / N^2
+        return sum(D) / (2 * N^2)
 end
 
 """
-    function get_local_pairwise_average_isolation(world,trait=1,time = 0)
+    function get_local_pairwise_average_isolation(world,dist,trait=1)
 Similar to `get_pairwise_average_isolation`, but the pairwise distance is calculated within demes.
 An average of this metrics by deme is return.
 """
-function get_local_pairwise_average_isolation(world,trait=1,time = 0)
+function get_local_pairwise_average_isolation(world,dist,trait=1)
         f(a) = get_x(a,1)
         groups = groupby(f,world)
-        d = get_pairwise_average_isolation.(collect(values(groups)),trait,time)
+        d = get_pairwise_average_isolation.(collect(values(groups)),dist,trait)
         mean(d)
 end
+
+isnotequal_dist(x1,x2) = x1 != x2
+squared_dist(x1,x2) = (x1-x2)^2

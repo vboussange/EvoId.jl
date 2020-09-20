@@ -47,6 +47,7 @@ end
 # This method can acces geotrait, while the second not
 get_x(a::Agent,t::Number,i::Integer) = i > 0 ? a.x_history[Int(i),end] : get_geo(a,t)
 get_x(a::Agent,i::Integer) = a.x_history[Int(i),end]
+get_t(a::Agent) = a.t_history[end]
 get_xhist(a::Agent,i::Number) = a.x_history[Int(i),:]
 get_xhist(a::Agent) = a.x_history
 get_thist(a::Agent) = a.t_history
