@@ -125,7 +125,7 @@ end
 
 """
     function get_xhist_mat(world,trait=1,time = 0)
-returns `xhist,ttot`, where `xhist` is a matrix with dimension `lenght(world)` x `length(thist)`,
+returns `xhist,ttot`, where `xhist` is a matrix with dimension `lenght(world)` x `length(thist)+1`,
 which consists of geographical history of ancestors at every time step.
 If `time` is specified and is higher that the highest time step in world,
 then the last column of xhist corresponds to actual position of agents
@@ -136,21 +136,31 @@ function get_xhist_mat(world,trait=1,time = 0)
         ttot = sort!(unique(thist))
         xhist = zeros(length(world),length(ttot))
         for (i,a) in enumerate(world)
-                _thist = get_thist(a)
+            _thist = get_thist(a)
+            # Here we check that there is no redundancy of thist because of casting errors
+            # In the future, we should remove this check, as the type of time has been set to Float64
+            # Hence there should be no more problems of this type
+            ttrue = _thist[2:end] .- _thist[1:end-1] .> 0
+            if count(ttrue) < length(_thist) - 1
+                _tt = vcat(ttrue,true)
+                _thist = _thist[_tt] # we drop the position that was occupied for dt = .0
+                _xhist = get_xhist(a,trait)[_tt]
+            else
                 _xhist = get_xhist(a,trait)
-                k = 0
-                _l = length(_thist)
-                for j in 1:(_l - 1)
-                        xhist[i,j+k] = _xhist[j]
-                                while _thist[j+1] > ttot[j+k+1]
-                                        k+=1
-                                        xhist[i,j+k] = _xhist[j]
-                                        if j+k == length(ttot)
-                                                break
-                                        end
-                                end
-                end
-                xhist[i,_l+k:end] .= _xhist[end]
+            end
+            k = 0
+            _l = length(_thist)
+            for j in 1:(_l - 1)
+                    xhist[i,j+k] = _xhist[j]
+                            while _thist[j+1] > ttot[j+k+1]
+                                    k+=1
+                                    xhist[i,j+k] = _xhist[j]
+                                    if j+k == length(ttot)
+                                            break
+                                    end
+                            end
+            end
+            xhist[i,_l+k:end] .= _xhist[end]
         end
         tt = 0
         time > ttot[end] ? ttot = vcat(ttot,time) : tt = 1
@@ -167,39 +177,8 @@ Returns the integral of the distance `dist` through time of `trait` between `a1.
 ```
 """
 function get_dist_hist(a1,a2,dist,trait=1,time = 0)
-        thist = vcat(get_thist(a1),get_thist(a2))
-        ttot = sort!(unique(thist))
-        xhist = zeros(2,length(ttot))
-        for (i,a) in enumerate([a1,a2])
-                _thist = get_thist(a)
-                # Here we check that there is no redundancy of thist because of casting errors
-                # In the future, we should remove this check, as the type of time has been set to Float64
-                # Hence there should be no more problems of this type
-                ttrue = _thist[2:end] .- _thist[1:end-1] .> 0
-                if count(ttrue) < length(_thist) - 1
-                    _tt = vcat(ttrue,true)
-                    _thist = _thist[_tt] # we drop the position that was occupied for dt = .0
-                    _xhist = get_xhist(a,trait)[_tt]
-                else
-                    _xhist = get_xhist(a,trait)
-                end
-                k = 0
-                _l = length(_thist)
-                for j in 1:(_l - 1)
-                        xhist[i,j+k] = _xhist[j]
-                                while _thist[j+1] > ttot[j+k+1]
-                                        k+=1
-                                        xhist[i,j+k] = _xhist[j]
-                                        if j+k == length(ttot)
-                                                break
-                                        end
-                                end
-                end
-                xhist[i,_l+k:end] .= _xhist[end]
-        end
-        tt = 0
-        time > ttot[end] ? ttot = vcat(ttot,time) : tt = 1
-        return sum(dist.(xhist[1,1:end-tt],xhist[2,1:end-tt])[:] .* (ttot[2:end] .- ttot[1:end-1]))
+        xhist,ttot = get_xhist_mat([a1,a2],trait,time)
+        return sum(dist.(xhist[1,:],xhist[2,:]) .* (ttot[2:end] .- ttot[1:end-1]))
 end
 
 
