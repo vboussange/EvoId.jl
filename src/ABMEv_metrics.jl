@@ -181,26 +181,30 @@ function get_dist_hist(a1,a2,dist,trait=1,time = 0)
         return sum(dist.(xhist[1,:],xhist[2,:]) .* (ttot[2:end] .- ttot[1:end-1]))
 end
 
+"""
+    function truncvar(X::AbstractArray)
+Returns the truncated variance of `X`.
+"""
 
+function truncvar(X::AbstractArray)
+        N = length(X)
+        c = [count(y->y!=x,X) for x  in unique(X)]
+        return sum(c .* (N .-c)) /(2*N^2)
+end
 
 """
-    function et_pairwise_average_isolation(world,dist,trait=1)
-Returns the average pairwise isolation by time between all agents of `world`,
-using metrics `get_hamming_dist_hist`
+    function get_pairwise_average_isolation(world;trait=1,trunc=false)
+Returns the integrated pairwise squared distance between all agents of `world` wrt `trait`.
+If `trunc=true` then the distance is truncated to binary value 0 or 1.
 """
-function get_pairwise_average_isolation(world,dist,trait=1)
-        N = size(world,1)
-        D = zeros(N)
-        time = maximum(get_t.(world))
-        # Here you should do a shared array to compute in parallel
-        Threads.@threads for i in 1:(N-1)
-                for j in i+1:N
-                            C = get_dist_hist(world[i],world[j],dist,trait,time)
-                            D[i] += C
-                            D[j] += C
-                end
+function get_pairwise_average_isolation(world;trait=1,trunc=false)
+        xhist,ttot = get_xhist_mat(world)
+        if trunc
+                V = truncvar.([xhist[:,i] for i in 1:size(xhist,2)])
+        else
+                V = var(xhist,dims=1,corrected=false)[:]
         end
-        return sum(D) / (2 * N^2)
+        return sum(V .* (ttot[2:end] .- ttot[1:end-1]))
 end
 
 """
@@ -208,12 +212,9 @@ end
 Similar to `get_pairwise_average_isolation`, but the pairwise distance is calculated within demes.
 An average of this metrics by deme is return.
 """
-function get_local_pairwise_average_isolation(world,dist,trait=1)
+function get_local_pairwise_average_isolation(world;trait=1,trunc=false)
         f(a) = get_x(a,1)
         groups = groupby(f,world)
-        d = get_pairwise_average_isolation.(collect(values(groups)),dist,trait)
+        d = get_pairwise_average_isolation.(collect(values(groups)),trait=trait,trunc=trunc)
         mean(d)
 end
-
-isnotequal_dist(x1,x2) = x1 != x2
-squared_dist(x1,x2) = (x1-x2)^2

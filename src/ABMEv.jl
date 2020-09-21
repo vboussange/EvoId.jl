@@ -22,7 +22,7 @@ module ABMEv
     export H_discrete,findclusters,var,covgeo,hamming,get_beta_div, get_alpha_div,
         get_dist_hist,get_pairwise_average_isolation,
         get_local_pairwise_average_isolation,
-        isnotequal_dist,squared_dist,get_xhist_mat
+        truncvar,get_xhist_mat
     export update_afterbirth_std!,update_afterdeath_std!
     export generalised_gaussian,gaussian,ma,geomsmooth,arithsmooth,eth_grad_std,
         DiversityFunction,geomsmooth2D,arithsmooth2D,interpolate_df,groupby
