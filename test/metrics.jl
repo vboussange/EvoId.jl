@@ -36,7 +36,7 @@ p = Dict("mu" => [1. 1.],"D" => [0. 0.], "nodes" =>10 )
        @testset "Isolation by history - hamming distance" begin
            a1 = Agent{StdAgent,Float64}([1 2 3],[0,1,4],0.,1.)
            a2 = Agent{StdAgent,Float64}([1 10 3 10],[0,3,4,5],0.,1.)
-           @test get_dist_hist(a1,a2,isnotequal_dist,1) ≈ 3.0
+           @test get_dist_hist(a1,a2,(x,y)->y!=x,1) ≈ 3.0
        end
 end
 

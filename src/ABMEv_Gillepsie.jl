@@ -2,7 +2,7 @@
 
 
 """
-    give_birth(a::Agent,p)
+    function give_birth(a::Agent,t,p::Dict)
 Used for Gillepsie setting
 """
 function give_birth(a::Agent,t,p::Dict)
@@ -77,3 +77,17 @@ Get rid of missing value in `world`
 """
 #TODO : put some type specs here
 clean_world(world) = collect(skipmissing(world))
+
+"""
+    function new_world_G(nagents::Int,p::Dict; spread = 1., offset = 0.)
+Returns an array `world0` of size `p["NMax"]`, with `nagents` ancestors agents.
+Those agents have traits distributed according to the normal distribution with mean `offset` and standard deviation `spread`.
+The dimension of the domain is determined by the size of the array `spread`.
+"""
+function new_world_G(nagents::Int,p::Dict; spread = 1., offset = 0.)
+    typeof(spread) <: Array ? spread = spread[:] : nothing;
+    typeof(offset) <: Array ? offset = offset[:] : nothing;
+    agent0 = [Agent( spread  .* randn(length(spread)) .+ offset) for i in 1:nagents]
+    world0 = vcat(agent0[:],repeat([missing],Int(p["NMax"] - nagents)))
+    return world0
+end

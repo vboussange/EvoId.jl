@@ -5,8 +5,10 @@ module ABMEv
     using LightGraphs
 
     include("ABMEv_Agent.jl")
+    include("ABMEv_Space.jl")
     include("ABMEv_WF.jl")
     include("ABMEv_Gillepsie.jl")
+    include("ABMEv_CFM.jl")
     include("ABMEv_runworld.jl")
     include("ABMEv_metrics.jl")
     include("ABMEv_plot.jl")

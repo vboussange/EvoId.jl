@@ -187,9 +187,12 @@ function runWorld_store_WF(p,world0;mode="std")
 end
 """
     function runWorld_store_G(p,world0)
-Gillepsie process. Returns a tuple worldall,tspanarray
-If specified p["dt_saving"] determines the time step to save the simulation. If not only last time step is saved
-
+Gillepsie process.
+- returns a tuple 'worldall, tspanarray'
+- `worldall` stores the world every `p["dt_saving"]` time steps.
+If `p["dt_saving"]` not specified, it returns an array with two columns,
+first corresponding to initial conditions and last corresponding to world in the last time step.
+>:warning: if you choose `nagents = 1` then nothing is saved until the end of the simulation.
 """
 function runWorld_store_G(p,world0)
     # we store the value of world every 100 changes by default

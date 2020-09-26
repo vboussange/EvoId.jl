@@ -24,29 +24,38 @@ import Base.copy
 copy(a::Agent{T,U}) where {T,U} = Agent{T,U}(copy(a.x_history),copy(a.t_history),copy(a.d),copy(a.b))
 copy(m::Missing) = missing
 
-"""
-    function new_world_G(nagents::Int,p::Dict; spread = 1., offset = 0.)
-Returns an array of type Array{Union{Missing,Agent}} initialised with normal distribution.
-Only relevant for Gillepsie algorithm as of now.
-"""
-function new_world_G(nagents::Int,p::Dict; spread = 1., offset = 0.)
-    typeof(spread) <: Array ? spread = spread[:] : nothing;
-    typeof(offset) <: Array ? offset = offset[:] : nothing;
-    agent0 = [Agent( spread  .* randn(length(spread)) .+ offset) for i in 1:nagents]
-    world0 = vcat(agent0[:],repeat([missing],Int(p["NMax"] - nagents)))
-    return world0
-end
+#####################
+###Agent accessors###
+#####################
 
-# returns trait i of the agent
+"""
+    get_x(a::Agent)
+Returns trait i of the agent
+"""
 get_x(a::Agent) = a.x_history[:,end]
+
+"""
+    function get_geo(a::Agent{U,T},t::Number) where {U,T}
+Returns geotrait of agent `a` at time `t`
+"""
 function get_geo(a::Agent{U,T},t::Number) where {U,T}
     tarray = vcat(a.t_history[2:end],convert(T,t))
     tarray .-= a.t_history
     return sum(get_xhist(a,1) .* tarray)
 end
 # This method can acces geotrait, while the second not
+"""
+    get_x(a::Agent,t::Number,i::Integer)
+Returns trait `i` of the agent.
+Geotrait corresponds to dimension `i=0`.
+"""
+
 get_x(a::Agent,t::Number,i::Integer) = i > 0 ? a.x_history[Int(i),end] : get_geo(a,t)
 get_x(a::Agent,i::Integer) = a.x_history[Int(i),end]
+"""
+    get_t(a::Agent) = a.t_history[end]
+Get time when agent born.
+"""
 get_t(a::Agent) = a.t_history[end]
 get_xhist(a::Agent,i::Number) = a.x_history[Int(i),:]
 get_xhist(a::Agent) = a.x_history
@@ -57,23 +66,34 @@ get_fitness(a::Agent) = a.b - a.d
 get_dim(a::Agent) = size(a.x_history,1)
 get_nancestors(a::Agent) = size(a.x_history,2)
 
+#####################
+###World accessors###
+#####################
+"""
+    get_x(world::Array{T},trait::Integer) where {T <: Agent}
+Get x of world without geotrait.
+"""
 get_x(world::Array{T},trait::Integer) where {T <: Agent} = trait > 0 ? reshape(hcat(get_x.(world,trait)),size(world,1),size(world,2)) : throw(ErrorException("Not the right method, need `t` as an argument"))
 """
     get_x(world::Array{T},t::Number,trait::Integer) where {T <: Agent}
 Returns trait of every agents of world in the form of an array which dimensions corresponds to the input.
-If trait = 0 , we return the geotrait.
-
+If `trait = 0` , we return the geotrait.
 """
 get_x(world::Array{T},t::Number,trait::Integer) where {T <: Agent} = trait > 0 ? reshape(hcat(get_x.(world,trait)),size(world,1),size(world,2)) : reshape(hcat(get_geo.(world,t)),size(world,1),size(world,2))
 
 """
-    get_xarray(world::Array{Agent,1})
+    function get_xarray(world::Array{T,1}) where {T <: Agent}
 Returns every traits of every agents of world in the form of an array
 """
 function get_xarray(world::Array{T,1}) where {T <: Agent}
     return hcat(get_x.(world)...)
 end
-
+"""
+    function get_xarray(world::Array{T,1},t::Number,geotrait::Bool=false) where {T <: Agent}
+Returns every traits of every agents of `world` in the form **of a one dimensional array** (in contrast to `get_x`).
+If `geotrait=true` the geotrait is also added to the set of trait, in the last line.
+If you do not want to specify `t` (only useful for geotrait), it is also possible to use `get_xarray(world::Array{T,1}) where {T <: Agent}`.
+"""
 function get_xarray(world::Array{T,1},t::Number,geotrait::Bool=false) where {T <: Agent}
     xarray = hcat(get_x.(world)...)
     if geotrait
@@ -146,62 +166,6 @@ function world2df(world::Array{T,1},t::Number,geotrait = false) where {T <: Agen
         dfw[:g] = get_geo.(world,t)
     end
     return dfw
-end
-
-
-
-"""
-    function increment_x!(a::Agent{StdAgent,U},t::U,p::Dict) where U
-This function increments agent by random numbers specified in p
-ONLY FOR CONTINUOUS DOMAINS
-"""
-function increment_x!(a::Agent{StdAgent,U},t,p::Dict) where U
-    tdim = length(p["D"])
-    reflected = haskey(p,"reflected") ? p["reflected"] : false
-    if reflected
-        inc = [get_inc_reflected(get_x(a,1),p["D"][1] *randn())]
-        if  tdim > 1
-            inc = vcat(inc,(rand(tdim-1) < p["mu"][2:end]) .* p["D"][2:end] .* randn(tdim-1))
-        end
-    else
-        # inc = yes no mutation * mutation
-        inc = (rand(tdim) < vec(p["mu"])) .* vec(p["D"][:]) .* randn(tdim)
-    end
-    a.x_history = hcat(a.x_history, get_x(a) + reshape(inc,:,1));
-    push!(a.t_history,t)
- end
-
- """
-     function increment_x!(a::Agent{MixedAgent,U},t::U,p::Dict) where U
- This function increments first trait of agent with integer values, that are automatically reflected between 1 and p["nodes"].
-Other traits are incremented as usual.
-TODO : make it work for a graph type landscape, where domain is not a line anymore.
- """
- function increment_x!(a::Agent{MixedAgent,U},t,p::Dict) where U
-     tdim = length(p["D"])
-     inc = [round(get_inc_reflected(get_x(a,1),p["D"][1] *randn(),1,p["nodes"]))]
-     if  tdim > 1
-         inc = vcat(inc,(rand(tdim-1) < p["mu"][2:end]) .* p["D"][2:end] .* randn(tdim-1))
-     end
-     a.x_history = hcat(a.x_history, get_x(a) + reshape(inc,:,1));
-     push!(a.t_history,t)
-end
-
-
-
-"""
-get_inc_reflected(x::Number,inc::Number,s=-1,e=1)
-    Here we increment the trajectory of trait 1 such that it follows a reflected brownian motion (1D)
-"""
-function get_inc_reflected(x::Number,inc::Number,s=-1,e=1)
-    if x + inc < s
-        inc = 2 * ( s - x ) - inc
-    elseif  x + inc > e
-        inc = 2 * ( e - x ) - inc
-    else
-        return inc
-    end
-    get_inc_reflected(x,inc,s,e)
 end
 
 """
