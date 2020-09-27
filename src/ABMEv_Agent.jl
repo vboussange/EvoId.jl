@@ -1,28 +1,66 @@
-abstract type StdAgent end
-abstract type MixedAgent end
+abstract type Ancestors{T} end
+abstract type Rates{T} end
+hasancestors(::Type{Ancestors{T}}) where {T} = T #not sure we need it
+hasrates(::Type{Rates{T}}) where {T} = T # not sure we need it
 
-mutable struct Agent{T,U}
+abstract type AbstractAgent{A<:Ancestors,R<:Rates} end # tc for time contingency, fit for fitness coeff
+AbstractAgentM = Union{Missing,AbstractAgent}
+mutable struct Agent{A<:Ancestors,R<:Rates,T,U,V} <: AbstractAgent{A,R}
     # history of traits for geotraits
-    x_history::Array{U}
+    pos::Array{T,1}
     # birth time of ancestors
-    t_history::Array{Float64,1}
+    t_history::Array{U,1}
     # death rate
-    d::Float64
+    d::V
     #birth rate
-    b::Float64
+    b::V
 end
 
-# Constructors
-# This  constructor should be used when one wants to impose the type of the agent (e.g. Mixed)
-Agent{T}(xhist::Array{U}) where {T,U} = Agent{T,U}(reshape(xhist,:,1),[0.],0.,1.)
+# infers position type and zeros
+function initpos(s::S) where {S<:AbstractSpacesTuple}
+    Eltype = eltype.(s)
+    Dims = ndims.(s)
+    pos = tuple()
+    for i in 1:length(Eltype)
+        if Dims[i] > 1
+            pos = (pos...,tuple(zeros(Eltype[i],Dims[i])...))
+        else
+            pos = (pos...,zero(Eltype[i]))
+        end
+    end
+    Tuple{Eltype...},pos
+end
 
-# This constructor is used by default
-Agent(xhist::Array{U}) where {U <: Number} = Agent{StdAgent}(xhist)
+function Agent(s::S;ancestors=false,rates=false) where {S  <: AbstractSpacesTuple}
+    T,pos = initpos(s)
+    t = ancestors ? [Float64(.0)] : [nothing]
+    U =  ancestors ? Float64 : Nothing
+    d = rates ?  Float64(.0) : nothing
+    b = d
+    V = rates ?  Float64 : Nothing
+    Agent{Ancestors{ancestors},Rates{rates},T,U,V}([pos],t,d,b)
+end
 
-Agent() = Agent(Float64[],0.,0.,1.)
+# here pos is provided
+function Agent(s::S, pos::P;ancestors=false,rates=false) where {P,S  <: AbstractSpacesTuple}
+    T = Tuple{eltype.(s)...}
+    if !(T <: P)
+        throw(ArgumentError("Position provided does not match with underlying space"))
+    end
+    t = ancestors ? Float64(.0) : [nothing]
+    U =  ancestors ? Float64 : Nothing
+    d = rates ?  Float64(.0) : nothing
+    b = d
+    V = rates ?  Float64 : Nothing
+    Agent{Ancestors{ancestors},Rates{rates},T,U,V}([pos],t,d,b)
+end
+
+# TODO : implement pretty print
+
 import Base.copy
-copy(a::Agent{T,U}) where {T,U} = Agent{T,U}(copy(a.x_history),copy(a.t_history),copy(a.d),copy(a.b))
+copy(a::Agent{A,R,T,U,V}) where {A,R,T,U,V} = Agent{A,R,T,U,V}(copy(a.pos),copy(a.t_history),copy(a.d),copy(a.b))
 copy(m::Missing) = missing
+copy(n::Nothing) = nothing
 
 #####################
 ###Agent accessors###
@@ -32,14 +70,14 @@ copy(m::Missing) = missing
     get_x(a::Agent)
 Returns trait i of the agent
 """
-get_x(a::Agent) = a.x_history[:,end]
+get_x(a::AbstractAgent) = a.x_history[end]
 
 """
     function get_geo(a::Agent{U,T},t::Number) where {U,T}
 Returns geotrait of agent `a` at time `t`
 """
-function get_geo(a::Agent{U,T},t::Number) where {U,T}
-    tarray = vcat(a.t_history[2:end],convert(T,t))
+function get_geo(a::Agent{Ancestors{true},R,T,U,V},t::Number) where {R,T,U,V}
+    tarray = vcat(a.t_history[2:end],convert(U,t))
     tarray .-= a.t_history
     return sum(get_xhist(a,1) .* tarray)
 end
@@ -50,13 +88,13 @@ Returns trait `i` of the agent.
 Geotrait corresponds to dimension `i=0`.
 """
 
-get_x(a::Agent,t::Number,i::Integer) = i > 0 ? a.x_history[Int(i),end] : get_geo(a,t)
-get_x(a::Agent,i::Integer) = a.x_history[Int(i),end]
+get_x(a::AbstractAgent,t::Number,i::Integer) = i > 0 ? a.x_history[end][Int(i)] : get_geo(a,t)
+get_x(a::AbstractAgent,i::Integer) = a.x_history[end][Int(i)]
 """
     get_t(a::Agent) = a.t_history[end]
 Get time when agent born.
 """
-get_t(a::Agent) = a.t_history[end]
+get_t(a::AbstractAgent) = a.t_history[end]
 get_xhist(a::Agent,i::Number) = a.x_history[Int(i),:]
 get_xhist(a::Agent) = a.x_history
 get_thist(a::Agent) = a.t_history
@@ -101,42 +139,6 @@ function get_xarray(world::Array{T,1},t::Number,geotrait::Bool=false) where {T <
     end
     return xarray
 end
-
-# """
-#     get_xhist(world::Vector{Agent},geotrait = false)
-# Returns the trait history of every agents of world in the form of an 3 dimensional array,
-# with
-# - first dimension as the agent index
-# - second as time index
-# - third as trait index
-# If geotrait = true, then a last trait dimension is added, corresponding to geotrait.
-# Note that because number of ancestors are different between agents, we return an array which size corresponds to the minimum of agents ancestors,
-# and return the last generations, dropping the youngest ones
-# """
-# function get_xhist(world::Vector{T}) where {T <: Agent}
-#     hist = minimum(get_nancestors.(world))
-#     ntraits = get_dim(first(world));
-#     xhist = zeros(length(world), hist, ntraits + geotrait);
-#     for (i,a) in enumerate(world)
-#         xhist[i,:,1:end-geotrait] = get_xhist(a)[:,end-hist+1:end]';
-#     end
-#     return xhist
-# end
-
-# TODO: This method broken, when one ask for the geotraits
-# function get_xhist(world::Vector{T},t::Number,geotrait = false) where {T <: Agent}
-#     hist = minimum(get_nancestors.(world))
-#     ntraits = get_dim(first(world));
-#     xhist = zeros(length(world), hist, ntraits + geotrait);
-#     for (i,a) in enumerate(world)
-#         xhist[i,:,1:end-geotrait] = get_xhist(a)[:,end-hist+1:end]';
-#         if geotrait
-#             xhist[i,:,ntraits+geotrait] = cumsum(get_xhist(a,1))[end-hist+1:end]
-#         end
-#     end
-#     return xhist
-# end
-
 
 function world2df(world::Array{T,1},geotrait=false) where {T <: Agent}
     xx = get_xarray(world)

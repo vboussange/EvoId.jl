@@ -47,11 +47,10 @@ It should correspond to an integer, as it indexes the column to plot
         xarray = get_x.(world_sm,tspan_ar[:],trait)
             seriestype := :scatter
             markercolor := eth_grad_small[d_i ./ maximum(d_i)]
-            # markercolor := :blue
             markerstrokewidth := 0
             seriesalpha :=1.
-            xlabel := "time"
-            ylabel := "trait value"
+            # xlabel := "time"
+            # ylabel := "trait value"
             label := ""
             grid := false
             # markersize := 2.3/1000*size(world_sm,1)
@@ -88,7 +87,7 @@ It should correspond to an integer, as it indexes the column to plot
             yaxis := "trait value"
             label := ""
             grid := false
-            marker := (:rect,20,1.)
+            # marker := (:rect,20,1.)
             x1_array[:],xt_array[:]
         end
     end

@@ -1,3 +1,36 @@
+using LightGraphs
+"""
+    abstract type AbstractSpace{Dim,T,F} end
+`Dim` is the dimension of the space, `T` is the element type, `ife` is a bool which is `true`
+when space is finite
+"""
+
+abstract type IsFinite{T} end
+Base.isfinite(::Type{IsFinite{T}}) where {T} = T
+
+#ife stands for is finite
+abstract type AbstractSpace{Dim,T,I} end
+AbstractSpacesTuple = Tuple{Vararg{AbstractSpace}}
+Base.ndims(x::AbstractSpace{Dim,T,I}) where {Dim,T,I} = Dim
+Base.isfinite(x::AbstractSpace{Dim,T,I}) where {Dim,T,F,I} = isfinite(I) #not sure we need this
+Base.eltype(::AbstractSpace{Dim,T,I}) where {Dim,T,I} = T
+
+SpaceType=Union{Nothing, AbstractSpace} # not sure what is this used for
+
+abstract type AbstractDiscreteSpace{Dim,T,I} <: AbstractSpace{Dim,T,I}  end
+abstract type AbstractGraphSpace{T} <: AbstractDiscreteSpace{1,T,IsFinite{true}} end
+struct GraphSpace{T} <: AbstractGraphSpace{T}
+    g::AbstractGraph{T}
+end
+
+struct DiscreteSegment{T} <: AbstractDiscreteSpace{1,T,IsFinite{true}}
+    s::T
+    e::T
+end
+
+struct Real1DSpace{T} <: AbstractSpace{1,T,IsFinite{false}} end
+
+
 
 """
     function increment_x!(a::Agent{StdAgent,U},t::U,p::Dict) where U

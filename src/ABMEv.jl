@@ -3,6 +3,7 @@ __precompile__()
 module ABMEv
     using Distributions,LinearAlgebra,Reexport,StatsBase
     using LightGraphs
+    using UnPack
 
     include("ABMEv_Agent.jl")
     include("ABMEv_Space.jl")

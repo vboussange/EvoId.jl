@@ -13,21 +13,21 @@ end
 
 function update_afterbirth_std!(world,idx_offspring,p::Dict) where T
     # updating competition only the two columns corresponding to agent idx
-    α = p["alpha"];K=p["K"];
+    @unpack d,b = p
     x_offspring = get_x(world[idx_offspring])
     for a in skipmissing(world)
-        a.d += α(get_x(a),x_offspring)
+        a.d += d(get_x(a),x_offspring)
     end
     # Now updating new agent
-    world[idx_offspring].d = sum(α.(get_x.(skipmissing(world)),Ref(x_offspring))) - α(x_offspring,x_offspring)
-    world[idx_offspring].b = K(x_offspring)
+    world[idx_offspring].d = sum(d.(get_x.(skipmissing(world)),Ref(x_offspring))) - d(x_offspring,x_offspring)
+    world[idx_offspring].b = b(x_offspring)
 end
 
 function update_afterdeath_std!(world,x_death,p::Dict) where T
-    α = p["alpha"]
+    @unpack d
     # updating death rate only the two columns corresponding to agent idx
     for a in skipmissing(world)
-        a.d -= α(get_x(a),x_death)
+        a.d -= d(get_x(a),x_death)
     end
 end
 
