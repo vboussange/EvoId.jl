@@ -140,34 +140,31 @@ function get_xarray(world::Array{T,1},t::Number,geotrait::Bool=false) where {T <
     return xarray
 end
 
-function world2df(world::Array{T,1},geotrait=false) where {T <: Agent}
-    xx = get_xarray(world)
-    dfw = DataFrame(:f => get_fitness.(world))
-    for i in 1:size(xx,1)
-        dfw[Meta.parse("x$i")] = xx[i,:]
+## Modifiers
+"""
+    function increment_x!(a::Agent{StdAgent,U},t::U,p::Dict) where U
+This function increments agent by random numbers specified in p
+ONLY FOR CONTINUOUS DOMAINS
+"""
+function increment_x!(a::AbstractAgent{A,R},s<:AbstractSpacesTuple,p<:Dict{String,Any},t<:T) where {A<:Ancestors{true},R,T}
+    @unpack D,mu = p
+    _x = get_x(a)
+    inc = similar(_x)
+    for (i,s) in enumerate(ss)
+        if rand() < mu[i]
+            inc[i] = get_inc.(_x[i],D[i],s)
+        end
     end
-    if geotrait
-        dfw[:g] = get_geo.(world)
-    end
-    return dfw
+    push!(a.t_history,t)
+    a.x_history = push!(a.x_history, _x + inc);
 end
 
-"""
-    world2df(world::Array{T,1},t::Number,geotrait = false) where {T <: Agent}
-Converts the array of agent world to a datafram, where each column corresponds to a trait of the
-agent, and an extra column captures fitness.
-Each row corresponds to an agent
-"""
-function world2df(world::Array{T,1},t::Number,geotrait = false) where {T <: Agent}
-    xx = get_xarray(world)
-    dfw = DataFrame(:f => get_fitness.(world))
-    for i in 1:size(xx,1)
-        dfw[Meta.parse("x$i")] = xx[i,:]
-    end
-    if geotrait
-        dfw[:g] = get_geo.(world,t)
-    end
-    return dfw
+function increment_x!(a::AbstractAgent{A,R},s<:AbstractSpacesTuple,p<:Dict{String,Any},t<:T) where {A<:Ancestors{false},R,T}
+    @unpack D,mu = p
+    _x = get_x(a)
+    inc = get_inc.(_x,D,s)
+    a.t_history = [t]
+    a.x_history = [_x + inc];
 end
 
 """
