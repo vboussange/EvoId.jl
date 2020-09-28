@@ -6,7 +6,7 @@ struct Gillepsie <: AbstractAlg end
     function give_birth(a::Agent,t,p::Dict)
 Used for Gillepsie setting
 """
-function give_birth(mum_idx::Int,w::World{AbstractAgent{A,R},S,T}) where {A <: Ancestors{true}}
+function give_birth(mum_idx::Int,w::World{AbstractAgent{A,R},S,T}) where {A <: Ancestors{true},R,S,T}
     new_a = copy(w[mum_idx])
     increment_x!(new_a,space(w),parameters(w),time(w))
     return new_a

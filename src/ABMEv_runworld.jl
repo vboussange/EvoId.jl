@@ -1,8 +1,3 @@
-abstract type AbstractAlg end
-
-function solve(m::Model;dt_saving=nothing,callbacks=nothing)
-
-end
 
 """
     update_rates_std!(world,p::Dict,t::Float64)

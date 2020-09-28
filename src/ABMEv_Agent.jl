@@ -5,6 +5,10 @@ hasrates(::Type{Rates{T}}) where {T} = T # not sure we need it
 
 abstract type AbstractAgent{A<:Ancestors,R<:Rates} end # tc for time contingency, fit for fitness coeff
 AbstractAgentM = Union{Missing,AbstractAgent}
+
+"""
+$(TYPEDEF)
+"""
 mutable struct Agent{A<:Ancestors,R<:Rates,T,U,V} <: AbstractAgent{A,R}
     # history of traits for geotraits
     pos::Array{T,1}
@@ -146,7 +150,7 @@ end
 This function increments agent by random numbers specified in p
 ONLY FOR CONTINUOUS DOMAINS
 """
-function increment_x!(a::AbstractAgent{A,R},s<:AbstractSpacesTuple,p<:Dict{String,Any},t<:T) where {A<:Ancestors{true},R,T}
+function increment_x!(a::AbstractAgent{A,R},s::AbstractSpacesTuple,p::Dict{String,Any},t::T) where {A<:Ancestors{true},R,T}
     @unpack D,mu = p
     _x = get_x(a)
     inc = similar(_x)
@@ -159,7 +163,7 @@ function increment_x!(a::AbstractAgent{A,R},s<:AbstractSpacesTuple,p<:Dict{Strin
     a.x_history = push!(a.x_history, _x + inc);
 end
 
-function increment_x!(a::AbstractAgent{A,R},s<:AbstractSpacesTuple,p<:Dict{String,Any},t<:T) where {A<:Ancestors{false},R,T}
+function increment_x!(a::AbstractAgent{A,R},s::AbstractSpacesTuple,p::Dict{String,Any},t::T) where {A<:Ancestors{false},R,T}
     @unpack D,mu = p
     _x = get_x(a)
     inc = get_inc.(_x,D,s)

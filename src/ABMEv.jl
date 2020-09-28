@@ -4,21 +4,28 @@ module ABMEv
     using Distributions,LinearAlgebra,Reexport,StatsBase
     using LightGraphs
     using UnPack
+    using DocStringExtensions
 
-    include("ABMEv_Agent.jl")
     include("ABMEv_Space.jl")
-    include("ABMEv_WF.jl")
-    include("ABMEv_Gillepsie.jl")
-    include("ABMEv_CFM.jl")
-    include("ABMEv_runworld.jl")
+    include("ABMEv_Agent.jl")
+    include("ABMEv_world.jl")
+    include("ABMEv_Sim.jl")
     include("ABMEv_metrics.jl")
     include("ABMEv_plot.jl")
     include("ABMEv_utils.jl")
+    include("algo/ABMEv_WF.jl")
+    include("algo/ABMEv_Gillepsie.jl")
+    include("algo/ABMEv_CFM.jl")
+    include("ABMEv_runworld.jl")
 
 
     @reexport using Distributions, DataFrames
+
+    export GraphSpace,ContinuousSegment,DiscreteSegment,RealSpace,
+        AbstractSpacesTuple
     export update_rates!
-    export MixedAgent,StdAgent,Agent,get_fitness,get_x,get_t,get_dim,get_nancestors,get_xarray,get_xhist,
+    export MixedAgent,StdAgent,Agent,get_fitness,get_x,get_t,get_dim,
+        get_nancestors,get_xarray,get_xhist,
         get_thist,get_geo,get_b,get_d,increment_x!,get_inc_reflected,world2df,
         split_move,split_merge_move,tin,new_world_G
     export copy,runWorld_store_WF,runWorld_store_G,clean_world #,runWorld_G!,runWorld_WF!,

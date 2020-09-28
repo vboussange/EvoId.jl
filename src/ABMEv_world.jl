@@ -19,12 +19,12 @@ agents(world) = skipmissing(world.agents)
 size(world) = size(world.agents) - count(ismissing,world.agents)
 maxsize(w::World) = length(w.agents)
 _findfreeidx(w::World) = findfirst(findfirst(ismissing,w.agents))
-addAgent!(w::World,a<:AbstractAgent) = begin
+addAgent!(w::World,a::AbstractAgent) = begin
     idx = _findfreeidx(w)
     w.agents[idx] = a
     return nothing
 end
-removeAgent!(w::world,i::Int) = begin
+removeAgent!(w::World,i::Int) = begin
     world[i] = missing
     return nothing
 end

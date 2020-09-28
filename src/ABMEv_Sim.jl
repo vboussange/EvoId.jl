@@ -1,3 +1,4 @@
+abstract type AbstractAlg end
 
 # this used to be  world
 mutable struct Simulation{A<:AbstractAgentM, S<:AbstractSpacesTuple,T<:Number,N<:Number}
