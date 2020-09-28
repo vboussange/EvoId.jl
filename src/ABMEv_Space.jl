@@ -50,39 +50,43 @@ struct RealSpace{N,T} <: AbstractSpace{N,T,IsFinite{false}} end
 
 function get_inc(D,s::AbstractSpace{Dim,T,I}) where {Dim,T,I<:IsFinite{false}}
     if Dim > 1
-        return D[:] .* rand(T,Dim)
+        tuple(T.(return D[:] .* rand(Dim)))
     else
-        return D * rand(T)
+        return T(D * rand())
     end
 end
 get_inc(x,D,s::AbstractSpace{Dim,T,I}) where {Dim,T,I<:IsFinite{false}} = get_inc(D,s)
 
 function get_inc(x,D,s::ContinuousSegment{T}) where {T}
-    inc = D * rand(T)
-    return reflect1D(x,inc,s)
+    inc = D * rand()
+    return _reflect1D(x,inc,s)
 end
 
 function get_inc(x,D,s::DiscreteSegment{T}) where {T}
-    inc = D * rand(T)
-    return round(reflect1D(x,inc,s))
+    inc = D * rand()
+    return round(T,_reflect1D(x,inc,s))
 end
 
 function get_inc(x,D,s::GraphSpace{T}) where {T}
-    niter = round(S*rand(T))
-    return last(randomwalk(s.g,x,niter))
+    niter = round(Int,D*rand())
+    if niter > 0
+        return last(randomwalk(s.g,x,niter)) - x
+    else
+        return 0
+    end
 end
 
 """
 function get_inc_reflected(x::Number,inc::Number,s=-1,e=1)
     Here we increment the trajectory of trait 1 such that it follows a reflected brownian motion (1D)
 """
-function reflect1D(x::Number,inc::Number,s::AbstractSegment)
-    if x + inc < s
+function _reflect1D(x::Number,inc::Number,s::AbstractSegment)
+    if x + inc < s.s
         inc = 2 * ( s.s - x ) - inc
-    elseif  x + inc > e
+    elseif  x + inc > s.e
         inc = 2 * ( s.e - x ) - inc
     else
         return inc
     end
-    reflect1D(x,inc,s)
+    _reflect1D(x,inc,s)
 end
