@@ -5,13 +5,16 @@ hasrates(::Type{Rates{T}}) where {T} = T # not sure we need it
 
 abstract type AbstractAgent{A<:Ancestors,R<:Rates} end # tc for time contingency, fit for fitness coeff
 AbstractAgentM = Union{Missing,AbstractAgent}
+export AbstractAgentM
 
 """
 $(TYPEDEF)
 """
-mutable struct Agent{A<:Ancestors,R<:Rates,T,U,V} <: AbstractAgent{A,R}
+abstract type Agent{A<:Ancestors,R<:Rates,T<:Tuple,U,V} <: AbstractAgent{A,R}
+
+mutable struct AgentA{R<:Rates,T<:Tuple,U,V} <: Agent{Ancestors{true},R,T,U,V}
     # history of traits for geotraits
-    pos::Array{T,1}
+    x_history::Array{T,1}
     # birth time of ancestors
     t_history::Array{U,1}
     # death rate
@@ -20,6 +23,19 @@ mutable struct Agent{A<:Ancestors,R<:Rates,T,U,V} <: AbstractAgent{A,R}
     b::V
 end
 
+struct AgentNA{R<:Rates,T<:Tuple,U,V} <: Agent{Ancestors{false},R,T,U,V}
+    # history of traits for geotraits
+    x_history::Array{T,1}
+    # birth time of ancestors
+    t_history::Array{U,1}
+    # death rate
+    d::V
+    #birth rate
+    b::V
+end
+
+eltype(a::Agent{A,R,T,U,V}) where {A,R,T,U,V} = T
+
 # infers position type and zeros
 function initpos(s::S) where {S<:AbstractSpacesTuple}
     Eltype = eltype.(s)
@@ -27,18 +43,23 @@ function initpos(s::S) where {S<:AbstractSpacesTuple}
     pos = tuple()
     for i in 1:length(Eltype)
         if Dims[i] > 1
-            pos = (pos...,tuple(zeros(Eltype[i],Dims[i])...))
+            pos = (pos...,Eltype[i](ones(Dims[i])))
         else
-            pos = (pos...,zero(Eltype[i]))
+            pos = (pos...,one(Eltype[i]))
         end
     end
     Tuple{Eltype...},pos
 end
 
+# default initialiser
+"""
+$(SIGNATURES)
+    Initialises agent with 0 values everywhere
+"""
 function Agent(s::S;ancestors=false,rates=false) where {S  <: AbstractSpacesTuple}
     T,pos = initpos(s)
-    t = ancestors ? [Float64(.0)] : [nothing]
-    U =  ancestors ? Float64 : Nothing
+    t = zeros(Float64,1)
+    U =  Float64
     d = rates ?  Float64(.0) : nothing
     b = d
     V = rates ?  Float64 : Nothing
@@ -46,25 +67,36 @@ function Agent(s::S;ancestors=false,rates=false) where {S  <: AbstractSpacesTupl
 end
 
 # here pos is provided
+"""
+$(SIGNATURES)
+    Initialises agent with `pos` provided
+"""
 function Agent(s::S, pos::P;ancestors=false,rates=false) where {P,S  <: AbstractSpacesTuple}
-    T = Tuple{eltype.(s)...}
-    if !(T <: P)
-        throw(ArgumentError("Position provided does not match with underlying space"))
+    T = eltype.(s)
+    for (i,p) in enumerate(pos)
+        if typeof(p) !== T[i]
+            try
+                p = convert(T[i],p)
+            catch e
+                throw(ArgumentError("Position provided does not match with underlying space"))
+            end
+        end
     end
-    t = ancestors ? Float64(.0) : [nothing]
-    U =  ancestors ? Float64 : Nothing
+    t = zeros(Float64,1)
+    U =  Float64
     d = rates ?  Float64(.0) : nothing
     b = d
     V = rates ?  Float64 : Nothing
-    Agent{Ancestors{ancestors},Rates{rates},T,U,V}([pos],t,d,b)
+    @show pos, T
+    Agent{Ancestors{ancestors},Rates{rates},Tuple{T...},U,V}([pos],t,d,b)
 end
 
 # TODO : implement pretty print
 
 import Base.copy
-copy(a::Agent{A,R,T,U,V}) where {A,R,T,U,V} = Agent{A,R,T,U,V}(copy(a.pos),copy(a.t_history),copy(a.d),copy(a.b))
-copy(m::Missing) = missing
-copy(n::Nothing) = nothing
+Base.copy(a::Agent{A,R,T,U,V}) where {A,R,T,U,V} = Agent{A,R,T,U,V}(copy(a.x_history),copy(a.t_history),copy(a.d),copy(a.b))
+Base.copy(m::Missing) = missing
+Base.copy(n::Nothing) = nothing
 
 #####################
 ###Agent accessors###
@@ -99,14 +131,14 @@ get_x(a::AbstractAgent,i::Integer) = a.x_history[end][Int(i)]
 Get time when agent born.
 """
 get_t(a::AbstractAgent) = a.t_history[end]
-get_xhist(a::Agent,i::Number) = a.x_history[Int(i),:]
+get_xhist(a::Agent,i::Number) = [a.x_history[t][Int(i)] for t in 1:length(a.xhistory)]
 get_xhist(a::Agent) = a.x_history
 get_thist(a::Agent) = a.t_history
 get_d(a::Agent) = a.d
 get_b(a::Agent) = a.b
 get_fitness(a::Agent) = a.b - a.d
-get_dim(a::Agent) = size(a.x_history,1)
-get_nancestors(a::Agent) = size(a.x_history,2)
+ndims(a::Agent) = size(a.x_history[end],1)
+nancestors(a::Agent) = length(a.x_history)
 
 #####################
 ###World accessors###
@@ -144,31 +176,39 @@ function get_xarray(world::Array{T,1},t::Number,geotrait::Bool=false) where {T <
     return xarray
 end
 
+import Base.zero
+Base.zero(t::Tuple{Vararg{Union{Number,Tuple{Vararg{Number}}}}}) = [zero.(e) for e in t]
+import Base.(+)
+(+)(t1::Tuple{Vararg{T,N}},t2::Tuple{Vararg{T,N}}) where {T<:Number,N}= tuple([t1[i] + t2[i] for i in 1:length(t1)]...)
+
+function _get_xinc(a::AbstractAgent,s::AbstractSpacesTuple,p::Dict,t::Number)
+    @unpack D,mu = p
+    _x = get_x(a)
+    inc = zero(_x)
+    for (i,ss) in enumerate(s)
+        if rand() < mu[i]
+            inc[i] = get_inc(_x[i],D[i],ss)
+        end
+    end
+    tuple((_x .+ inc)...)
+end
+
 ## Modifiers
 """
-    function increment_x!(a::Agent{StdAgent,U},t::U,p::Dict) where U
+    $(SIGNATURES)
 This function increments agent by random numbers specified in p
 ONLY FOR CONTINUOUS DOMAINS
 """
-function increment_x!(a::AbstractAgent{A,R},s::AbstractSpacesTuple,p::Dict{String,Any},t::T) where {A<:Ancestors{true},R,T}
-    @unpack D,mu = p
-    _x = get_x(a)
-    inc = similar(_x)
-    for (i,s) in enumerate(ss)
-        if rand() < mu[i]
-            inc[i] = get_inc.(_x[i],D[i],s)
-        end
-    end
+function increment_x!(a::AbstractAgent{A,R},s::AbstractSpacesTuple,p::Dict,t::T) where {A<:Ancestors{true},R,T}
     push!(a.t_history,t)
-    a.x_history = push!(a.x_history, _x + inc);
+    a.x_history = push!(a.x_history,_get_xinc(a,s,p,t))
+    return a
 end
 
-function increment_x!(a::AbstractAgent{A,R},s::AbstractSpacesTuple,p::Dict{String,Any},t::T) where {A<:Ancestors{false},R,T}
-    @unpack D,mu = p
-    _x = get_x(a)
-    inc = get_inc.(_x,D,s)
-    a.t_history = [t]
-    a.x_history = [_x + inc];
+function increment_x!(a::AbstractAgent{A,R},s::AbstractSpacesTuple,p::Dict,t::T) where {A<:Ancestors{false},R,T}
+    a.t_history = [ t ]
+    a.x_history = [_get_xinc(a,s,p,t)]
+    return a
 end
 
 """

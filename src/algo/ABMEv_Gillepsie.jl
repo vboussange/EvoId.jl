@@ -1,12 +1,14 @@
 # In this file lie the function for Gillepsie algorithm
-
+"""
+$(TYPEDEF)
+"""
 struct Gillepsie <: AbstractAlg end
-
+export Gillepsie
 """
     function give_birth(a::Agent,t,p::Dict)
 Used for Gillepsie setting
 """
-function give_birth(mum_idx::Int,w::World{AbstractAgent{A,R},S,T}) where {A <: Ancestors{true},R,S,T}
+function give_birth(mum_idx::Int,w::World)
     new_a = copy(w[mum_idx])
     increment_x!(new_a,space(w),parameters(w),time(w))
     return new_a
@@ -44,27 +46,27 @@ Returning dt drawn from an exponential distribution with parameter the total rat
  # Args
  t is for now not used but might be used for dynamic landscape
 """
-function updateWorld!(w::World,g::G) where {G <: Gillepsie}
+function updateWorld!(w::World{A,S,T},g::G) where {A,S,T,G <: Gillepsie}
     # total update world
-    agents = agents(world)
-    events_weights = ProbabilityWeights(vcat(get_d.(agents),get_b.(agents)))
+    alive = agents(w)
+    events_weights = ProbabilityWeights(vcat(get_d.(alive),get_b.(alive)))
     # Total rate of events
-    U = sum(events_weights)
-    dt = - log(rand(T))/U
-    update_clock!(world,dt)
+    ∑ = sum(events_weights)
+    dt = - log(rand(T))/∑
+    update_clock!(w,dt)
     if dt > 0.
         i_event = sample(events_weights)
         # This is ok since size is a multiple of 2
-        n = size(world)
+        n = size(w)
         if i_event <= n
             # DEATH EVENT
             # In this case i_event is also the index of the individual to die in the world_alive
-            updateDeathEvent!(world,G,i_event)
+            updateDeathEvent!(w,g,i_event)
         else
             # birth event
             # i_event - n is also the index of the individual to give birth in the world_alive
-            mum = world[i_event-n]
-            update_afterbirth_std!(world,idx_offspring)
+            mum = w[i_event-n]
+            updateBirthEvent!(w,g,idx_offspring)
         end
         return dt
     else
@@ -78,17 +80,3 @@ Get rid of missing value in `world`
 """
 #TODO : put some type specs here
 clean_world(world) = collect(skipmissing(world))
-
-"""
-    function new_world_G(nagents::Int,p::Dict; spread = 1., offset = 0.)
-Returns an array `world0` of size `p["NMax"]`, with `nagents` ancestors agents.
-Those agents have traits distributed according to the normal distribution with mean `offset` and standard deviation `spread`.
-The dimension of the domain is determined by the size of the array `spread`.
-"""
-function new_world_G(nagents::Int,p::Dict; spread = 1., offset = 0.)
-    typeof(spread) <: Array ? spread = spread[:] : nothing;
-    typeof(offset) <: Array ? offset = offset[:] : nothing;
-    agent0 = [Agent( spread  .* randn(length(spread)) .+ offset) for i in 1:nagents]
-    world0 = vcat(agent0[:],repeat([missing],Int(p["NMax"] - nagents)))
-    return world0
-end

@@ -9,9 +9,12 @@ abstract type IsFinite{T} end
 #ife stands for is finite
 abstract type AbstractSpace{Dim,T,I} end
 AbstractSpacesTuple = Tuple{Vararg{AbstractSpace}}
+import Base:ndims,isfinite,eltype
 Base.ndims(x::AbstractSpace{Dim,T,I}) where {Dim,T,I} = Dim
 Base.isfinite(x::AbstractSpace{Dim,T,IsFinite{t}}) where {Dim,T,t} = t #not sure we need this
-Base.eltype(::AbstractSpace{Dim,T,I}) where {Dim,T,I} = T
+Base.eltype(::AbstractSpace{Dim,T,I}) where {Dim,T,I} = Dim > 1 ? Tuple{Vararg{T,Dim}} : T
+Base.ndims(ss::AbstractSpacesTuple) = length(ss)
+Base.eltype(ss::AbstractSpacesTuple) where {Dim,T,I} = Tuple{eltype.(ss)...}
 
 SpaceType=Union{Nothing, AbstractSpace} # not sure what is this used for
 
@@ -22,12 +25,12 @@ struct GraphSpace{T} <: AbstractSpace{1,T,IsFinite{true}}
     g::AbstractGraph{T}
 end
 
-abstract type AbstractSegment{T}  <: AbstractSpace{1,T,IsFinite{true}} end
+abstract type AbstractSegment{T<:Number}  <: AbstractSpace{1,T,IsFinite{true}} end
 
 """
 $(TYPEDEF)
 """
-struct ContinuousSegment{T} <:  AbstractSegment{T}
+struct ContinuousSegment{T<:AbstractFloat} <:  AbstractSegment{T}
     s::T
     e::T
 end
@@ -35,40 +38,47 @@ end
 """
 $(TYPEDEF)
 """
-struct DiscreteSegment{T} <: AbstractSegment{T}
+struct DiscreteSegment{T<:Integer} <: AbstractSegment{T}
     s::T
     e::T
 end
 
 """
 $(TYPEDEF)
+
+A real pace with dimension N and type T
 """
 struct RealSpace{N,T} <: AbstractSpace{N,T,IsFinite{false}} end
 
-# TODO: find a way to put a type on get_inc
-# TODO: there is probably a better way of dealing with get_inc
+# TODO:
+"""
+$(SIGNATURES)
 
-function get_inc(D,s::AbstractSpace{Dim,T,I}) where {Dim,T,I<:IsFinite{false}}
+Returns increment
+"""
+# TODO: find a way to put a type on D in get_inc
+function get_inc(D,s::AbstractSpace{Dim,T,I}) where {Dim,T<:AbstractFloat,I<:IsFinite{false}}
     if Dim > 1
-        tuple(T.(return D[:] .* rand(Dim)))
+        return Tuple(D .* randn(T,Dim))
     else
-        return T(D * rand())
+        return D * randn(T)
     end
 end
 get_inc(x,D,s::AbstractSpace{Dim,T,I}) where {Dim,T,I<:IsFinite{false}} = get_inc(D,s)
 
+#TODO: there is probably a better way of dealing with those two functions
 function get_inc(x,D,s::ContinuousSegment{T}) where {T}
-    inc = D * rand()
+    inc = D * randn(T)
     return _reflect1D(x,inc,s)
 end
 
 function get_inc(x,D,s::DiscreteSegment{T}) where {T}
-    inc = D * rand()
+    inc = D * randn()
     return round(T,_reflect1D(x,inc,s))
 end
 
 function get_inc(x,D,s::GraphSpace{T}) where {T}
-    niter = round(Int,D*rand())
+    niter = round(Int,abs(D*randn()))
     if niter > 0
         return last(randomwalk(s.g,x,niter)) - x
     else

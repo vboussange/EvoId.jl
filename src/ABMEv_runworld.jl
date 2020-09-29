@@ -78,7 +78,10 @@ If `p["dt_saving"]` not specified, it returns an array with two columns,
 first corresponding to initial conditions and last corresponding to world in the last time step.
 >:warning: if you choose `nagents = 1` then nothing is saved until the end of the simulation.
 """
-function run(w::World{AbstractAgent{A,R},S,T},g::G;dt_saving=nothing,callbacks=nothing) where {G<:Gillepsie,A,R,S,T}
+# function run(w::World{AbstractAgent{A,R},S,T},g::G;dt_saving=nothing,callbacks=nothing) where {G<:Gillepsie,A,R,S,T}
+function run(w::World{AbstractAgent{A,R},S,T},g::G,tend::Number;
+                dt_saving=nothing,
+                callbacks=nothing) where {G<:Gillepsie,A,R,S,T}
     @unpack tend = parameters(w)
     n=size(w);
     NMax = sizemax(w)
@@ -103,7 +106,7 @@ function run(w::World{AbstractAgent{A,R},S,T},g::G;dt_saving=nothing,callbacks=n
             @info "saving world @ t = $(t)/ $(tend)"
             add_entry!(s,w)
         end
-        dt = updateWorld!!(w,g)
+        dt = updateWorld!(w,g)
         i += 1
     end
     # Saving last time step

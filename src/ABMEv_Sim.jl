@@ -1,31 +1,50 @@
 abstract type AbstractAlg end
 
 # this used to be  world
-mutable struct Simulation{A<:AbstractAgentM, S<:AbstractSpacesTuple,T<:Number,N<:Number}
-    worldarray::Array{AbstractAgentM,2}
+mutable struct Simulation{A<:AbstractAgentM, S<:AbstractSpacesTuple,T<:Number,F}
+    agentarray::Vector{AbstractAgentM}
+    space::S
     tspan::Vector{T}
-    aggregates::Vector{Dict{String,Number}}
+    cb::F
+    df_agg
     p::Dict{String,Any}
 end
 
-function Simulation()
-    tspan = zeros(1);
-    worldall = reshape(copy.(world0),N,1);
-    worldall = hcat(worldall,Array{Missing}(missing,N,1))
+# callbacks has to be of the form (names" => String[],"aggregates" => Function)
 
+"""
+$(SIGNATURES)
+"""
+function Simulation(w0::World{A,S,T};cb=(names = String[],agg =nothing)) where {A,S,T}
+    tspan = zeros(1);
+    NMax = maxsize(w0)
+    #agentarray is of size 2 at the beginning
+    agentarray = copy.(collect(w0.agents))
+    agentarray = hcat(agentarray,Array{Missing}(missing,NMax,1))
+    !isnothing(cb.agg) ? df_agg = [Dict(cb.names .=> cb.agg(world))] : df_agg = nothing
+    Simulation{A,S,T,cb.agg}([agentarray],space(w0),tspan,cb.agg,df_agg,parameters(w0))
  end
 
 get_tend(s::Simulation) = s.tspan[end]
+get_size(s::Simulation) = length(s.tspan)
 
-function add_entry!(s::Simulation,w::World)
-    j+=1;sw = size(worldall,2);
-    # we use <= because we save at the end of the wile loop
-    if sw <= j
-        # we double the size of worldall
-        worldall = hcat(worldall,Array{Missing}(missing,N,sw))
-    end
-    worldall[1:Int(N - count(ismissing,world0)),j] .= copy.(collect(skipmissing(world0)));
-    push!(tspanarray,t)
+"""
+$(SIGNATURES)
+Add `w` with callbacks `s.cb` to `s`
+"""
+function add_entry!(s::Simulation{A,S,T,F},w::World) where {A,S,T,F<:Function}
+    push!(s.agentarray,copy.(collect(w.agents)))
+    push!(s.tspan,w.t)
+    push!(s.df_agg,Dict(s.cb.names .=> s.cb.agg(world)))
+end
+
+"""
+$(SIGNATURES)
+Add `w` to `s`
+"""
+function add_entry!(s::Simulation{A,S,T,F},w::World) where {A,S,T,F<:Nothing}
+    push!(s.agentarray,copy.(collect(w.agents)))
+    push!(s.tspan,w.t)
 end
 
 function world2df(world::Array{T,1},geotrait=false) where {T <: Agent}

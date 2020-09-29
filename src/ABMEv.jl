@@ -24,11 +24,14 @@ module ABMEv
     export GraphSpace,ContinuousSegment,DiscreteSegment,RealSpace,
         AbstractSpacesTuple,get_inc
     export update_rates!
-    export MixedAgent,StdAgent,Agent,get_fitness,get_x,get_t,get_dim,
-        get_nancestors,get_xarray,get_xhist,
+    export AbstractAgent,Agent,get_fitness,get_x,get_t,get_dim,
+        nancestors,get_xarray,get_xhist,
         get_thist,get_geo,get_b,get_d,increment_x!,get_inc_reflected,world2df,
         split_move,split_merge_move,tin,new_world_G
-    export copy,runWorld_store_WF,runWorld_store_G,clean_world #,runWorld_G!,runWorld_WF!,
+    export World,parameters,time,space,agents,size,maxsize,addAgent!,removeAgent!
+    export runWorld!,give_birth,updateWorld!,update_clock!,updateBirthEvent!,
+        updateDeathEvent!#,runWorld_G!,runWorld_WF!,
+    export Simulation,add_entry!
     export H_discrete,findclusters,var,covgeo,hamming,get_beta_div, get_alpha_div,
         get_dist_hist,get_pairwise_average_isolation,
         get_local_pairwise_average_isolation,
