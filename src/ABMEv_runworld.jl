@@ -6,11 +6,11 @@ This standard updates takes
     - carrying capacity of the form K(x)
 """
 function  update_rates_std!(w::World)
-    @unpack b,k = parameters(w)
+    @unpack b,d = parameters(w)
     _agents = agents(w)
     traits = get_x.(_agents)
     # traits = get_xhist.(world)
-    n = size(world)
+    n = size(w)
     D = zeros(n)
     # Here you should do a shared array to compute in parallel
     for i in 1:(n-1)
@@ -21,7 +21,7 @@ function  update_rates_std!(w::World)
         end
     end
     # Here we can do  it in parallel as well
-    for (i,a) in _agents
+    for (i,a) in enumerate(_agents)
         a.d = D[i]
         a.b = b(traits[i])
     end
@@ -79,26 +79,25 @@ first corresponding to initial conditions and last corresponding to world in the
 >:warning: if you choose `nagents = 1` then nothing is saved until the end of the simulation.
 """
 # function run(w::World{AbstractAgent{A,R},S,T},g::G;dt_saving=nothing,callbacks=nothing) where {G<:Gillepsie,A,R,S,T}
-function run(w::World{AbstractAgent{A,R},S,T},g::G,tend::Number;
+function run!(w::World{A,S,T},g::G,tend::Number;
                 dt_saving=nothing,
-                callbacks=nothing) where {G<:Gillepsie,A,R,S,T}
-    @unpack tend = parameters(w)
+                cb=(names = String[],agg =nothing)) where {A,S,T,G<:Gillepsie}
     n=size(w);
-    NMax = sizemax(w)
+    NMax = maxsize(w)
     t = .0
-    i = 1;j=1;dt = 1.
-    isnothing(dt_saving) ? dt_saving =  p["tend"] + 1. : nothing
-    sim = Simulation(w,callbacks=callbacks)
-    if R <: Rates{true}
-        update_rates!(w)
+    i = 1;j=1;dt = 0.
+    isnothing(dt_saving) ? dt_saving =  tend + 1. : nothing
+    sim = Simulation(w,cb=cb)
+    if A <: AbstractAgent{AA,Rates{true}} where {AA}
+        update_rates_std!(w)
     end
     while t<tend
         if dt < 0
             throw("We obtained negative time step dt = $dt at event $i")
-        elseif size(world) == NMax
+        elseif size(w) == NMax
             @info "All individuals have died :("
             break
-        elseif size(world) == 0
+        elseif size(w) == 0
             @info "We have reached the maximum number of individuals allowed"
             break
         end
@@ -107,10 +106,11 @@ function run(w::World{AbstractAgent{A,R},S,T},g::G,tend::Number;
             add_entry!(s,w)
         end
         dt = updateWorld!(w,g)
+        t +=  dt
         i += 1
     end
     # Saving last time step
     add_entry!(sim,w)
-    @info "simulation stopped at t=$(tspanarray[end]), after $(i) generations"
+    @info "simulation stopped at t=$(t), after $(i) generations"
     return sim
 end

@@ -1,33 +1,37 @@
 cd(@__DIR__)
+using Random
 Random.seed!(0)
-import ABMEv:update_rates_std!
+using LightGraphs
+using Test
+using Revise,ABMEv
+using UnPack,JLD2
 
-
-a = 0;
+myspace = (RealSpace{1,Float64}(),)
 sigma_K = .9;
 sigma_a = .7;
 K0 = 1000;
-K(X) = gaussian(X[1],0.,sigma_K)
-α(X,Y) = gaussian(X[1],Y[1],sigma_a)/K0
-# α(X,Y) = 0.
-p_default = Dict(
-        "alpha" => α,
-        "K" => K,
-        "D" => [1e-2],
-        "mu" => [.1],
-        "tend" => 1.5,
-        "NMax" => Int(10000))
-na_init = K0
-world0 = new_world_G(na_init,p_default,spread = .01)
-worldall,p_default["tspan"] = runWorld_store_G(p_default,world0)
-world_alive_test = clean_world(worldall[:,end])
+b(X) = gaussian(X[1],0.,sigma_K)
+d(X,Y) = gaussian(X[1],Y[1],sigma_a)/K0
+D = (1e-2,)
+mu = [.1]
+NMax = 10000
+tend = 1.5
+p = Dict{String,Any}();@pack! p = d,b,D,mu,NMax
+
+myagents = [Agent(myspace,ancestors=true,rates=true) for i in 1:K0]
+w0 = World(myagents,myspace,p,0.)
+w1 = copy(w0)
+
+sim = run!(w0,Gillepsie(),tend)
+
+world_alive_test = collect(skipmissing(sim[:,end]))
 # @save "gillepsie_test.jld2" world_alive
 @load "gillepsie_test.jld2" world_alive
 ## Testing
 @testset "Gillepsie Algorithm" begin
         @testset "Testing global functioning" begin
-                @test size(worldall,2) > 1
-                @test p_default["tspan"][end] >= p_default["tend"]
+                @test size(sim,2) > 1
+                @test get_tend(sim) >= tend
         end
         ## Comparing simulation
         @testset "Matching new vs old results " begin

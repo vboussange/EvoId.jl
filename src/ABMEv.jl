@@ -29,9 +29,9 @@ module ABMEv
         get_thist,get_geo,get_b,get_d,increment_x!,get_inc_reflected,world2df,
         split_move,split_merge_move,tin,new_world_G
     export World,parameters,time,space,agents,size,maxsize,addAgent!,removeAgent!
-    export runWorld!,give_birth,updateWorld!,update_clock!,updateBirthEvent!,
+    export run!,give_birth,updateWorld!,update_clock!,updateBirthEvent!,
         updateDeathEvent!#,runWorld_G!,runWorld_WF!,
-    export Simulation,add_entry!
+    export Simulation,add_entry!,get_tend,get_size
     # export H_discrete,findclusters,var,covgeo,hamming,get_beta_div, get_alpha_div,
     #     get_dist_hist,get_pairwise_average_isolation,
     #     get_local_pairwise_average_isolation,

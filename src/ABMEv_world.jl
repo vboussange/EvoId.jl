@@ -11,7 +11,7 @@ end
 #constructor
 function World(w::Vector{A},s::S,p::Dict,t::T=0.) where {A<:AbstractAgent,S<:AbstractSpacesTuple,T}
     if typeof(p["D"]) != eltype(skipmissing(w)[1])
-        throw(ArgumentError("Diffusion coefficient does not match with underlying space"))
+        throw(ArgumentError("Diffusion coefficient does not match with underlying space\n `D::Tuple`"))
     end
     ww = vcat(w,repeat([missing],Int(p["NMax"] - length(w))))
     World{A,S,T}(ww,s,p,t)
@@ -60,7 +60,7 @@ Base.getindex(w::World,i::Integer) = getindex.(agents(w),i)
 # If `trait = 0` , we return the geotrait.
 # """
 # get_x(w::World,t::Number,trait::Integer) = trait > 0 ? w[i] : reshape(hcat(get_geo.(w,t)),size(w,1),size(w,2))
-# 
+#
 # """
 # $(SIGNATURES)
 # Returns every traits of every agents of world in the form of an array

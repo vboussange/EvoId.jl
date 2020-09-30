@@ -14,12 +14,12 @@ function give_birth(mum_idx::Int,w::World)
     return new_a
 end
 
-function updateBirthEvent!(world::World,::Gillepsie,mum_idx::Int)
+function updateBirthEvent!(w::World,::Gillepsie,mum_idx::Int)
     # updating competition only the two columns corresponding to agent idx
-    @unpack d,b = parameters(world)
-    offspring = give_birth(w,mum_idx)
+    @unpack d,b = parameters(w)
+    offspring = give_birth(mum_idx,w)
     x_offspring = get_x(offspring)
-    _agents = agents(world)
+    _agents = agents(w)
     for a in _agents
         a.d += d(get_x(a),x_offspring)
     end
@@ -65,8 +65,7 @@ function updateWorld!(w::World{A,S,T},g::G) where {A,S,T,G <: Gillepsie}
         else
             # birth event
             # i_event - n is also the index of the individual to give birth in the world_alive
-            mum = w[i_event-n]
-            updateBirthEvent!(w,g,idx_offspring)
+            updateBirthEvent!(w,g,i_event-n)
         end
         return dt
     else

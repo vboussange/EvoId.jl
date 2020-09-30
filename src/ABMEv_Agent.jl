@@ -104,7 +104,7 @@ Returns trait i of the agent
 
 Base.getindex(a::Agent,i::Int) = a.x_history[end][i]
 
-Base.getindex(a::Agent,I::Vararg{Int, 2}) = a.x_history[end][I]
+Base.getindex(a::Agent,I::Vararg{Int}) = a.x_history[end][I]
 
 get_x(a::Agent) = a.x_history[end]
 @deprecate get_x(a) a[:]
