@@ -34,7 +34,7 @@ ABMEv.initpos(myspace2)
 
 # increment on finite spaces
 # checking if reflection works
-@test mysegment.s < get_inc(5.,100.,mysegment) + 5. < mysegment.e
+@test mysegment.s - eps() < get_inc(5.,100.,mysegment) + 5. < mysegment.e + eps()
 @test mycontinuoussegment.s < get_inc(0.,100.,mycontinuoussegment) < mycontinuoussegment.e
 #checking if graph works
 @test prod([get_inc(1,10,mygraph) + 1 ∈ vertices(mygraph.g) for i in 1:30])

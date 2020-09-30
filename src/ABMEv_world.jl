@@ -45,3 +45,39 @@ update_clock!(w::World{A,S,T},dt) where {A,S,T} = begin
     w.t = convert(T,sum(w.t + dt))
     return nothing
 end
+
+
+## Accessors
+"""
+$(SIGNATURES)
+Get x of world without geotrait.
+"""
+Base.getindex(w::World,i::Integer) = getindex.(agents(w),i)
+#TODO : code it
+# """
+# $(SIGNATURES)
+# Returns trait of every agents of world in the form of an array which dimensions corresponds to the input.
+# If `trait = 0` , we return the geotrait.
+# """
+# get_x(w::World,t::Number,trait::Integer) = trait > 0 ? w[i] : reshape(hcat(get_geo.(w,t)),size(w,1),size(w,2))
+# 
+# """
+# $(SIGNATURES)
+# Returns every traits of every agents of world in the form of an array
+# """
+# function get_xarray(world::Array{T,1}) where {T <: Agent}
+#     return hcat(get_x.(world)...)
+# end
+# """
+# $(SIGNATURES)
+# Returns every traits of every agents of `world` in the form **of a one dimensional array** (in contrast to `get_x`).
+# If `geotrait=true` the geotrait is also added to the set of trait, in the last line.
+# If you do not want to specify `t` (only useful for geotrait), it is also possible to use `get_xarray(world::Array{T,1}) where {T <: Agent}`.
+# """
+# function get_xarray(world::Array{T,1},t::Number,geotrait::Bool=false) where {T <: Agent}
+#     xarray = hcat(get_x.(world)...)
+#     if geotrait
+#         xarray = vcat( xarray, get_geo.(world,t)')
+#     end
+#     return xarray
+# end

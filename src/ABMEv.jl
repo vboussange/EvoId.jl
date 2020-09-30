@@ -10,8 +10,8 @@ module ABMEv
     include("ABMEv_Agent.jl")
     include("ABMEv_world.jl")
     include("ABMEv_Sim.jl")
-    include("ABMEv_metrics.jl")
-    include("ABMEv_plot.jl")
+    # include("ABMEv_metrics.jl")
+    # include("ABMEv_plot.jl")
     include("ABMEv_utils.jl")
     include("algo/ABMEv_WF.jl")
     include("algo/ABMEv_Gillepsie.jl")
@@ -32,10 +32,10 @@ module ABMEv
     export runWorld!,give_birth,updateWorld!,update_clock!,updateBirthEvent!,
         updateDeathEvent!#,runWorld_G!,runWorld_WF!,
     export Simulation,add_entry!
-    export H_discrete,findclusters,var,covgeo,hamming,get_beta_div, get_alpha_div,
-        get_dist_hist,get_pairwise_average_isolation,
-        get_local_pairwise_average_isolation,
-        truncvar,get_xhist_mat
+    # export H_discrete,findclusters,var,covgeo,hamming,get_beta_div, get_alpha_div,
+    #     get_dist_hist,get_pairwise_average_isolation,
+    #     get_local_pairwise_average_isolation,
+    #     truncvar,get_xhist_mat
     export update_afterbirth_std!,update_afterdeath_std!
     export generalised_gaussian,gaussian,ma,geomsmooth,arithsmooth,eth_grad_std,
         DiversityFunction,geomsmooth2D,arithsmooth2D,interpolate_df,groupby

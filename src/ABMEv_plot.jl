@@ -212,3 +212,10 @@ It should correspond to an integer, as it indexes the column to plot
     #     end
     # end
 end
+
+
+import Plots:cgrad
+# asymmetry towards red, blue is only a fifth of the color range
+const eth_grad_small = cgrad([colorant"#1F407A", RGB(0.671,0.851,0.914),RGB(1.0,1.0,0.749), RGB(0.992,0.682,0.38),RGB(0.647,0.0,0.149),],[.0,.1])
+# symmetry between red and blue
+const eth_grad_std = cgrad([colorant"#1F407A", RGB(0.671,0.851,0.914),RGB(1.0,1.0,0.749), RGB(0.992,0.682,0.38),RGB(0.647,0.0,0.149),],[.0,1.])

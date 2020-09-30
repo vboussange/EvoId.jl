@@ -1,6 +1,7 @@
 using LightGraphs
 using Test
 using Revise,ABMEv
+using UnPack
 myspace = (GraphSpace(SimpleGraph(10,10)),RealSpace{1,Float64}())
 myagents = [Agent(myspace,ancestors=true,rates=true) for i in 1:10]
 d(X,Y) = gaussian(X[1],Y[1],1)
@@ -12,10 +13,10 @@ p = Dict{String,Any}();@pack! p = d,b,D,mu,NMax
 
 
 
-@test eltype(agents) <: AbstractAgentM
-@test typeof(agents) <: Vector{A} where {A<:AbstractAgentM}
+@test eltype(myagents) <: AbstractAgentM
+@test typeof(myagents) <: Vector{A} where {A<:AbstractAgentM}
 
-w = World(agents,myspace,p,0.)
+w = World(myagents,myspace,p,0.)
 @test size(w) ≈ 10
 newa = give_birth(1,w)
 addAgent!(w,newa)
@@ -24,8 +25,8 @@ removeAgent!(w,11)
 @test size(w) ≈ 10
 @test isnothing(update_clock!(w,.1))
 
+using BenchmarkTools
 if false
-    using BenchmarkTools
     # TODO
     # Here we observe that deleting an agent is a bit of a pain
     # Since one has to look where this agent is located in the structure

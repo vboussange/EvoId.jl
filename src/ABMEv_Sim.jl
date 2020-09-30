@@ -1,7 +1,7 @@
 abstract type AbstractAlg end
 
 # this used to be  world
-mutable struct Simulation{A<:AbstractAgentM, S<:AbstractSpacesTuple,T<:Number,F}
+mutable struct Simulation{A<:AbstractAgent, S<:AbstractSpacesTuple,T<:Number,F}
     agentarray::Vector{AbstractAgentM}
     space::S
     tspan::Vector{T}
@@ -47,32 +47,33 @@ function add_entry!(s::Simulation{A,S,T,F},w::World) where {A,S,T,F<:Nothing}
     push!(s.tspan,w.t)
 end
 
-function world2df(world::Array{T,1},geotrait=false) where {T <: Agent}
-    xx = get_xarray(world)
-    dfw = DataFrame(:f => get_fitness.(world))
-    for i in 1:size(xx,1)
-        dfw[Meta.parse("x$i")] = xx[i,:]
-    end
-    if geotrait
-        dfw[:g] = get_geo.(world)
-    end
-    return dfw
-end
-
-"""
-    world2df(world::Array{T,1},t::Number,geotrait = false) where {T <: Agent}
-Converts the array of agent world to a datafram, where each column corresponds to a trait of the
-agent, and an extra column captures fitness.
-Each row corresponds to an agent
-"""
-function world2df(world::Array{T,1},t::Number,geotrait = false) where {T <: Agent}
-    xx = get_xarray(world)
-    dfw = DataFrame(:f => get_fitness.(world))
-    for i in 1:size(xx,1)
-        dfw[Meta.parse("x$i")] = xx[i,:]
-    end
-    if geotrait
-        dfw[:g] = get_geo.(world,t)
-    end
-    return dfw
-end
+#TODO: code it
+# function world2df(world::Array{T,1},geotrait=false) where {T <: Agent}
+#     xx = get_xarray(world)
+#     dfw = DataFrame(:f => get_fitness.(world))
+#     for i in 1:size(xx,1)
+#         dfw[Meta.parse("x$i")] = xx[i,:]
+#     end
+#     if geotrait
+#         dfw[:g] = get_geo.(world)
+#     end
+#     return dfw
+# end
+#
+# """
+#     world2df(world::Array{T,1},t::Number,geotrait = false) where {T <: Agent}
+# Converts the array of agent world to a datafram, where each column corresponds to a trait of the
+# agent, and an extra column captures fitness.
+# Each row corresponds to an agent
+# """
+# function world2df(world::Array{T,1},t::Number,geotrait = false) where {T <: Agent}
+#     xx = get_xarray(world)
+#     dfw = DataFrame(:f => get_fitness.(world))
+#     for i in 1:size(xx,1)
+#         dfw[Meta.parse("x$i")] = xx[i,:]
+#     end
+#     if geotrait
+#         dfw[:g] = get_geo.(world,t)
+#     end
+#     return dfw
+# end
