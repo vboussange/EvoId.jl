@@ -52,25 +52,32 @@ update_clock!(w::World{A,S,T},dt) where {A,S,T} = begin
     return nothing
 end
 
-#TODO : code it
+#TODO : modify this
 """
 $(SIGNATURES)
 Returns trait of every agents of world in the form of an array which dimensions corresponds to the input.
 If `trait = 0` , we return the geotrait.
+# Warning
+This works only for linear subspace, indexed with a single value
 """
-get_x(w::World,trait) = vcat(getindex.(agents(w),trait)...)
+get_x(w::World,trait) = hcat(collect.(getindex.(agents(w),trait))...)'
 
 """
 $(SIGNATURES)
 Returns every traits of every agents of `world` in the form **of a one dimensional array** (in contrast to `get_x`).
-If `geotrait=true` the geotrait is also added to the set of trait, in the last line.
+If `geotrait=true` the geotrait is also added to the set of trait, in the last column.
 If you do not want to specify `t` (only useful for geotrait), it is also possible to use `get_xarray(world::Array{T,1}) where {T <: Agent}`.
 """
 function get_xarray(world::World,geotrait::Bool=false)
-    xarray = hcat(get_x.(agents.(world))...)
+    xarray = get_x(world,Colon())
     if geotrait
-        xarray = vcat( xarray, get_geo.(agents(world),world.t)')
+        xarray = hcat( xarray, get_geo.(agents(world),world.t))
     end
     return xarray
 end
 @deprecate get_xarray(world,geotrait=false) get_x(world,Colon())
+
+"""
+$(SIGNATURES)
+"""
+get_geo(w::World) = map(a-> get_geo(a,time(w)), agents(w))

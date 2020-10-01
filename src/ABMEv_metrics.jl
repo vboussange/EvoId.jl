@@ -52,7 +52,6 @@ If trait > 0, returns the covariance matrix, with first row geotrait and second 
 
 """
 function var(world::World;trait=1)
-    world = agents(world)
     xarray = get_x(world,trait)
     return var(xarray,dims=1,corrected=false)
 end
@@ -64,11 +63,10 @@ If trait > 0, returns the covariance matrix, with first row geotrait and second 
 # Arguments
 
 """
-function covgeo(world::Array{U,1},t::Number,trait = 0) where U <: Union{Missing,Agent}
-    world = collect(skipmissing(world))
-    xarray = Float64.(get_geo.(world,t))
+function covgeo(world::World,trait = 0)
+    xarray = Float64.(get_geo(world))
     if trait > 0
-        xstd = reshape(Float64.(get_x.(world,trait)),size(world,1),size(world,2))
+        xstd = reshape(Float64.(get_x(world,trait)),size(world,1),size(world,2))
         xarray = hcat(xarray,xstd)
     end
     return cov(xarray,corrected=false)
@@ -80,10 +78,10 @@ Returns a matrix H where H_ij = hamming(a_i,a_j).
 The hamming distance is taken through the whole history
 and functional space of the agents.
 """
-function hamming(world::Array{Agent,1}) where T <: Int
-    N = size(world,1)
-    H = zeros(N,N)
-    for (i,a) in enumerate(world)
+function hamming(world::World) where T <: Int
+    n = size(world)
+    H = zeros(n,n)
+    for (i,a) in enumerate(agents(world))
             for (j,b) in enumerate(world)
                     H[i,j] = hamming(get_xhist(a),get_xhist(b))
             end
@@ -92,17 +90,16 @@ function hamming(world::Array{Agent,1}) where T <: Int
 end
 """
     get_alpha_div(world::Array{U,1},t::Number,trait=1) where U <: Union{Missing,Agent}
-Mean of the local variance of `trait` per patch
+Mean of the local variance of `trait` per patch. If trait=0, we get the geotrait
 # Arguments
 """
-function get_alpha_div(world::Array{U,1},t::Number,trait=1) where U <: Union{Missing,Agent}
-    _xall_df = world2df(world,t,true)
-    xall_per_patch = groupby(_xall_df, :x1,sort=true)
+function get_alpha_div(world::World,trait=1)
+    xarray = get_xarray(world,true)
+    g = groupby(x->x[1],collect(eachrow(xarray)))
     if trait == 0
-        # need to convert to Float64, otherwise infinite variance
-        return mean([var(Float64.(xp.g),corrected=false) for xp in xall_per_patch])
+        return mean([var(Float64.([x[end] for x in xp]),corrected=false) for xp in values(g)])
     else
-        return mean([var(Float64.(xp[:,trait+1]),corrected=false) for xp in xall_per_patch])
+        return mean([var(Float64.([x[trait] for x in xp]),corrected=false) for xp in values(g)])
     end
 end
 
@@ -111,14 +108,14 @@ end
 Variance of the mean of `trait` per patch
 # Arguments
 """
-function get_beta_div(world::Array{U,1},t::Number,trait=1) where U <: Union{Missing,Agent}
-    _xall_df = world2df(world,t,true)
-    xall_per_patch = groupby(_xall_df, :x1,sort=true)
+function get_beta_div(world::World,trait=1)
+    xarray = get_xarray(world,true)
+    g = groupby(x->x[1],collect(eachrow(xarray)))
     if trait == 0
         # need to convert to Float64, otherwise infinite variance
-        sbar_i = [mean(Float64.(xp.g)) for xp in xall_per_patch]
+        sbar_i = [mean(Float64.([x[end] for x in xp])) for xp in values(g)]
     else
-        sbar_i = [mean(Float64.(xp[:,trait+1])) for xp in xall_per_patch]
+        sbar_i = [mean(Float64.([x[trait] for x in xp])) for xp in values(g)]
     end
     return var(sbar_i,corrected=false)
 end

@@ -57,7 +57,7 @@ end
 $(SIGNATURES)
     Initialises agent with `pos` provided
 """
-function Agent(s::S, pos::P;ancestors=false,rates=false) where {P,S  <: AbstractSpacesTuple}
+function Agent(s::S, pos::P;ancestors=false,rates=false) where {P<:Tuple,S  <: AbstractSpacesTuple}
     T = eltype.(s)
     for (i,p) in enumerate(pos)
         if typeof(p) !== T[i]
@@ -74,6 +74,24 @@ function Agent(s::S, pos::P;ancestors=false,rates=false) where {P,S  <: Abstract
     b = d
     V = rates ?  Float64 : Nothing
     Agent{Ancestors{ancestors},Rates{rates},Tuple{T...},U,V}([pos],[t],d,b)
+end
+
+# TODO : to be modified
+function Agent(s::S,pos::Vector,t::Vector{U};ancestors=false,rates=false) where {S  <: AbstractSpacesTuple,U}
+    T = eltype.(s)
+    for (i,p) in enumerate(pos[1])
+        if typeof(p) !== T[i]
+            try
+                p = convert(T[i],p)
+            catch e
+                throw(ArgumentError("Position provided does not match with underlying space"))
+            end
+        end
+    end
+    d = rates ?  Float64(.0) : nothing
+    b = d
+    V = rates ?  Float64 : Nothing
+    Agent{Ancestors{ancestors},Rates{rates},Tuple{T...},U,V}(pos,t,d,b)
 end
 
 import Base:copy,show

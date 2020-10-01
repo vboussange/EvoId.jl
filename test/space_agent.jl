@@ -34,8 +34,16 @@ ABMEv.initpos(myspace2)
 
 # increment on finite spaces
 # checking if reflection works
-@test mysegment.s - eps() < get_inc(5.,100.,mysegment) + 5. < mysegment.e + eps()
-@test mycontinuoussegment.s < get_inc(0.,100.,mycontinuoussegment) < mycontinuoussegment.e
+@testset "Reflection" begin
+    @test mysegment.s - eps() < get_inc(5.,100.,mysegment) + 5. < mysegment.e + eps()
+    @test mycontinuoussegment.s < get_inc(0.,100.,mycontinuoussegment) < mycontinuoussegment.e
+    mysegment2 = DiscreteSegment(-1,1)
+    @test ABMEv._reflect1D(0.,2.0,mysegment2) ≈ .0
+    @test ABMEv._reflect1D(0.,-2.0,mysegment2) ≈ .0
+    @test ABMEv._reflect1D(0.,4.0,mysegment2) ≈ .0
+    @test ABMEv._reflect1D(0.,1.1,mysegment2) ≈ 1 - .1
+end
+
 #checking if graph works
 @test prod([get_inc(1,10,mygraph) + 1 ∈ vertices(mygraph.g) for i in 1:30])
 
