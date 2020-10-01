@@ -1,32 +1,3 @@
-
-"""
-    update_rates_std!(world,p::Dict,t::Float64)
-This standard updates takes
-    - competition kernels of the form α(x,y) and
-    - carrying capacity of the form K(x)
-"""
-function  update_rates_std!(w::World)
-    @unpack b,d = parameters(w)
-    _agents = agents(w)
-    traits = get_x.(_agents)
-    # traits = get_xhist.(world)
-    n = size(w)
-    D = zeros(n)
-    # Here you should do a shared array to compute in parallel
-    for i in 1:(n-1)
-        for j in i+1:n
-            C = d(traits[i],traits[j])
-            D[i] += C
-            D[j] += C
-        end
-    end
-    # Here we can do  it in parallel as well
-    for (i,a) in enumerate(_agents)
-        a.d = D[i]
-        a.b = b(traits[i])
-    end
-end
-
 function  update_rates_graph!(world,C,p::Dict,t::Float64)
     for e in edges(p["g"])
         # agents on e
@@ -79,9 +50,9 @@ first corresponding to initial conditions and last corresponding to world in the
 >:warning: if you choose `nagents = 1` then nothing is saved until the end of the simulation.
 """
 # function run(w::World{AbstractAgent{A,R},S,T},g::G;dt_saving=nothing,callbacks=nothing) where {G<:Gillepsie,A,R,S,T}
-function run!(w::World{A,S,T},g::G,tend::Number;
+function run!(w::World{A,S,T},alg::L,tend::Number;
                 dt_saving=nothing,
-                cb=(names = String[],agg =nothing)) where {A,S,T,G<:Gillepsie}
+                cb=(names = String[],agg =nothing)) where {A,S,T,L<:AbstractAlg}
     n=size(w);
     NMax = maxsize(w)
     t = .0
@@ -89,7 +60,7 @@ function run!(w::World{A,S,T},g::G,tend::Number;
     isnothing(dt_saving) ? dt_saving =  tend + 1. : nothing
     sim = Simulation(w,cb=cb)
     if A <: AbstractAgent{AA,Rates{true}} where {AA}
-        update_rates_std!(w)
+        update_rates!(w,alg)
     end
     while t<tend
         if dt < 0
@@ -103,9 +74,9 @@ function run!(w::World{A,S,T},g::G,tend::Number;
         end
         if  t - get_tend(sim) >= dt_saving
             @info "saving world @ t = $(t)/ $(tend)"
-            add_entry!(s,w)
+            add_entry!(sim,w)
         end
-        dt = updateWorld!(w,g)
+        dt = updateWorld!(w,alg)
         t +=  dt
         i += 1
     end

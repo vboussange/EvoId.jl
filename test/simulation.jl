@@ -26,3 +26,31 @@ addAgent!(w0,newa)
 @test size(s.agentarray,2) == 2
 
 #TODO: try with callbacks
+###################################
+#######CALLBACKS###################
+###################################
+
+myspace = (RealSpace{1,Float64}(),)
+sigma_K = .9;
+sigma_a = .7;
+K0 = 1000;
+b(X) = gaussian(X[1],0.,sigma_K)
+d(X,Y) = gaussian(X[1],Y[1],sigma_a)/K0
+D = (1e-2,)
+mu = [.1]
+NMax = 10000
+tend = 1.5
+p = Dict{String,Any}();@pack! p = d,b,D,mu,NMax
+
+myagents = [Agent(myspace,(0,),ancestors=true,rates=true) for i in 1:K0]
+w0 = World(myagents,myspace,p,0.)
+w1 = copy(w0)
+cb = (names = ["gamma_div"], agg = Function[w -> var(Float64.(get_x(w,1)))])
+eltype(cb.agg)
+@time sim = run!(w1,Gillepsie(),tend,cb=cb,dt_saving = .1)
+
+sim["gamma_div"]
+sim.df_agg
+
+using Plots
+plot(get_tspan(sim),sim["gamma_div"])

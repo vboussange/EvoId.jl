@@ -5,8 +5,8 @@ mutable struct Simulation{A<:AbstractAgent, S<:AbstractSpacesTuple,T<:Number,F}
     agentarray::Array{AbstractAgentM,2}
     space::S
     tspan::Vector{T}
-    cb::F
-    df_agg
+    cb::NamedTuple
+    df_agg::Vector{Dict}
     p::Dict{String,Any}
 end
 
@@ -21,13 +21,16 @@ function Simulation(w0::World{A,S,T};cb=(names = String[],agg =nothing)) where {
     #agentarray is of size 2 at the beginning
     agentarray = copy.(collect(w0.agents))
     agentarray = hcat(agentarray,Array{Missing}(missing,NMax,1))
-    !isnothing(cb.agg) ? df_agg = [Dict(cb.names .=> cb.agg(world))] : df_agg = nothing
-    Simulation{A,S,T,typeof(cb.agg)}(agentarray,space(w0),tspan,cb.agg,df_agg,parameters(w0))
+    !isnothing(cb.agg) ? df_agg = [Dict(cb.names .=> [f(w0) for f in cb.agg])] : df_agg = [Dict()]
+    Simulation{A,S,T,typeof(cb.agg)}(agentarray,space(w0),tspan,cb,df_agg,parameters(w0))
  end
 
 get_tend(s::Simulation) = s.tspan[end]
 get_size(s::Simulation) = length(s.tspan)
+get_tspan(s::Simulation) = s.tspan
 Base.getindex(s::Simulation,i,j) = s.agentarray[i,j]
+Base.getindex(s::Simulation,measure::String) = [agg[measure] for agg in s.df_agg]
+
 import Base:lastindex,size
 Base.lastindex(s::Simulation,i) = lastindex(s.agentarray,i)
 Base.size(s::Simulation,i) = size(s.agentarray,i)
@@ -49,8 +52,8 @@ function add_entry!(s::Simulation{A,S,T,F},w::World) where {A,S,T,F}
     end
     s.agentarray[:,i+1] .= copy.(collect(w.agents))
     push!(s.tspan,w.t)
-    if F <: Function
-        push!(s.df_agg,Dict(s.cb.names .=> s.cb.agg(world)))
+    if !(F==Nothing)
+        push!(s.df_agg,Dict(s.cb.names .=> [f(w) for f in s.cb.agg]))
     end
 end
 

@@ -51,8 +51,8 @@ If trait > 0, returns the covariance matrix, with first row geotrait and second 
 # Arguments
 
 """
-function var(world::Array{U,1};trait=1) where U <: Union{Missing,Agent{T}} where T
-    world = collect(skipmissing(world))
+function var(world::World;trait=1)
+    world = agents(world)
     xarray = get_x(world,trait)
     return var(xarray,dims=1,corrected=false)
 end

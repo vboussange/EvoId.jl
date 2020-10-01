@@ -1,36 +1,38 @@
-
+myspace1 = (RealSpace{1,Float64}(),)
+myspace2 = (RealSpace{2,Float64}(),)
+myspace3 = (DiscreteSegment(Int16(1),Int16(10)),RealSpace{1,Float64}())
 K0 = 1000; σ = 1e-1
-agents1 = [Agent( [σ]  .* randn(1) .- .5) for i in 1:K0]
-agents2 = [Agent( [σ σ]  .* randn(2) .- .5) for i in 1:K0]
-agentsd = [Agent{MixedAgent}( Float16[rand(1:10), 1e-1* randn() + 5.5] ) for i in 1:K0]
+w1 = [Agent(myspace1, (σ,)  .* randn() .- .5) for i in 1:K0]
+w2 = [Agent(myspace2,(tuple((σ, σ)  .* randn(2) .- .5...),)) for i in 1:K0]
+w3 = [Agent(myspace3, (rand(Int16.(1:10)), 1e-1* randn() + 5.5 )) for i in 1:K0]
 p = Dict("mu" => [1. 1.],"D" => [0. 0.], "nodes" =>10 )
 ## testing variance
 @testset "Testing metrics" begin
     @testset "var" begin
-        @test first(var(agents1)) ≈ (σ).^2 atol=0.001
-        @test first(var(agents2,trait=2)) ≈ (σ).^2 atol=0.001
+        @test first(var(w1)) ≈ (σ).^2 atol=0.001
+        @test first(var(w2,trait=2)) ≈ (σ).^2 atol=0.001
     end
 
     ## testing covgeo
     @testset "covgeo" begin
-        @test covgeo(agents1) ≈ (σ).^2 atol=0.001
-         for i in covgeo(agents1,1)
+        @test covgeo(w1) ≈ (σ).^2 atol=0.001
+         for i in covgeo(w1,1)
              @test i ≈ (σ).^2 atol=0.001
          end
      end
      # not sure this is the bestway of testing
      # there is a problem here
      @testset "covgeo2d" begin
-         cmat = covgeo(agents2,2);
+         cmat = covgeo(w2,2);
          smat = [σ^2 0; 0 σ^2]
          @test cmat ≈ smat atol=0.01
       end
       @testset "Alpha diversity" begin
-          α = get_alpha_div(agentsd,1.0,2);
+          α = get_alpha_div(w3,1.0,2);
           @test abs(α) < Inf
        end
        @testset "Beta diversity" begin
-           β = get_beta_div(agentsd,1.0,2);
+           β = get_beta_div(w3,1.0,2);
            @test abs(β) < Inf
        end
        @testset "Isolation by history - hamming distance" begin

@@ -102,9 +102,7 @@ Base.summary(A::AbstractAgent) = string(TYPE_COLOR,nameof(typeof(a)),NO_COLOR," 
 Returns trait i of the agent
 """
 
-Base.getindex(a::Agent,i::Int) = a.x_history[end][i]
-
-Base.getindex(a::Agent,I::Vararg{Int}) = a.x_history[end][I]
+Base.getindex(a::Agent,i) = a.x_history[end][i]
 
 get_x(a::Agent) = a.x_history[end]
 @deprecate get_x(a) a[:]
@@ -134,11 +132,11 @@ Get time when agent born.
 get_t(a::Agent) = a.t_history[end]
 
 # TODO: change this with getindex
-get_xhist(a::Agent,i::Number) = [a.x_history[t][Int(i)] for t in 1:length(a.xhistory)]
+get_xhist(a::AbstractAgent,i::Number) = [a.x_history[t][Int(i)] for t in 1:length(a.x_history)]
 
-get_xhist(a::Agent) = a.x_history
+get_xhist(a::AbstractAgent) = a.x_history
 
-get_thist(a::Agent) = a.t_history
+get_thist(a::AbstractAgent) = a.t_history
 
 get_d(a::AbstractAgent) = a.d
 
@@ -146,7 +144,9 @@ get_b(a::AbstractAgent) = a.b
 
 get_fitness(a::AbstractAgent) = a.b - a.d
 
-Base.ndims(a::Agent{A,R,T,U,V}) where {A,R,T<:(Tuple{Vararg{S,N}} where {S,N}),U,V} = N
+# TODO : we can surely extract N in Agent{A,R,Tuple{Vararg{S,N}},U,V}
+# Inspiration : where U <: Union{Missing,Agent{T}} where T
+Base.length(a::AbstractAgent) = length(a.x_history[end])
 
 nancestors(a::Agent) = length(a.x_history)
 

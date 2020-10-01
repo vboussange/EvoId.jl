@@ -24,7 +24,7 @@ function updateBirthEvent!(w::World,::Gillepsie,mum_idx::Int)
         a.d += d(get_x(a),x_offspring)
     end
     # Now updating new agent
-    offspring.d = sum(d.(get_x.(_agents),Ref(x_offspring))) - d(x_offspring,x_offspring)
+    offspring.d = sum(d.(get_x.(_agents),Ref(x_offspring))) #- d(x_offspring,x_offspring)
     offspring.b = b(x_offspring)
     addAgent!(w,offspring)
 end
@@ -36,6 +36,34 @@ function updateDeathEvent!(world::World,::Gillepsie,i_event::Int)
     removeAgent!(world,i_event)
     for a in agents(world)
         a.d -= d(get_x(a),x_death)
+    end
+end
+
+"""
+    update_rates_std!(world,p::Dict,t::Float64)
+This standard updates takes
+    - competition kernels of the form α(x,y) and
+    - carrying capacity of the form K(x)
+"""
+function  update_rates!(w::World,::Gillepsie)
+    @unpack b,d = parameters(w)
+    _agents = agents(w)
+    traits = get_x.(_agents)
+    # traits = get_xhist.(world)
+    n = size(w)
+    D = zeros(n)
+    # Here you should do a shared array to compute in parallel
+    for i in 1:(n-1)
+        for j in i+1:n
+            C = d(traits[i],traits[j])
+            D[i] += C
+            D[j] += C
+        end
+    end
+    # Here we can do  it in parallel as well
+    for (i,a) in enumerate(_agents)
+        a.d = D[i]
+        a.b = b(traits[i])
     end
 end
 
