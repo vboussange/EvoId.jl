@@ -141,7 +141,7 @@ $(SIGNATURES)
 Returns trait `i` of the agent.
 Geotrait corresponds to dimension `i=0`.
 """
-get_x(a::Agent,t::Number,i::Integer) = i > 0 ? a.x_history[end][Int(i)] : get_geo(a,t)
+get_x(a::AbstractAgent,t::Number,i::Integer) = i > 0 ? a.x_history[end][Int(i)] : get_geo(a,t)
 
 """
 $(SIGNATURES)

@@ -11,7 +11,7 @@ module ABMEv
     include("ABMEv_world.jl")
     include("ABMEv_Sim.jl")
     include("ABMEv_metrics.jl")
-    # include("ABMEv_plot.jl")
+    include("ABMEv_plot.jl")
     include("ABMEv_utils.jl")
     include("algo/ABMEv_WF.jl")
     include("algo/ABMEv_Gillepsie.jl")

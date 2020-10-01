@@ -15,8 +15,8 @@ function updateBirthEvent!(w::World,::CFM,mum_idx::Int)
     addAgent!(w,offspring)
 end
 
-function updateDeathEvent!(world::World,::CFM,i_event::Int)
-    removeAgent!(world,i_event)
+function updateDeathEvent!(world::World,::CFM,i::Int)
+    removeAgent!(world,i)
 end
 
 """
@@ -27,34 +27,26 @@ DOI : 10.1016/j.tpb.2005.10.004
 """
 function updateWorld!(w::World{A,S,T},c::CFM) where {A,S,T}
     # total update world
+    @unpack Cbar,d,b = parameters(w)
     alive = agents(w)
-    events_weights = ProbabilityWeights(vcat(get_d.(alive),get_b.(alive)))
     # Total rate of events
-    ∑ = sum(events_weights)
-    dt = - log(rand(T))/∑
+    n = size(w)
+    ∑ = (n + 1)
+    dt = - log(rand(T))/(Cbar * ∑)
     update_clock!(w,dt)
+    i = rand(1:n)
+    x = get_x(w[i])
+    W = rand()
     if dt > 0.
-        i_event = sample(events_weights)
-        # This is ok since size is a multiple of 2
-        n = size(w)
-        if i_event <= n
-            # DEATH EVENT
-            # In this case i_event is also the index of the individual to die in the world_alive
-            updateDeathEvent!(w,g,i_event)
-        else
-            # birth event
-            # i_event - n is also the index of the individual to give birth in the world_alive
-            updateBirthEvent!(w,g,i_event-n)
+        deathprob = (sum(d.(get_x.(alive),Ref(x))) - d(x,x)) / (Cbar*(n+1))
+        birthprob = b(x) / (Cbar*(n+1))
+        if W <= deathprob
+            updateDeathEvent!(w,c,i)
+        elseif W <= deathprob + birthprob
+            updateBirthEvent!(w,c,i)
         end
         return dt
     else
         return -1
     end
 end
-
-"""
-    clean_world(world::Array{T}) where {T <: Agent}
-Get rid of missing value in `world`
-"""
-#TODO : put some type specs here
-clean_world(world) = collect(skipmissing(world))

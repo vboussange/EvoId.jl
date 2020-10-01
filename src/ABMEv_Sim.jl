@@ -57,6 +57,11 @@ function add_entry!(s::Simulation{A,S,T,F},w::World) where {A,S,T,F}
     end
 end
 
+clean!(sim::Simulation) = sim.agentarray = sim.agentarray[:,1:length(sim.tspan)]
+# get_x(agentarray::Array{T},t,trait::Integer) where {T <: AbstractAgent} = reshape(hcat(get_x.(agentarray,t,trait)),size(agentarray,1),size(agentarray,2))
+# @deprecate get_x(agentarray::Array{T},t::Number,trait::Integer)
+
+
 #TODO: code it
 # function world2df(world::Array{T,1},geotrait=false) where {T <: Agent}
 #     xx = get_xarray(world)
