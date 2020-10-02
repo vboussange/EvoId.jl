@@ -25,7 +25,11 @@ function Simulation(w0::World{A,S,T};cb=(names = String[],agg =nothing)) where {
 get_tend(s::Simulation) = s.tspan[end]
 get_size(s::Simulation) = length(s.tspan)
 get_tspan(s::Simulation) = s.tspan
-Base.getindex(s::Simulation,i,j) = s.agentarray[i][j]
+get_world(s::Simulation,i) = World(s.agentarray[i],s.space,s.p,s.tspan[i])
+Base.getindex(s::Simulation,i) = s.agentarray[i]
+import Base.lastindex
+Base.lastindex(s::Simulation) = get_size(s)
+
 Base.getindex(s::Simulation,measure::String) = [agg[measure] for agg in s.df_agg]
 
 

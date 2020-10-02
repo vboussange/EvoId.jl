@@ -50,6 +50,9 @@ eltype(cb.agg)
 
 @test typeof(sim["gamma_div"]) <: Vector
 
+@test typeof(get_world(sim,get_size(sim))) <: World
+@test typeof(sim[2]) <: Vector
+
 ## testing plot
 using Plots
 plot(get_tspan(sim),sim["gamma_div"])

@@ -11,41 +11,11 @@ function  update_rates_graph!(world,C,p::Dict,t::Float64)
 end
 
 """
-    function runWorld_store_WF(p,world0;mode="std")
-Wright Fisher process. Returns an array worldall with every agents.
-"""
-function runWorld_store_WF(p,world0;mode="std")
-    # worldall = repeat(world0,inner = (1,length(1:Int(p["tend"]))))
-    # N=length(world0);
-    # newworld = copy.(world0)
-    # if mode == "std"
-    #     update_rates! = update_rates_std!
-    # elseif mode == "2D"
-    #     update_rates! = update_rates_2D!
-    # elseif mode == "grad2D"
-    #     update_rates! = update_rates_grad2D!
-    # elseif mode == "mountain"
-    #     update_rates! = update_rates_mountain!
-    # elseif mode == "split"
-    #     update_rates! = update_rates_std_split!
-    # elseif mode == "graph"
-    #     update_rates! = update_rates_graph!
-    # else
-    #     error("Mode $mode is not recognized")
-    # end
-    # for i in 1:(Int(p["tend"])-1)
-    #     # we have to take views, otherwise it does not affect worldall
-    #     world = @view worldall[:,i];newworld = @view worldall[:,i+1];
-    #     updateWorld_WF!(world,newworld,p,update_rates!,Float64(i))
-    # end
-    # return worldall,collect(0:Int(p["tend"]-1))
-end
-"""
-    function runWorld_store_G(p,world0)
-Gillepsie process.
-- returns a tuple 'worldall, tspanarray'
+$(SIGNATURES)
+Run `w` with algorithm `alg`, until `tend` is reached.
+Returns a `Simulation` type.
 - `worldall` stores the world every `p["dt_saving"]` time steps.
-If `p["dt_saving"]` not specified, it returns an array with two columns,
+If `dt_saving` not specified, `sim` contains an array of two elements,
 first corresponding to initial conditions and last corresponding to world in the last time step.
 >:warning: if you choose `nagents = 1` then nothing is saved until the end of the simulation.
 """

@@ -31,7 +31,7 @@ module ABMEv
     export World,parameters,time,space,agents,size,maxsize,addAgent!,removeAgent!
     export run!,give_birth,updateWorld!,update_clock!,updateBirthEvent!,
         updateDeathEvent!#,runWorld_G!,runWorld_WF!,
-    export Simulation,add_entry!,get_tend,get_size,get_tspan
+    export Simulation,add_entry!,get_tend,get_size,get_tspan,get_world
     export H_discrete,findclusters,var,covgeo,hamming,get_beta_div, get_alpha_div,
         get_dist_hist,get_pairwise_average_isolation,
         get_local_pairwise_average_isolation,

@@ -2,31 +2,31 @@
 
 # TODO: do a constructor that ensures the parameters numerics are of the same type as the agents
 mutable struct World{A<:AbstractAgent, S<:AbstractSpacesTuple,T<:Number}
-    agents::Vector{AbstractAgent}
+    agents::Vector{A}
     space::S
-    parameters::Dict
+    p::Dict
     t::T
 end
 
 #constructor
 function World(w::Vector{A},s::S,p::Dict,t::T=0.) where {A<:AbstractAgent,S<:AbstractSpacesTuple,T}
-    if typeof(p["D"]) != eltype(skipmissing(w)[1])
-        throw(ArgumentError("Diffusion coefficient does not match with underlying space\n `D::Tuple`"))
-    end
+    # if typeof(p["D"]) != eltype(skipmissing(w)[1])
+    #     throw(ArgumentError("Diffusion coefficient does not match with underlying space\n `D::Tuple`"))
+    # end
     World{A,S,T}(w,s,p,t)
 end
 
 # this throws an iterators of agents in the world
 agents(world::World) = world.agents
-parameters(world::World) = world.parameters
+parameters(world::World) = world.p
 time(w::World) = w.t
 space(w::World) = w.space
-maxsize(w::World) = w.parameters["NMax"]
+maxsize(w::World) = w.p["NMax"]
 # this throws indices that are occupied by agents
 # this throws agents of an abstract array of size size(world)
 import Base:size,getindex
 Base.size(world::World) = length(world.agents)
-Base.copy(w::W) where {W<:World} = W(copy.(w.agents),w.space,w.parameters,copy(w.t))
+Base.copy(w::W) where {W<:World} = W(copy.(w.agents),w.space,w.p,copy(w.t))
 ## Accessors
 """
 $(SIGNATURES)
