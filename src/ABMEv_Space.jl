@@ -1,12 +1,13 @@
-"""
-    abstract type AbstractSpace{Dim,T,F} end
-`Dim` is the dimension of the space, `T` is the element type, `ife` is a bool which is `true`
-when space is finite
-"""
+
 
 abstract type IsFinite{T} end
 
 #ife stands for is finite
+"""
+$(TYPEDEF)
+`Dim` is the dimension of the space, `T` is the element type,
+`I` to indicate finiteness
+"""
 abstract type AbstractSpace{Dim,T,I} end
 AbstractSpacesTuple = Tuple{Vararg{AbstractSpace}}
 import Base:ndims,isfinite,eltype
@@ -50,13 +51,11 @@ A real pace with dimension N and type T
 """
 struct RealSpace{N,T} <: AbstractSpace{N,T,IsFinite{false}} end
 
-# TODO:
+# TODO: find a way to put a type on D in get_inc
 """
 $(SIGNATURES)
-
 Returns increment
 """
-# TODO: find a way to put a type on D in get_inc
 function get_inc(D,s::AbstractSpace{Dim,T,I}) where {Dim,T<:AbstractFloat,I<:IsFinite{false}}
     if Dim > 1
         return Tuple(D .* randn(T,Dim))
@@ -87,8 +86,8 @@ function get_inc(x,D,s::GraphSpace{T}) where {T}
 end
 
 """
-function get_inc_reflected(x::Number,inc::Number,s=-1,e=1)
-    Here we increment the trajectory of trait 1 such that it follows a reflected brownian motion (1D)
+$(SIGNATURES)
+Here we increment the trajectory of trait 1 such that it follows a reflected brownian motion (1D)
 """
 function _reflect1D(x::Number,inc::Number,s::AbstractSegment)
     if x + inc < s.s
