@@ -30,7 +30,7 @@ w1 = copy(w0)
 ## Testing
 @testset "Gillepsie Algorithm" begin
         @testset "Testing global functioning" begin
-                @test size(sim,2) > 1
+                @test get_size(sim) > 1
                 @test get_tend(sim) >= tend
         end
         ## Comparing simulation

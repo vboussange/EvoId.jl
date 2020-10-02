@@ -23,7 +23,6 @@ newa = give_birth(1,w0)
 addAgent!(w0,newa)
 @test isnothing(add_entry!(s,w0))
 @test get_size(s) == 2
-@test size(s.agentarray,2) == 2
 
 #TODO: try with callbacks
 ###################################
@@ -49,8 +48,8 @@ cb = (names = ["gamma_div"], agg = Function[w -> var(Float64.(get_x(w,1)))])
 eltype(cb.agg)
 @time sim = run!(w1,Gillepsie(),tend,cb=cb,dt_saving = .1)
 
-sim["gamma_div"]
-sim.df_agg
+@test typeof(sim["gamma_div"]) <: Vector
 
+## testing plot
 using Plots
 plot(get_tspan(sim),sim["gamma_div"])

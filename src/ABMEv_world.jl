@@ -2,7 +2,7 @@
 
 # TODO: do a constructor that ensures the parameters numerics are of the same type as the agents
 mutable struct World{A<:AbstractAgent, S<:AbstractSpacesTuple,T<:Number}
-    agents::Vector{AbstractAgentM}
+    agents::Vector{AbstractAgent}
     space::S
     parameters::Dict
     t::T
@@ -13,38 +13,32 @@ function World(w::Vector{A},s::S,p::Dict,t::T=0.) where {A<:AbstractAgent,S<:Abs
     if typeof(p["D"]) != eltype(skipmissing(w)[1])
         throw(ArgumentError("Diffusion coefficient does not match with underlying space\n `D::Tuple`"))
     end
-    ww = vcat(w,repeat([missing],Int(p["NMax"] - length(w))))
-    World{A,S,T}(ww,s,p,t)
+    World{A,S,T}(w,s,p,t)
 end
 
 # this throws an iterators of agents in the world
-agents(world::World) = skipmissing(world.agents)
+agents(world::World) = world.agents
 parameters(world::World) = world.parameters
 time(w::World) = w.t
 space(w::World) = w.space
 maxsize(w::World) = w.parameters["NMax"]
-_findfreeidx(w::World) = findfirst(ismissing,w.agents)
 # this throws indices that are occupied by agents
-_get_idx(world::World) = collect(eachindex(agents(world)))
 # this throws agents of an abstract array of size size(world)
 import Base:size,getindex
-Base.size(world::World) = length(world.agents) - count(ismissing,world.agents)
+Base.size(world::World) = length(world.agents)
 Base.copy(w::W) where {W<:World} = W(copy.(w.agents),w.space,w.parameters,copy(w.t))
 ## Accessors
 """
 $(SIGNATURES)
 Get x of world without geotrait.
 """
-Base.getindex(w::World,i::Int) = w.agents[_get_idx(w)[i]]
+Base.getindex(w::World,i) = w.agents[i]
 
 addAgent!(w::World,a::AbstractAgent) = begin
-    idx = _findfreeidx(w)
-    w.agents[idx] = a
-    return nothing
+    push!(w.agents,a)
 end
 removeAgent!(w::World,i::Int) = begin
-    w.agents[_get_idx(w)[i]] = missing
-    return nothing
+    deleteat!(w.agents,i)
 end
 
 update_clock!(w::World{A,S,T},dt) where {A,S,T} = begin
@@ -71,7 +65,7 @@ If you do not want to specify `t` (only useful for geotrait), it is also possibl
 function get_xarray(world::World,geotrait::Bool=false)
     xarray = get_x(world,Colon())
     if geotrait
-        xarray = hcat( xarray, get_geo.(agents(world),world.t))
+        xarray = hcat(xarray, get_geo.(agents(world),world.t))
     end
     return xarray
 end

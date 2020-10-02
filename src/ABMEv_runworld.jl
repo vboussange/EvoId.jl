@@ -82,7 +82,6 @@ function run!(w::World{A,S,T},alg::L,tend::Number;
     end
     # Saving last time step
     add_entry!(sim,w)
-    clean!(sim)
     @info "simulation stopped at t=$(t), after $(i) generations"
     return sim
 end

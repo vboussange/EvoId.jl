@@ -25,17 +25,8 @@ removeAgent!(w,11)
 @test size(w) ≈ 10
 @test isnothing(update_clock!(w,.1))
 
-using BenchmarkTools
-if false
-    # TODO
-    # Here we observe that deleting an agent is a bit of a pain
-    # Since one has to look where this agent is located in the structure
-    # This should be improved at some point
-    # This could be improved by maintaining a list of agents IDs
-    dicttest = Dict((i,w.agents[i]) for i in 1:p["NMax"]);
-    @btime w.agents[ABMEv._get_idx(w)[8]]
-    @btime dicttest[8]
-    @btime ABMEv.agents(w)
-end
+@test typeof(w[1]) <: AbstractAgent
+@test size(get_x(w,:)) == (10,2)
+
 ##############  Testing world with Gillepsie
 @test !isnothing(updateWorld!(w,Gillepsie()))

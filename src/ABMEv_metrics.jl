@@ -66,7 +66,7 @@ If trait > 0, returns the covariance matrix, with first row geotrait and second 
 function covgeo(world::World,trait = 0)
     xarray = Float64.(get_geo(world))
     if trait > 0
-        xstd = reshape(Float64.(get_x(world,trait)),size(world,1),size(world,2))
+        xstd = get_x(world,trait)
         xarray = hcat(xarray,xstd)
     end
     return cov(xarray,corrected=false)

@@ -2,7 +2,7 @@ abstract type AbstractAlg end
 
 # this used to be  world
 mutable struct Simulation{A<:AbstractAgent, S<:AbstractSpacesTuple,T<:Number,F}
-    agentarray::Array{AbstractAgentM,2}
+    agentarray::Vector{Vector{AbstractAgent}}
     space::S
     tspan::Vector{T}
     cb::NamedTuple
@@ -17,23 +17,17 @@ $(SIGNATURES)
 """
 function Simulation(w0::World{A,S,T};cb=(names = String[],agg =nothing)) where {A,S,T}
     tspan = zeros(1);
-    NMax = maxsize(w0)
     #agentarray is of size 2 at the beginning
-    agentarray = copy.(collect(w0.agents))
-    agentarray = hcat(agentarray,Array{Missing}(missing,NMax,1))
     !isnothing(cb.agg) ? df_agg = [Dict(cb.names .=> [f(w0) for f in cb.agg])] : df_agg = [Dict()]
-    Simulation{A,S,T,typeof(cb.agg)}(agentarray,space(w0),tspan,cb,df_agg,parameters(w0))
+    Simulation{A,S,T,typeof(cb.agg)}([copy.(agents(w0))],space(w0),tspan,cb,df_agg,parameters(w0))
  end
 
 get_tend(s::Simulation) = s.tspan[end]
 get_size(s::Simulation) = length(s.tspan)
 get_tspan(s::Simulation) = s.tspan
-Base.getindex(s::Simulation,i,j) = s.agentarray[i,j]
+Base.getindex(s::Simulation,i,j) = s.agentarray[i][j]
 Base.getindex(s::Simulation,measure::String) = [agg[measure] for agg in s.df_agg]
 
-import Base:lastindex,size
-Base.lastindex(s::Simulation,i) = lastindex(s.agentarray,i)
-Base.size(s::Simulation,i) = size(s.agentarray,i)
 
 # TODO: define two functions with signatures
 # function add_entry!(s::Simulation{A,S,T,F},w::World) where {A,S,T,F<:Function}
@@ -44,20 +38,29 @@ $(SIGNATURES)
 Add `w` with callbacks `s.cb` to `s` if provided
 """
 function add_entry!(s::Simulation{A,S,T,F},w::World) where {A,S,T,F}
+    push!(s.agentarray,copy.(agents(w)))
+    push!(s.tspan,w.t)
+    if !(F==Nothing)
+        push!(s.df_agg,Dict(s.cb.names .=> [f(w) for f in s.cb.agg]))
+    end
+    return nothing
+end
+
+#TODO : code it
+function get_x(s::Simulation,i)
     i = get_size(s)
     j = size(s.agentarray,2)
     if i == j
         # we double the siwe of agent array
         s.agentarray = hcat(s.agentarray,Array{Missing}(missing,maxsize(w),j))
     end
-    s.agentarray[:,i+1] .= copy.(collect(w.agents))
+    s.agentarray[1:size(w),i+1] .= copy.(agents(w))
     push!(s.tspan,w.t)
     if !(F==Nothing)
         push!(s.df_agg,Dict(s.cb.names .=> [f(w) for f in s.cb.agg]))
     end
+    return nothing
 end
-
-clean!(sim::Simulation) = sim.agentarray = sim.agentarray[:,1:length(sim.tspan)]
 # get_x(agentarray::Array{T},t,trait::Integer) where {T <: AbstractAgent} = reshape(hcat(get_x.(agentarray,t,trait)),size(agentarray,1),size(agentarray,2))
 # @deprecate get_x(agentarray::Array{T},t::Number,trait::Integer)
 

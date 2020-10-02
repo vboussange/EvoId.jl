@@ -112,3 +112,5 @@ myagents = [Agent(myspace,(0,),ancestors=false,rates=true) for i in 1:K0]
 w0 = World(myagents,myspace,p,0.)
 @info "Running simulation with Gillepsie algorithm"
 @time sim = run!(w0,Gillepsie(),tend)
+
+agentarray = vcat(copy.(agents(w0)),Array{Missing}(missing,NMax - size(w0),1))
