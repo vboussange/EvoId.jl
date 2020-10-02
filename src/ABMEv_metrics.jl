@@ -121,18 +121,18 @@ function get_beta_div(world::World,trait=1)
 end
 
 """
-    function get_xhist_mat(world,trait=1,time = 0)
+$(SIGNATURES)
 returns `xhist,ttot`, where `xhist` is a matrix with dimension `lenght(world)` x `length(thist)+1`,
 which consists of geographical history of ancestors at every time step.
 If `time` is specified and is higher that the highest time step in world,
 then the last column of xhist corresponds to actual position of agents
 """
 
-function get_xhist_mat(world,trait=1,time = 0)
-        thist = vcat(get_thist.(world)...)
+function get_xhist_mat(agentarray::Vector{A},trait=1,time = 0) where {A<:AbstractAgent}
+        thist = vcat(get_thist.(agentarray)...)
         ttot = sort!(unique(thist))
-        xhist = zeros(length(world),length(ttot))
-        for (i,a) in enumerate(world)
+        xhist = zeros(length(agentarray),length(ttot))
+        for (i,a) in enumerate(agentarray)
             _thist = get_thist(a)
             # Here we check that there is no redundancy of thist because of casting errors
             # In the future, we should remove this check, as the type of time has been set to Float64
@@ -194,8 +194,8 @@ end
 Returns the integrated pairwise squared distance between all agents of `world` wrt `trait`.
 If `trunc=true` then the distance is truncated to binary value 0 or 1.
 """
-function get_pairwise_average_isolation(world;trait=1,trunc=false)
-        xhist,ttot = get_xhist_mat(world)
+function get_pairwise_average_isolation(world::World;trait=1,trunc=false)
+        xhist,ttot = get_xhist_mat(agents(world))
         if trunc
                 V = truncvar.([xhist[:,i] for i in 1:size(xhist,2)])
         else
@@ -209,9 +209,14 @@ end
 Similar to `get_pairwise_average_isolation`, but the pairwise distance is calculated within demes.
 An average of this metrics by deme is return.
 """
-function get_local_pairwise_average_isolation(world;trait=1,trunc=false)
-        f(a) = get_x(a,1)
-        groups = groupby(f,world)
-        d = get_pairwise_average_isolation.(collect(values(groups)),trait=trait,trunc=trunc)
+function get_local_pairwise_average_isolation(world::World;trait=1,trunc=false)
+        f(a) = a[1]
+        groups = groupby(f,agents(world))
+        smallworlds = []
+        for v in values(groups)
+            myagents = [a for a in v]
+            push!(smallworlds,World(myagents,world.space,world.p,world.t))
+        end
+        d = get_pairwise_average_isolation.(smallworlds,trait=trait,trunc=trunc)
         mean(d)
 end

@@ -4,6 +4,7 @@ using ABMEv, Test, JLD2,Random
     include("gillepsie.jl")
     # include("wrightfisher.jl")
     include("metrics.jl")
+    include("metrics_hamming.jl")
     include("utilstest.jl")
     include("simulation.jl")
     include("space_agent.jl")
