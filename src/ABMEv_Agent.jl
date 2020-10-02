@@ -101,13 +101,9 @@ Base.copy(m::Missing) = missing
 
 Base.copy(n::Nothing) = nothing
 
-function Base.show(io::IO, a::AbstractAgent)
-     print(io,"pos: ")
-     show(io, a.x_history)
-     println(io)
-     print(io,"t: ")
-     show(io, a.t_history)
- end
+function Base.show(io::IO, a::Agent{A,R,T,U,V}) where {A,R,T,U,V}
+     println(io, "Agent with indices of type", T)
+end
 
 Base.summary(A::AbstractAgent) = string(TYPE_COLOR,nameof(typeof(a)),NO_COLOR," with uType ",TYPE_COLOR,eltype(a.x_history))
 

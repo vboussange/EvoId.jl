@@ -34,6 +34,10 @@ Get x of world without geotrait.
 """
 Base.getindex(w::World,i) = w.agents[i]
 
+function Base.show(io::IO, w::World{A,S,T}) where {A,S,T}
+     println(io, "World with agents of type", A)
+ end
+
 addAgent!(w::World,a::AbstractAgent) = begin
     push!(w.agents,a)
 end
