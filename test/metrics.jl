@@ -65,10 +65,10 @@ end
 
 # TODO needs to test hamming distance
 
-# testing for real space of dimension d>1
+## testing for real space of dimension d>1
 multispace = (DiscreteSegment{Int8}(1,9),RealSpace{3,Float64}(),)
 K0 = 10000;
-multia = [Agent(multispace, (rand(Int8(1):Int8(10)),tuple(randn(3)...),),ancestors=true) for i in 1:K0]
+multia = [Agent(multispace, (rand(Int8(1):Int8(10)),tuple( randn(3) ...),),ancestors=true) for i in 1:K0]
 D = (Int8(1),tuple(fill(1.,3)...),)
 mu = [1]
 NMax = 1000
@@ -78,5 +78,25 @@ a = multia[10]
 inc = get_inc(1,D[1],multispace[2])
 @test inc[1] != inc[2] # checking that we have independent increments in each direction
 @test isapprox(mean(var(multiw,trait = 2)),1.,atol=1e-2)
+@test prod([isapprox(i,0.,atol=1e-1) for i in mean(multiw,trait = 2)])
 @test isapprox(get_alpha_div(multiw,2),1.,atol = 1e-2)
 @test isapprox(get_beta_div(multiw,2),0.,atol = 1e-2)
+
+## some test to write metrics functions
+# world = multiw;trait=2
+# g = groupby(a->a[1],agents(world))
+# v = [var(World(subw,space(world),parameters(world)),trait=trait) for subw in values(g)]
+# h = vcat(v...)
+# mean(mean(h,dims=1))
+# mean(h)
+# mean([mean(var(Float64.(get_x(World(subw,space(world),parameters(world)),trait)),corrected=false)) for subw in values(g)])
+#
+# [var(Float64.(get_x(World(subw,space(world),parameters(world)),trait)),corrected=false) for subw in values(g)]
+# subw = collect(values(g))[1]
+# var(Float64.(get_x(World(subw,space(world),parameters(world)),trait)),corrected=false)
+# var(World(subw,space(world),parameters(world)),trait=trait)
+# mean(World(subw,space(world),parameters(world)),trait=1)
+#
+# m = [mean(World(subw,space(world),parameters(world)),trait=trait) for subw in values(g)]
+# h=vcat(m...)
+# var(h,dims=1,corrected=false)

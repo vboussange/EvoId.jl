@@ -41,7 +41,7 @@ function findclusters(v::Vector,allextrema =true)
     return collect(h.edges...)[idx .+ 1] .+ s/2, x[idx .+ 1]
 end
 
-import Statistics.var
+import Statistics:var,mean
 # TODO: rename this to gamma diversity
 """
     var(world::Array{Agent};trait=:)
@@ -54,6 +54,15 @@ If trait > 0, returns the covariance matrix, with first row geotrait and second 
 function var(world::World;trait=1)
     xarray = Float64.(get_x(world,trait))
     return var(xarray,dims=1,corrected=false)
+end
+
+"""
+function mean(world::World;trait=1)
+
+"""
+function mean(world::World;trait=1)
+    xarray = Float64.(get_x(world,trait))
+    return mean(xarray,dims=1)
 end
 """
     covgeo(world::Array{Agent,1},trait = 0)
@@ -99,7 +108,9 @@ function get_alpha_div(world::World,trait=1)
         return mean([var(Float64.(get_geo(World(subw,space(world),parameters(world)))),corrected=false) for subw in values(g)])
     else
         # here the second mean is here when subspace is multidimensional
-        return mean([mean(var(Float64.(get_x(World(subw,space(world),parameters(world)),trait)),corrected=false)) for subw in values(g)])
+        v = [var(World(subw,space(world),parameters(world)),trait=trait) for subw in values(g)]
+        h = vcat(v...)
+        return mean(h)
     end
 end
 
@@ -114,9 +125,10 @@ function get_beta_div(world::World,trait=1)
         # need to convert to Float64, otherwise infinite variance
         sbar_i = [mean(Float64.(get_geo(World(subw,space(world),parameters(world))))) for subw in values(g)]
     else
-        sbar_i = [mean(Float64.(get_x(World(subw,space(world),parameters(world)),trait))) for subw in values(g)]
+        m = [mean(World(subw,space(world),parameters(world)),trait=trait) for subw in values(g)]
+        h=vcat(m...)
     end
-    return var(sbar_i,corrected=false)
+    return mean(var(h,dims=1,corrected=false))
 end
 
 """
