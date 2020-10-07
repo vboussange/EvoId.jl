@@ -124,11 +124,12 @@ function get_beta_div(world::World,trait=1)
     if trait == 0
         # need to convert to Float64, otherwise infinite variance
         sbar_i = [mean(Float64.(get_geo(World(subw,space(world),parameters(world))))) for subw in values(g)]
+        return var(sbar_i,corrected=false)
     else
         m = [mean(World(subw,space(world),parameters(world)),trait=trait) for subw in values(g)]
         h=vcat(m...)
+        return mean(var(h,dims=1,corrected=false))
     end
-    return mean(var(h,dims=1,corrected=false))
 end
 
 """
