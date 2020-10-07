@@ -64,3 +64,19 @@ end
 end
 
 # TODO needs to test hamming distance
+
+# testing for real space of dimension d>1
+multispace = (DiscreteSegment{Int8}(1,9),RealSpace{3,Float64}(),)
+K0 = 10000;
+multia = [Agent(multispace, (rand(Int8(1):Int8(10)),tuple(randn(3)...),),ancestors=true) for i in 1:K0]
+D = (Int8(1),tuple(fill(1.,3)...),)
+mu = [1]
+NMax = 1000
+multip = Dict{String,Any}();@pack! multip = D,mu,NMax
+multiw = World(multia,multispace,multip)
+a = multia[10]
+inc = get_inc(1,D[1],multispace[2])
+@test inc[1] != inc[2] # checking that we have independent increments in each direction
+@test isapprox(mean(var(multiw,trait = 2)),1.,atol=1e-2)
+@test isapprox(get_alpha_div(multiw,2),1.,atol = 1e-2)
+@test isapprox(get_beta_div(multiw,2),0.,atol = 1e-2)

@@ -52,7 +52,7 @@ If trait > 0, returns the covariance matrix, with first row geotrait and second 
 
 """
 function var(world::World;trait=1)
-    xarray = get_x(world,trait)
+    xarray = Float64.(get_x(world,trait))
     return var(xarray,dims=1,corrected=false)
 end
 """
@@ -94,12 +94,12 @@ Mean of the local variance of `trait` per patch. If trait=0, we get the geotrait
 # Arguments
 """
 function get_alpha_div(world::World,trait=1)
-    xarray = get_xarray(world,true)
-    g = groupby(x->x[1],collect(eachrow(xarray)))
+    g = groupby(a->a[1],agents(world))
     if trait == 0
-        return mean([var(Float64.([x[end] for x in xp]),corrected=false) for xp in values(g)])
+        return mean([var(Float64.(get_geo(World(subw,space(world),parameters(world)))),corrected=false) for subw in values(g)])
     else
-        return mean([var(Float64.([x[trait] for x in xp]),corrected=false) for xp in values(g)])
+        # here the second mean is here when subspace is multidimensional
+        return mean([mean(var(Float64.(get_x(World(subw,space(world),parameters(world)),trait)),corrected=false)) for subw in values(g)])
     end
 end
 
@@ -109,13 +109,12 @@ Variance of the mean of `trait` per patch
 # Arguments
 """
 function get_beta_div(world::World,trait=1)
-    xarray = get_xarray(world,true)
-    g = groupby(x->x[1],collect(eachrow(xarray)))
+    g = groupby(a->a[1],agents(world))
     if trait == 0
         # need to convert to Float64, otherwise infinite variance
-        sbar_i = [mean(Float64.([x[end] for x in xp])) for xp in values(g)]
+        sbar_i = [mean(Float64.(get_geo(World(subw,space(world),parameters(world))))) for subw in values(g)]
     else
-        sbar_i = [mean(Float64.([x[trait] for x in xp])) for xp in values(g)]
+        sbar_i = [mean(Float64.(get_x(World(subw,space(world),parameters(world)),trait))) for subw in values(g)]
     end
     return var(sbar_i,corrected=false)
 end

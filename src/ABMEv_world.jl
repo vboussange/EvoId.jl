@@ -58,13 +58,21 @@ If `trait = 0` , we return the geotrait.
 # Warning
 This works only for linear subspace, indexed with a single value
 """
-get_x(w::World,trait) = hcat(collect.(getindex.(agents(w),trait))...)'
+function get_x(w::World,trait)
+    if ndims(space(w)[trait]) > 1
+        hcat(collect.(getindex.(agents(w),trait))...)'
+    else
+        collect(getindex.(agents(w),trait))
+    end
+end
 
 """
 $(SIGNATURES)
 Returns every traits of every agents of `world` in the form **of a one dimensional array** (in contrast to `get_x`).
 If `geotrait=true` the geotrait is also added to the set of trait, in the last column.
 If you do not want to specify `t` (only useful for geotrait), it is also possible to use `get_xarray(world::Array{T,1}) where {T <: Agent}`.
+# Warning
+It does not work with subspace where ndims(subspace) > 1.
 """
 function get_xarray(world::World,geotrait::Bool=false)
     xarray = get_x(world,Colon())

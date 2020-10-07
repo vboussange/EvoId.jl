@@ -94,10 +94,10 @@ import DataFrames.groupby
     function groupby(f, list::Array)
 returns a dictionary that group `list` elements by value of function `f`
 """
-groupby(f, list::Array) = begin
+groupby(f, list::Array{T}) where {T}= begin
   groups = Dict()
   for v in list
-    push!(get!(groups, f(v), []), v)
+    push!(get!(groups, f(v), T[]), v)
   end
   groups
 end
