@@ -19,4 +19,4 @@ makedocs(sitename="ABMEv.jl",
         # "contributing.md",
         ],)
 
-deploydocs(repo= "gitlab.ethz.ch:bvictor/abmev.wiki.git",)
+# deploydocs(repo= "gitlab.ethz.ch:bvictor/abmev.wiki.git",)
