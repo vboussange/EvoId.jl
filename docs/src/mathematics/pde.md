@@ -35,3 +35,15 @@ Then we get the **large population limit without mutation scaling**
 ## Mutations
 Assuming a small mutational variance $`\max \sigma^2_i << 1`$ and a mutation rate $`U`$, the mutational effects can be approximated by an elliptic operator $`\sum_{i=1}^{n} (\mu_i^2/x)\partial_{ii}`$ with $`\mu_i = \sigma_i\sqrt{U}`$
 > :warning: check that with Burger
+
+In other words (from Champagnat, Ferriere and Meleard 2006), we have
+
+```math
+\partial_t u(t,x) =  u(t,x)\big(b(t,x) - d(x,u(t,x)) \big) + \frac{1}{2} \Delta (\sigma^2 r \mu u)(t,x)
+```
+where 
+```math
+d(x,u(t,x)) = (u \ast c)(x)
+```
+and ``c`` is the competition function.
+For us, ``x \in ``

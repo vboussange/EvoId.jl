@@ -2,28 +2,22 @@
 
 This is a suite for simulating an Agent Based Model that captures the evolutionary dynamics of a population in a multidimensional space.
 
+## How it works
+This library helps you studying the evolution of a population of agents that evolve into some multidimensional space.
+
+- Define a space
+- Define birth and death function, that depend on agents traits, population state and time
+- Define mutation function
+- Initialise the world and run the simulation according to some updating algorithm
+- Obtain a summary of the population state
+
+
+
 ## Getting started
 ```julia
 using ABMEv
 ```
 
-## The `Agent` structure
-This package is an Agent Based Model, where the atomic structure is the `Agent`. It has four attributes
--  the ancestors' history of traits, and the corresponding time where the traits have changed,
-- a death rate and a birth rate.
-```julia
-mutable struct Agent{T,U}
-    # history of traits for geotraits
-    x_history::Array{U}
-    # birth time of ancestors
-    t_history::Array{U,1}
-    # death rate
-    d::Float64
-    #birth rate
-    b::Float64
-end
-```
-For more understanding of the composite types `T,U`, check the wiki: Gillepsie / Agent Type.
 ## Parameters of the simulation
 Parameters are stored in the parameter dictionary `p`
 ### General parameters

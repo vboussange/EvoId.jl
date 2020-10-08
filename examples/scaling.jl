@@ -5,13 +5,13 @@ using ABMEv
 sigma_K = 1.; #bandwith of resource
 sigma_a = 1.2; #bandwith of competition
 K0 = 1000 #carrying capacity
-K(X) = gaussian(X[1],0,Float32(sigma_K)) #birth
-alpha(X,Y) = gaussian(X[1],Y[1],Float32(sigma_a)) / Float32(K0) #competition
+b(X) = gaussian(X[1],0,Float32(sigma_K)) #birth
+d(X,Y) = gaussian(X[1],Y[1],Float32(sigma_a)) / Float32(K0) #competition
 D = [1e-2] #mutation range
 mu = [1.] #probability of mutation
 NMax = 2000 #number of individual
 dt_saving = 1.0 #time step saving
-tend = 100.
+tend = 2.
 using UnPack
 p = Dict{String,Any}()
 @pack! p = K,alpha,D,mu,NMax,dt_saving,tend

@@ -54,19 +54,8 @@ function add_entry!(s::Simulation{A,S,T,F},w::World) where {A,S,T,F}
 end
 
 #TODO : code it
-function get_x(s::Simulation,i)
-    i = get_size(s)
-    j = size(s.agentarray,2)
-    if i == j
-        # we double the siwe of agent array
-        s.agentarray = hcat(s.agentarray,Array{Missing}(missing,maxsize(w),j))
-    end
-    s.agentarray[1:size(w),i+1] .= copy.(agents(w))
-    push!(s.tspan,w.t)
-    if !(F==Nothing)
-        push!(s.df_agg,Dict(s.cb.names .=> [f(w) for f in s.cb.agg]))
-    end
-    return nothing
+function get_xnt(s::Simulation;trait = i)
+    return [getindex.(wa,trait) for wa in s.agentarray],[fill(t,size(s[j])) for (j,t) in enumerate(s.tspan)]
 end
 # get_x(agentarray::Array{T},t,trait::Integer) where {T <: AbstractAgent} = reshape(hcat(get_x.(agentarray,t,trait)),size(agentarray,1),size(agentarray,2))
 # @deprecate get_x(agentarray::Array{T},t::Number,trait::Integer)
