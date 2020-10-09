@@ -4,7 +4,7 @@
 
 <div align="center"> <img
 src="docs/src/assets/abmev_1d.png"
-alt="ABMEv.jl logo" width="210"></img> </div>
+alt="ABMEv.jl logo" width="400"></img> </div>
 
 This is a suite for simulating an Agent Based Model that captures the evolutionary dynamics of a population in a multidimensional space.
 
