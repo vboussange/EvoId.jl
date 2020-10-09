@@ -19,4 +19,5 @@ makedocs(sitename="ABMEv.jl",
         # "contributing.md",
         ],)
 
-# deploydocs(repo= "gitlab.ethz.ch:bvictor/abmev.wiki.git",)
+deploydocs(repo = "github.com/vboussange/ABMEv.jl",
+            deps = Deps.pip("mkdocs", "python-markdown-math"),)

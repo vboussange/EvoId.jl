@@ -86,7 +86,11 @@ function interpolate_df(df,xlab,ylab,zlab)
     sort!(df,[ylab,xlab])
     xa = unique(df[xlab]); ya = unique(df[ylab])
     A = reshape(df[zlab],length(xa),length(ya))
-    return DiversityFunction(xa,ya,interpolate((xa,ya),A,Gridded(Linear())))
+    if length(xa) > 1 && length(ya) > 1
+        return DiversityFunction(xa,ya,interpolate((xa,ya),A,Gridded(Linear())))
+    else
+        return DiversityFunction(xa,ya,A)
+    end
 end
 
 import DataFrames.groupby
