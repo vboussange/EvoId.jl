@@ -4,7 +4,6 @@ pathsrc = joinpath(@__DIR__,"src")
 makedocs(sitename="ABMEv.jl",
         format = Documenter.HTML(prettyurls = false),
         authors = "Victor Boussange",
-        sitename= "ABMEv.jl"
         pages = [
             "Home" => "index.md",
             "Manual" => [ joinpath(s[end-1:end]...) for s in splitpath.(readdir(joinpath(pathsrc,"manual"),join=true))],
