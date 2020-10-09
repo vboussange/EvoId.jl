@@ -3,6 +3,8 @@ using Documenter, ABMEv
 pathsrc = joinpath(@__DIR__,"src")
 makedocs(sitename="ABMEv.jl",
         format = Documenter.HTML(prettyurls = false),
+        authors = "Victor Boussange",
+        sitename= "ABMEv.jl"
         pages = [
             "Home" => "index.md",
             "Manual" => [ joinpath(s[end-1:end]...) for s in splitpath.(readdir(joinpath(pathsrc,"manual"),join=true))],
@@ -19,5 +21,4 @@ makedocs(sitename="ABMEv.jl",
         # "contributing.md",
         ],)
 
-deploydocs(repo = "github.com/vboussange/ABMEv.jl",
-            deps = Deps.pip("mkdocs", "python-markdown-math"),)
+deploydocs(repo = "github.com/vboussange/ABMEv.jl")

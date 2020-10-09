@@ -2,6 +2,10 @@
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://vboussange.github.io/ABMEv.jl/stable)
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://vboussange.github.io/ABMEv.jl/dev)
 
+<div align="center"> <img
+src="https://gitlab.ethz.ch/bvictor/abmev/-/tree/master/docs/src/assets/logo.svg"
+alt="ABMEv.jl logo" width="210"></img> </div>
+
 This is a suite for simulating an Agent Based Model that captures the evolutionary dynamics of a population in a multidimensional space.
 
 ## Installation
