@@ -1,4 +1,7 @@
 # ABMEv.jl
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://vboussange.github.io/ABMEv.jl/stable)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://vboussange.github.io/ABMEv.jl/dev)
+
 This is a suite for simulating an Agent Based Model that captures the evolutionary dynamics of a population in a multidimensional space.
 
 ## Installation
@@ -16,6 +19,3 @@ Pkg.add("ABMEv#no_C_matrix")
 ```julia
 using ABMEv
 ```
-
-## Documentation
-Ask for wiki pages.
