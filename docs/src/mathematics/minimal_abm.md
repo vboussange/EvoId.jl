@@ -33,7 +33,7 @@ Which has Hessian matrix
 \frac{\partial^2 f}{\partial y_i \partial y_j}(x,y) = -w_i(x)w_j(x) + w_j(x) x_i^3 - 2 x_i^3x_j^3 - \left(3 x_i^2 - \frac{1}{\sigma_i^2} \right) \delta_{ij}
 ```
 
-This Hessian matrix can possess positive eigenvalues depending on the variance of the Gaussian components $`\sigma_i`$ and the coordinates in the phenotypic space.
+This Hessian matrix can possess positive eigenvalues depending on the variance of the Gaussian components ``\sigma_i`` and the coordinates in the phenotypic space.
 
 ## References
 - [Evolutionary dynamics from deterministic microscopic ecological processes](https://journals.aps.org/pre/abstract/10.1103/PhysRevE.101.032411)

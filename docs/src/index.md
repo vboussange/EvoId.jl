@@ -21,7 +21,7 @@ using ABMEv
 ## Parameters of the simulation
 Parameters are stored in the parameter dictionary `p`
 ### General parameters
-- ```"reflected"=>true```: if ```true``` then reflection occurs on the first trait -which should stand for geographic position. Depending on the agent type, reflections occurs in the domain $` [-1,1] `$ or between nodes 1 and `p["nodes"]`
+- ```"reflected"=>true```: if ```true``` then reflection occurs on the first trait -which should stand for geographic position. Depending on the agent type, reflections occurs in the domain `` [-1,1] `` or between nodes 1 and `p["nodes"]`
 - ```"alpha" => α```: is the competition function
 - ```"K" => K```: is the birth rate
 - ```"tend" => 1.5```: is the time to end simulation
@@ -30,16 +30,16 @@ Parameters are stored in the parameter dictionary `p`
 ### Mutation
 If anisotropy in mutation, the following parameters should be declared as arrays where each entry corresponds to a dimension.
 - ```mu``` The probability of mutation.
-- ```D``` If mutation happens on the agent, the increment follows $`\mathcal{N}_{ 0, D}`$
+- ```D``` If mutation happens on the agent, the increment follows ``\mathcal{N}_{ 0, D}``
 ### Birth
 #### Growth
-- ```K``` is the birth coefficient ( $`b(x) = K(x)`$ )
+- ```K``` is the birth coefficient ( ``b(x) = K(x)`` )
 ### Death
 #### Competition
 - Competition between agent with trait ```x``` and ```y``` is defined as
 ```α(x,y)```
 
-- Death coefficient is defined as $`d(x^{(i)}) = \sum_j^{N(t)} \alpha(x^{(i)},x^{(j)})`$
+- Death coefficient is defined as ``d(x^{(i)}) = \sum_j^{N(t)} \alpha(x^{(i)},x^{(j)})``
 
 ### Fitness
 Fitness is defined internally as ```b - d```.

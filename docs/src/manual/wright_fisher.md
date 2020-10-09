@@ -5,7 +5,7 @@ The Wright Fisher process is an individual based model where the number of agent
 
 ![alt text](https://upload.wikimedia.org/wikipedia/commons/0/0b/Random_sampling_genetic_drift.svg)
 
-At each time step, $`N`$ agents are picked up from previous generation to reproduce. Their number of offspring is proportional to their fitness, calculated as usual with **birth and death rates**.
+At each time step, ``N`` agents are picked up from previous generation to reproduce. Their number of offspring is proportional to their fitness, calculated as usual with **birth and death rates**.
 
 It takes thus **only one time step to go trough one generation**. Thus it is more suit- able for numerical simulations. In practice, the Moran and Wright–Fisher models give qualitatively similar results, but genetic drift runs twice as fast in the Moran model.
 
