@@ -9,4 +9,5 @@ using ABMEv, Test, JLD2,Random
     include("simulation.jl")
     include("space_agent.jl")
     include("world.jl")
+    include("utils.jl")
 end

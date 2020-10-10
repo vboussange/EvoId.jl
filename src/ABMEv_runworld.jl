@@ -1,15 +1,3 @@
-function  update_rates_graph!(world,C,p::Dict,t::Float64)
-    for e in edges(p["g"])
-        # agents on e
-        aidx_e = findall(a -> get_x(a,1)==e,world)
-        na = length(aidx_e)
-        for i in aidx_e
-            world[i].d = na^2
-            world[i].b = 1
-        end
-    end
-end
-
 """
 $(SIGNATURES)
 Run `w` with algorithm `alg`, until `tend` is reached.
@@ -23,6 +11,7 @@ first corresponding to initial conditions and last corresponding to world in the
 function run!(w::World{A,S,T},alg::L,tend::Number;
                 dt_saving=nothing,
                 cb=(names = String[],agg =nothing)) where {A,S,T,L<:AbstractAlg}
+    _check_timedep(w.p)
     n=size(w);
     NMax = maxsize(w)
     t = .0
@@ -54,4 +43,21 @@ function run!(w::World{A,S,T},alg::L,tend::Number;
     add_entry!(sim,w)
     @info "simulation stopped at t=$(t), after $(i) generations"
     return sim
+end
+
+"""
+function _correct_timedep!(p::Dict)
+
+checks time dependency of birth and death functions,
+and overloads the function if not provided
+"""
+
+function _check_timedep(p::Dict)
+    @unpack d,b = p
+    if numargs(p["b"]) < 2
+        throw(ArgumentError("Birth function needs `X` and `t` arguments"))
+    end
+    if numargs(p["d"]) < 3
+        throw(ArgumentError("Death function needs `X`, `Y` and `t` arguments"))
+    end
 end

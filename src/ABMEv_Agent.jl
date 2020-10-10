@@ -200,20 +200,3 @@ function increment_x!(a::AbstractAgent{A,R},s::AbstractSpacesTuple,p::Dict,t::T)
     a.x_history[1] = _get_xinc(a,s,p,t)
     return a
 end
-
-"""
-    function tin(t::Number,a::Number,b::Number)
-if t in [a,b) returns 1. else returns 0
-"""
-
-function tin(t::Number,a::Number,b::Number)
-    return t>=a && t<b ? 1. : 0.
-end
-
-function split_move(t)
-    return .0 + 1/100*(t-20.)*tin(t,20.,120.) + tin(t,120.,Inf64)
-end
-
-function split_merge_move(t)
-    return .0 + 1/30*(t-10.)*tin(t,10.,40.) + tin(t,40.,70.) + (1- 1/30*(t-70.))*tin(t,70.,100.)
-end

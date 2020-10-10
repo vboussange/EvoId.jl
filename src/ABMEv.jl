@@ -38,5 +38,5 @@ module ABMEv
         truncvar,get_xhist_mat
     export update_afterbirth_std!,update_afterdeath_std!
     export generalised_gaussian,gaussian,ma,geomsmooth,arithsmooth,eth_grad_std,
-        DiversityFunction,geomsmooth2D,arithsmooth2D,interpolate_df,groupby
+        DiversityFunction,geomsmooth2D,arithsmooth2D,interpolate_df,groupby,numargs
 end

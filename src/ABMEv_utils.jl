@@ -6,6 +6,16 @@ function generalised_gaussian(x::Number,mu::Number,sigma::Number,epsilon::Number
 end
 
 """
+    function tin(t::Number,a::Number,b::Number)
+if t in [a,b) returns 1. else returns 0
+"""
+
+function tin(t::Number,a::Number,b::Number)
+    return a <= t < b ? 1. : 0.
+end
+
+
+"""
         gaussian(x::Number,mu::Number,sigma::Number) = generalised_gaussian(x,mu,sigma,2)
 """
 gaussian(x::Number,mu::Number,sigma::Number) = generalised_gaussian(x,mu,sigma,2.)
@@ -104,4 +114,13 @@ groupby(f, list::Array{T}) where {T}= begin
     push!(get!(groups, f(v), T[]), v)
   end
   groups
+end
+
+"""
+$(SIGNATURES)
+returns the number of arguments of function `f`
+"""
+
+function numargs(f)
+    return maximum([length(m.sig.parameters) - 1 for m in methods(f)] )
 end
