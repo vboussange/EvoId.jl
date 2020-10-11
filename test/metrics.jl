@@ -6,13 +6,13 @@ myspace1 = (RealSpace{1,Float64}(),)
 myspace2 = (RealSpace{1,Float64}(),RealSpace{1,Float64}())
 myspace3 = (DiscreteSegment(Int16(1),Int16(10)),RealSpace{1,Float64}())
 g = SimpleGraph(1000,4000)
-myspace4 = (GraphSpace(g),)
+myspace4 = (RealSpace{1,Float64}(),GraphSpace(g),)
 
 K0 = 1000; σ = 1e-1
 a1 = [Agent(myspace1, (σ,)  .* randn() .- .5,ancestors=true) for i in 1:K0]
 a2 = [Agent(myspace2,tuple((σ, σ)  .* randn(2) .- .5...),ancestors=true) for i in 1:K0]
 a3 = [Agent(myspace3, (rand(Int16.(1:10)), 1e-1* randn() + 5.5 ),ancestors=true) for i in 1:K0]
-a4 = [Agent(myspace4, (rand(Int64(1):Int64(1000)),),ancestors=true) for i in 1:K0]
+a4 = [Agent(myspace4, (1.,rand(Int64(1):Int64(1000)),),ancestors=true) for i in 1:K0]
 
 D = (1.,);
 mu = [1.,1.]
@@ -22,7 +22,7 @@ D = (1.,1.);
 p2 = Dict{String,Any}();@pack! p2 = D,mu,NMax
 D = (Int16(0.),0.)
 p3 = Dict{String,Any}();@pack! p3 = D,mu,NMax
-D = (0.)
+D = (0.,0.)
 p4 = Dict{String,Any}();@pack! p4 = D,mu,NMax
 
 w1 = World(a1,myspace1,p1)
@@ -36,6 +36,8 @@ w4 = World(a4,myspace4,p4)
         @test first(var(w1)) ≈ (σ).^2 atol=0.001
         @test first(var(w2,trait=2)) ≈ (σ).^2 atol=0.001
         @test first(var(w4,trait=1)) < Inf
+        @test first(var(w4,trait=2)) < Inf
+
 
     end
 
