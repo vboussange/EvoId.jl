@@ -54,12 +54,13 @@ thanks to the Fiedler vector (cf `https://mathworld.wolfram.com/FiedlerVector.ht
 """
 function var(world::World;trait=1)
     xarray = get_x(world,trait)
-    if trait > 0 && typeof(space(world)[trait]) <: GraphSpace
-        fiedlervec = eigs(laplacian_matrix(space(world)[trait].g),nev=2,which=:SM)[2][:,2]
-        return mean(fiedlervec[xarray].^2) - mean(fiedlervec[xarray])^2
-    else
-        return var(Float64.(xarray),dims=1,corrected=false)
+    if trait > 0
+        if typeof(space(world)[trait]) <: GraphSpace
+            fiedlervec = eigs(laplacian_matrix(space(world)[trait].g),nev=2,which=:SM)[2][:,2]
+            return mean(fiedlervec[xarray].^2) - mean(fiedlervec[xarray])^2
+        end
     end
+    return var(Float64.(xarray),dims=1,corrected=false)
 end
 
 """
@@ -69,12 +70,13 @@ If trait = 0, returns the variance of the geotrait,
 """
 function mean(world::World;trait=1)
     xarray = get_x(world,trait)
-    if trait > 0 && typeof(space(world)[trait]) <: GraphSpace
-        fiedlervec = eigs(laplacian_matrix(space(world)[trait].g),nev=2,which=:SM)[2][:,2]
-        return mean(fiedlervec[xarray])
-    else
-        return mean(Float64.(xarray),dims=1)
+    if trait > 0
+        if typeof(space(world)[trait]) <: GraphSpace
+            fiedlervec = eigs(laplacian_matrix(space(world)[trait].g),nev=2,which=:SM)[2][:,2]
+            return mean(fiedlervec[xarray])
+        end
     end
+    return mean(Float64.(xarray),dims=1)
 end
 
 """
