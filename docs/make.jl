@@ -6,9 +6,9 @@ makedocs(sitename="ABMEv.jl",
         authors = "Victor Boussange",
         pages = [
             "Home" => "index.md",
+            "Examples" => [ joinpath(s[end-1:end]...) for s in splitpath.(readdir(joinpath(pathsrc,"examples"),join=true))],
             "Manual" => [ joinpath(s[end-1:end]...) for s in splitpath.(readdir(joinpath(pathsrc,"manual"),join=true))],
             "Mathematics" => [ joinpath(s[end-1:end]...) for s in splitpath.(readdir(joinpath(pathsrc,"mathematics"),join=true))],
-            "Examples" => [ joinpath(s[end-1:end]...) for s in splitpath.(readdir(joinpath(pathsrc,"examples"),join=true))],
             "Library" => Any[
                 "Public" => "lib/public.md",
                 # "Internals" => map(
