@@ -5,6 +5,7 @@ module ABMEv
     using LightGraphs
     using UnPack
     using DocStringExtensions
+    using Arpack
 
     include("ABMEv_Space.jl")
     include("ABMEv_Agent.jl")

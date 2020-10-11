@@ -41,6 +41,16 @@ function geomsmooth(x,smooth)
 end
 
 """
+    function geomsmooth(x,y,smooth)
+-`x` is the shifted x-axis vector, due to smoothing
+-`y` is the smoothed value
+Returning a tuple
+"""
+function geomsmooth(x,y,smooth)
+    idx = Int((smooth-1)/2)+1:length(x)- Int((smooth-1)/2)
+    return x[idx],[prod(y[i-smooth + 1:i])^(1/smooth) for i in smooth:length(y)]
+end
+"""
     function arithsmooth(x,smooth)
 arithmetic smoothing
 
@@ -48,9 +58,22 @@ arithmetic smoothing
 function arithsmooth(x,smooth)
     return [sum(x[i-smooth+1:i])/smooth for i in smooth:length(x)]
 end
+"""
+    function arithsmooth(x,y,smooth)
+-`x` is the shifted x-axis vector, due to smoothing
+-`y` is the smoothed value
+Returning a tuple
+"""
+function arithsmooth(x,y,smooth)
+    idx = Int((smooth-1)/2)+1:length(x)- Int((smooth-1)/2)
+    return x[idx],[sum(y[i-smooth+1:i])/smooth for i in smooth:length(y)]
+end
 
 # This is all about interpolations
 import Interpolations:interpolate,Gridded,Linear
+"""
+$(TYPEDEF)
+"""
 struct DiversityFunction
     x
     y
@@ -99,7 +122,7 @@ function interpolate_df(df,xlab,ylab,zlab)
     if length(xa) > 1 && length(ya) > 1
         return DiversityFunction(xa,ya,interpolate((xa,ya),A,Gridded(Linear())))
     else
-        return DiversityFunction(xa,ya,A)
+        return DiversityFunction(xa[:],ya[:],A[:])
     end
 end
 

@@ -44,33 +44,46 @@ end
 import Statistics:var,mean
 # TODO: rename this to gamma diversity
 """
-    var(world::Array{Agent};trait=:)
+    function var(world::World;trait=1)
+Return the variance of the `world`'s `trait` distribution.
 If trait = 0, returns the variance of the geotrait,
 knowing that by default it is associated with position trait 1.
-If trait > 0, returns the covariance matrix, with first row geotrait and second row trait.
-# Arguments
-
+# Notes
+For now, the variance of a `trait` defined on a `GraphSpace` is calculated
+thanks to the Fiedler vector (cf `https://mathworld.wolfram.com/FiedlerVector.html`)
 """
 function var(world::World;trait=1)
-    xarray = Float64.(get_x(world,trait))
-    return var(xarray,dims=1,corrected=false)
+    xarray = get_x(world,trait)
+    if trait > 0 && typeof(space(world)[trait]) <: GraphSpace
+        fiedlervec = eigs(laplacian_matrix(space(world)[trait].g),nev=2,which=:SM)[2][:,2]
+        return mean(fiedlervec[xarray].^2) - mean(fiedlervec[xarray])^2
+    else
+        return var(Float64.(xarray),dims=1,corrected=false)
+    end
 end
 
 """
-function mean(world::World;trait=1)
-
+    function mean(world::World;trait=1)
+Returns the mean of the `world`'s `trait` distribution.
+If trait = 0, returns the variance of the geotrait,
 """
 function mean(world::World;trait=1)
-    xarray = Float64.(get_x(world,trait))
-    return mean(xarray,dims=1)
+    xarray = get_x(world,trait)
+    if trait > 0 && typeof(space(world)[trait]) <: GraphSpace
+        fiedlervec = eigs(laplacian_matrix(space(world)[trait].g),nev=2,which=:SM)[2][:,2]
+        return mean(fiedlervec[xarray])
+    else
+        return mean(Float64.(xarray),dims=1)
+    end
 end
+
 """
     covgeo(world::Array{Agent,1},trait = 0)
 If trait = 0, returns the variance of the geotrait,
 knowing that by default it is associated with position trait 1.
 If trait > 0, returns the covariance matrix, with first row geotrait and second row trait
-# Arguments
-
+# Notes
+This might be deprecated in the future
 """
 function covgeo(world::World,trait = 0)
     xarray = Float64.(get_geo(world))
@@ -99,19 +112,15 @@ function hamming(world::World) where T <: Int
 end
 """
     get_alpha_div(world::Array{U,1},t::Number,trait=1) where U <: Union{Missing,Agent}
-Mean of the local variance of `trait` per patch. If trait=0, we get the geotrait
-# Arguments
+Mean of the local variance of `trait` per patch.
+If trait=0, we get the mean of the local variance of the geotrait
 """
 function get_alpha_div(world::World,trait=1)
     g = groupby(a->a[1],agents(world))
-    if trait == 0
-        return mean([var(Float64.(get_geo(World(subw,space(world),parameters(world)))),corrected=false) for subw in values(g)])
-    else
-        # here the second mean is here when subspace is multidimensional
-        v = [var(World(subw,space(world),parameters(world)),trait=trait) for subw in values(g)]
-        h = vcat(v...)
-        return mean(h)
-    end
+    # here the second mean is here when subspace is multidimensional
+    v = [var(World(subw,space(world),parameters(world)),trait=trait) for subw in values(g)]
+    h = vcat(v...)
+    return mean(h)
 end
 
 """
@@ -121,15 +130,9 @@ Variance of the mean of `trait` per patch
 """
 function get_beta_div(world::World,trait=1)
     g = groupby(a->a[1],agents(world))
-    if trait == 0
-        # need to convert to Float64, otherwise infinite variance
-        sbar_i = [mean(Float64.(get_geo(World(subw,space(world),parameters(world))))) for subw in values(g)]
-        return var(sbar_i,corrected=false)
-    else
-        m = [mean(World(subw,space(world),parameters(world)),trait=trait) for subw in values(g)]
-        h=vcat(m...)
-        return mean(var(h,dims=1,corrected=false))
-    end
+    m = [mean(World(subw,space(world),parameters(world)),trait=trait) for subw in values(g)]
+    h=vcat(m...)
+    return mean(var(h,dims=1,corrected=false))
 end
 
 """

@@ -1,6 +1,8 @@
 # ABMEv.jl
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://vboussange.github.io/ABMEv.jl/stable)
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://vboussange.github.io/ABMEv.jl/dev)
+[![pipeline status](https://gitlab.ethz.ch/bvictor/abmev/badges/master/pipeline.svg)](https://gitlab.ethz.ch/bvictor/abmev/-/commits/master)
+[![coverage report](https://gitlab.ethz.ch/bvictor/abmev/badges/master/coverage.svg)](https://gitlab.ethz.ch/bvictor/abmev/-/commits/master)
 
 <div align="center"> <img
 src="docs/src/assets/abmev_1d.png"
