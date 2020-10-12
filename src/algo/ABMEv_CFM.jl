@@ -38,7 +38,7 @@ function updateWorld!(w::World{A,S,T},c::CFM) where {A,S,T}
     x = get_x(w[i])
     W = rand()
     if dt > 0.
-        deathprob = (sum(d.(get_x.(alive),Ref(x)),w.t) - d(x,x,w.t)) / (Cbar*(n+1))
+        deathprob = (sum(d.(get_x.(alive),Ref(x),w.t) .- d(x,x,w.t))) / (Cbar*(n+1))
         birthprob = b(x,w.t) / (Cbar*(n+1))
         if W <= deathprob
             updateDeathEvent!(w,c,i)
