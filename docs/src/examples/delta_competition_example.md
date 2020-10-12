@@ -96,7 +96,7 @@ Plots.plot(get_tspan(sim),wsize,
                 xlabel ="time",
                 grid = false)
 ```
-![](tutorials/delta_comp_wsize.png)
+![](../assets/tutorials/delta_comp_wsize.png)
 
 
 !!! notes "Callbacks"
@@ -113,4 +113,4 @@ Plots.plot(sim,
         grid = false,
         markersize = 10)
 ```
-![](tutorials/delta_comp_pos.png)
+![delta_comp_pos](../assets/tutorials/delta_comp_pos.png)

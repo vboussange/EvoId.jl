@@ -17,7 +17,17 @@ using ABMEv
 
 ## Tutorial
 We strongly advise to have a look at the tutorial section.
-
+```@contents
+Pages = [
+    "examples/delta_competition_example.md",
+    "examples/changing_environment.md",
+    "examples/sympatric_speciation.md",
+    "examples/gradient_establishment.md",
+    "examples/genetic_structure.md",
+    ""
+    ]
+Depth = 2
+```
 ## How it works
 There general workflow to launch any simulation is the following
 
