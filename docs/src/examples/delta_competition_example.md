@@ -63,7 +63,8 @@ mu = [1.]
 D = (1.5,)
 ```
 ## Running the world
-We initialise the world with initial population of size ``K_0 / 9`` located on patch `5`. We keep track of individuals' ancestors by setting `ancestors=true`. Because we wish to use `Gillepsie` algorithm, we need `rates=true` as agents' internal birth and death rates are updated at every time step.
+We initialise the world with initial population of size ``K_0 / 9`` located on patch `5`. `NMax` corresponds to the maximum number of individuals that can be attained. If attained, then the programm stops.
+We keep track of individuals' ancestors by setting `ancestors=true`. Because we wish to use `Gillepsie` algorithm, we need `rates=true` as agents' internal birth and death rates are updated at every time step.
 !!! note "Warning"
     `rates` treatment is something we might implement in the library internals.
 

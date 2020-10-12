@@ -1,7 +1,8 @@
 # Run the World
 
-- ```NMax``` Maximum number of individuals that can be attained. If attained, then the programm stops.
-
+```@docs
+run!
+```
 
 For now three algorithms
 ```@docs
@@ -10,7 +11,3 @@ CFM
 WF
 ```
 > Warning : `WF` not implemented yet
-```@autodocs
-Modules = [ABMEv]
-Pages   = ["ABMEv_runworld.jl"]
-```

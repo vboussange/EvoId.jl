@@ -1,13 +1,14 @@
 """
-$(SIGNATURES)
+    function run!(w::World{A,S,T},alg::L,tend::Number;dt_saving=nothing,cb=(names = String[],agg =nothing))
+
 Run `w` with algorithm `alg`, until `tend` is reached.
 Returns a `Simulation` type.
 - `worldall` stores the world every `p["dt_saving"]` time steps.
 If `dt_saving` not specified, `sim` contains an array of two elements,
 first corresponding to initial conditions and last corresponding to world in the last time step.
+- the run stops if the number of agents reaches`p["NMax"]`.
 >:warning: if you choose `nagents = 1` then nothing is saved until the end of the simulation.
 """
-# function run(w::World{AbstractAgent{A,R},S,T},g::G;dt_saving=nothing,callbacks=nothing) where {G<:Gillepsie,A,R,S,T}
 function run!(w::World{A,S,T},alg::L,tend::Number;
                 dt_saving=nothing,
                 cb=(names = String[],agg =nothing)) where {A,S,T,L<:AbstractAlg}
@@ -46,12 +47,11 @@ function run!(w::World{A,S,T},alg::L,tend::Number;
 end
 
 """
-function _correct_timedep!(p::Dict)
+    function _correct_timedep!(p::Dict)
 
 checks time dependency of birth and death functions,
 and overloads the function if not provided
 """
-
 function _check_timedep(p::Dict)
     @unpack d,b = p
     if numargs(p["b"]) < 2

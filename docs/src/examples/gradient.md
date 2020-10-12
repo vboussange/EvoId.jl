@@ -42,7 +42,7 @@ Here we show how to plot a cool animated scatter plot of the trait space through
 ```
 ![](../assets/tutorials/gradient_2Dtrait.gif)
 
-## Plotting lineages
+## [Plotting lineages](@id lineages)
 A cool feature of ABMEv.jl is its ability to track agents ancestors traits (cf [Agent section](../manual/agent.md))
 
 On can plot it, to get an idea of the coalescence of the population.

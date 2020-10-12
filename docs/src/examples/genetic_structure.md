@@ -1,4 +1,4 @@
-# Modelling agents with a genetic structure
+# [Modelling agents with a genetic structure](@id genetic_structure)
 
 In this example, we show how to model a population which evolve on a linear geographic space, and is defined by a genotype graph. Any two connected node in the genotype graph should be thought of as two neighbour genomes, i.e that are very similar in their alleles / nucleotide.
 
@@ -35,3 +35,9 @@ The genotype space is inspired from the article [The architecture of an empirica
 ```
 
 ## Plotting
+Plotting animations of graphs is a bit involved. If you want to learn about that, consult  `src/examples/genetic_structure.jl`.
+### Geographical space
+![](../assets/tutorials/space_genetic_struct.gif)
+
+### Genetic space
+![](../assets/tutorials/animated_gen_space.gif)

@@ -7,8 +7,12 @@ The purpose of this package is to provide a numerical laboratory for evolutionar
 - analysis tools to investigate the simulations.
 
 ## Features
-Agents consist of a set of traits in some combination of vector spaces. A vector space can represent for example a geographical landscape, or trait space. Spaces can be of any dimensions, discrete or continuous, bounded or unbounded. They can equally consist of graphs.
+Agents consist of sets of traits in some combination of vector spaces. A vector space can represent for example **a geographical landscape, a trait space, or genetic structure**. Spaces can be of any dimensions, discrete or continuous, bounded or unbounded. They can equally consist of graphs.
 Vector spaces are used to define birth and death processes, as well as mutation processes.
+
+### Specificities
+- [ABMEv.jl allows to keep track of agents' trait lineages](@ref genetic_structure)
+- [ABMEv.jl enables to run evolutionary dynamics on graphs!](@ref lineages)
 
 ## Getting started
 ```@repl
@@ -22,14 +26,14 @@ Pages = [
     "examples/delta_competition_example.md",
     "examples/changing_environment.md",
     "examples/sympatric_speciation.md",
-    "examples/gradient_establishment.md",
+    "examples/gradient.md",
     "examples/genetic_structure.md",
     ""
     ]
 Depth = 2
 ```
 ## How it works
-There general workflow to launch any simulation is the following
+General workflow to launch any simulation is the following
 
 - [Define the combination of vector spaces you are interested in.](manual/space.md)
 - Define birth and death function, that depend on agents position in the space
@@ -40,9 +44,9 @@ There general workflow to launch any simulation is the following
 
 ### Available algorithms
 As of now, three types of simulation algorithm can be used:
-        - [Gillepsie](manual/gillepsie.md)
-        - [Wright-Fisher](manual/wright_fisher.md)
-        - [CFM](CFM.md)
+- [Gillepsie](manual/gillepsie.md)
+- [Wright-Fisher](manual/wright_fisher.md)
+- [CFM](CFM.md)
 
 ## References
 - [Champagnat and Ferriere founding article](https://linkinghub.elsevier.com/retrieve/pii/S0040580905001632)

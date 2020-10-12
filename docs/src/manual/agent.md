@@ -1,7 +1,7 @@
 # Agent properties
 
 ## The `Agent` structure
-The atomic structure is the `Agent`. It has four attributes
+`Agent` is the atomic structure of ABMEv.jl. It has four attributes
 -  the ancestors' history of traits, and the corresponding time where the traits have changed,
 - a death rate and a birth rate.
 ```julia
@@ -16,14 +16,11 @@ mutable struct Agent{A<:Ancestors,R<:Rates,T<:Tuple,U,V} <: AbstractAgent{A,R}
     b::V
 end
 ```
-!!! note Specificities
+!!! note "Specificities"
     The type `Agent` has two important composite types
 
     - `Ancestors{bool}` : when `bool = true`, the ancestors traits are stored,
     - `Rates{bool}` : when `bool = true`, the rates `d` and `b` of agents are updated at each time step. This is need in e.g. Gillepsie Algorithm
-
-
-#
 
 ```@autodocs
 Modules = [ABMEv]
