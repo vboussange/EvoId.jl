@@ -6,7 +6,7 @@ In this script, we model the evolution of a population where agents are simply d
 Let's start by a linear landscape. We define a discrete segment of length `9`, with reflecting boundary conditions. In fact, reflecting boundary conditions are implemented for any finite space.
 
 !!! warning "1D Reflections"
-  As of v1, only reflections on one dimensional space are implemented. We have a two dimensional reflection method that will be released in the future.
+    As of v1, only reflections on one dimensional space are implemented. We have a two dimensional reflection method that will be released in the future.
 
 There are two ways of implementing a linear landscape. The first one uses a `DiscreteSegment` while the second relies on LightGraphs.jl library. Both are *almost* equivalent.
 
@@ -15,6 +15,7 @@ There are two ways of implementing a linear landscape. The first one uses a `Dis
 using ABMEv
 nodes = 10
 mysegment = DiscreteSegment(1,nodes)
+wholespace = (mysegment,)
 ```
 
 ### grid
@@ -23,12 +24,15 @@ using ABMEv, LightGraphs
 nodes = 10
 g = grid([nodes,1])
 mysegmentgraph = GraphSpace(g)
+wholespace = (mysegmentgraph,)
 ```
+!!! warning "Space tuple"
+    Notice that the whole space should be a *tuple of spaces*. Even where there is only one sub vector space as here, you need to have brackets and comma around the unit vector space.
 Here is how you can visualise the landscape.
 
 ```julia
-using GraphPlots
-gplot(g,locs_x = 1:nodes,locs_y=1:nodes)
+using GraphPlot
+gplot(g, collect(1:nodes), collect(1:nodes))
 ```
 
 ## Defining competition processes
@@ -49,6 +53,9 @@ d(X,Y,t) = (X[1] ≈ Y[1]) / K0
 ```
 At equilibrium, population size in each deme will reach `K0 / nodes`.
 
+!!! warning "Time dependency"
+    Even though time is not used, you have to write birth and death functions with time dependency.
+
 ## Dispersal
 We assume that anytime an offspring is born, it is given a chance to move (`\mu = 1`).
 ```julia
@@ -58,31 +65,52 @@ D = (1.5,)
 ## Running the world
 We initialise the world with initial population of size ``K_0 / 9`` located on patch `5`. We keep track of individuals' ancestors by setting `ancestors=true`. Because we wish to use `Gillepsie` algorithm, we need `rates=true` as agents' internal birth and death rates are updated at every time step.
 !!! note "Warning"
-  `rates` treatment is something we might implement in the library internals.
+    `rates` treatment is something we might implement in the library internals.
 
 ```julia
+using UnPack# useful macro @pack!
 NMax = 2000
-tend = 2
+tend = 300.
 p = Dict{String,Any}();@pack! p = d,b,D,mu,NMax
 myagents = [Agent(myspace,(5,),ancestors=true,rates=true) for i in 1:K0/nodes]
 w0 = World(myagents,myspace,p,0.)
 @time sim = run!(w0,Gillepsie(),tend)
 ```
+This is the simplest run you can do. Now time to more interesting things
+
 ## Analysis
+
+### Size of the world
 Let's verify that the population's growth is logistic. We will plot the population size over time.
-To do so, one need to define `dt_saving`.
+To do so, one need to define `dt_saving` < `tend` to save every `dt_saving` time steps of the world.
 
 ```julia
+myagents = [Agent(wholespace,(5,),ancestors=true,rates=true) for i in 1:K0/nodes]
+w0 = World(myagents,wholespace,p,0.) # we need to reinitialise the world
+@time sim = run!(w0,Gillepsie(),tend,dt_saving=2.)
+wsize = [length(w) for w in sim[:]]
 using Plots
-@time sim = run!(w0,Gillepsie(),tend,dt_saving=1)
-Plots.plot()
-@animate for (i,t) in tspan(sim)
-  Plots.
-end
+Plots.plot(get_tspan(sim),wsize,
+                label = "",
+                ylabel = "Metapopulation size",
+                xlabel ="time",
+                grid = false)
 ```
+![](tutorials/delta_comp_wsize.png)
 
-One might be tempted to plot the world for some time steps. This requires some knowledge of the library Plots.jl.
-Agents values are accessed by `get_x(w::World)`.
 
-!!! notes "Plotting"
-  This will be proposed as a blackbox with PlotRecipes.jl in the near future
+!!! notes "Callbacks"
+    Note that one could also use a callback function to obtain time series of size of the world computed at simulation time. See [Simulation page](../manual/simulation.md).
+
+### Position through time
+
+One might be tempted to plot the agents position for some time steps.
+
+```julia
+Plots.plot(sim,
+        label = "",
+        ylabel = "Geographical position",
+        grid = false,
+        markersize = 10)
+```
+![](tutorials/delta_comp_pos.png)
