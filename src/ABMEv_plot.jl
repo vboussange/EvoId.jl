@@ -41,9 +41,9 @@ last time step in the two  (three) dimensional trait space define by `trait`
         end
     end
     if length(trait) == 2
-        isnothing(time) ? w = get_world(sim[end]) :  w = get_world(sim[time])
-        y = get_x(w,trait[1]);
-        x=get_x(w,trait[2])
+        isnothing(time) ? w = get_world(sim[end]) :  w = get_world(sim,time)
+        x = get_x(w,trait[1]);
+        y = get_x(w,trait[2])
         X = hcat(x,y)
         d = kde(X)
         # by density
@@ -58,15 +58,13 @@ last time step in the two  (three) dimensional trait space define by `trait`
             # markercolor := :blue
             markerstrokewidth := 0
             # seriesalpha := 1.
-            xaxis := "geotrait"
-            yaxis := "trait value"
             label := ""
             grid := false
             # marker := (:rect,20,1.)
             x,y
         end
     end
-    if length(trait) == 2
+    if length(trait) == 3
         throw(ArgumentError("Plot for three traits not yet implemented"))
     end
 end

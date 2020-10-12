@@ -11,9 +11,9 @@ mu = [.1]
 NMax = 2000
 tend = 1500
 p = Dict{String,Any}();@pack! p = d,b,D,mu,NMax
-myagents = [Agent(myspace,(1e-2 * randn(),),ancestors=true,rates=true) for i in 1:K0]
+myagents = [Agent(myspace,(1e-2 * randn(),),rates=true) for i in 1:K0]
 w0 = World(myagents,myspace,p,0.)
-@time sim = run!(w0,Gillepsie(),tend,dt_saving = 4)
+@time sim = run!(w0,Gillepsie(),tend,dt_saving = 10)
 
 using JLD2
 @save joinpath(@__DIR__,"sim_sympatric_speciation.jld2") sim
@@ -32,5 +32,5 @@ xplot = Plots.plot(thist,xhistall,
                 grid = false,
                 xlabel = "time",
                 ylabel = "Historical adaptive trait"
-                )a
+                )
 savefig(joinpath(@__DIR__, "x_hist_sympatric_speciation.png"))
