@@ -34,6 +34,7 @@ Here is how you can visualise the landscape.
 using GraphPlot
 gplot(g, collect(1:nodes), collect(1:nodes))
 ```
+![delta_comp_pos](../assets/tutorials/line.png)
 
 ## Defining competition processes
 We propose that any individual have a constant birth rate, and competes with all the individuals present in the same patch. Let ``i \in \N``,``x_i \in \{1,2,\dots,9\}``.

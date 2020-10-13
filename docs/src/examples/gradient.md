@@ -2,6 +2,12 @@
 
 In this tutorial, we model agents evolving on a discrete segment, where each patch favours an optimal adaptive trait, along a gradient. This is typically the case along an altitudinal gradient.
 
+Here is what the geographical space looks like.
+
+![delta_comp_pos](../assets/tutorials/adapt_line.png)
+
+Every colour stands for a different optimal trait.
+
 ## Run the world
 ```julia
 using Revise,ABMEv,Plots,UnPack
