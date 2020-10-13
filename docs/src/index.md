@@ -11,8 +11,8 @@ Agents consist of sets of traits in some combination of vector spaces. A vector 
 Vector spaces are used to define birth and death processes, as well as mutation processes.
 
 ### Specificities
-- [ABMEv.jl allows to keep track of agents' trait lineages](@ref genetic_structure)
-- [ABMEv.jl enables to run evolutionary dynamics on graphs!](@ref lineages)
+- [ABMEv.jl allows to keep track of agents' trait lineages](@ref lineages)
+- [ABMEv.jl enables to run evolutionary dynamics on graphs!](@ref genetic_structure)
 
 ## Getting started
 ```@repl

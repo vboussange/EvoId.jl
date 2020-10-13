@@ -6,7 +6,7 @@
 [![coverage report](https://gitlab.ethz.ch/bvictor/abmev/badges/master/coverage.svg)](https://gitlab.ethz.ch/bvictor/abmev/-/commits/master)
 
 <div align="center"> <img
-src="docs/src/assets/abmev_1d.png"
+src="docs/src/assets/logo.png"
 alt="ABMEv.jl logo" width="400"></img> </div>
 
 This is a suite for simulating an Agent Based Model that captures the evolutionary dynamics of a population in a multidimensional space.
