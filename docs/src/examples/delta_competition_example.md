@@ -101,7 +101,7 @@ Plots.plot(get_tspan(sim),wsize,
 
 
 !!! notes "Callbacks"
-    Note that one could also use a callback function to obtain time series of size of the world computed at simulation time. See [Simulation page](../manual/simulation.md).
+    Note that one could also use a callback function to obtain time series of size of the world computed at simulation time. See [Callbacks page](../manual/callbacks.md).
 
 ### Position through time
 

@@ -40,7 +40,7 @@ General workflow to launch any simulation is the following
 - Define mutation function
 - [Define initial population state and time](manual/world)
 - [Run the simulation according to some updating algorithm](manual/run_world.md)
-- [Obtain a summary of the population state](manual/simulation.md)
+- [Obtain a summary of the population state](manual/callbacks.md)
 
 ### Available algorithms
 As of now, three types of simulation algorithm can be used:

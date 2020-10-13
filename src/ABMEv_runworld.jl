@@ -6,8 +6,8 @@ Returns a `Simulation` type.
 - `worldall` stores the world every `p["dt_saving"]` time steps.
 If `dt_saving` not specified, `sim` contains an array of two elements,
 first corresponding to initial conditions and last corresponding to world in the last time step.
+- `cb` correspond to callbacks function. Look at the documentation for more information
 - the run stops if the number of agents reaches`p["NMax"]`.
->:warning: if you choose `nagents = 1` then nothing is saved until the end of the simulation.
 """
 function run!(w::World{A,S,T},alg::L,tend::Number;
                 dt_saving=nothing,
