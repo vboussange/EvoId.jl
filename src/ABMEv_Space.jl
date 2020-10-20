@@ -47,9 +47,11 @@ end
 """
 $(TYPEDEF)
 
-A real pace with dimension N and type T
+A real space with dimension N and type T
 """
 struct RealSpace{N,T} <: AbstractSpace{N,T,IsFinite{false}} end
+struct NaturalSpace{N,T} <: AbstractSpace{N,T,IsFinite{false}} end
+
 
 # TODO: find a way to put a type on D in get_inc
 
@@ -58,6 +60,14 @@ function _get_inc(D,s::AbstractSpace{Dim,T,I}) where {Dim,T<:AbstractFloat,I<:Is
         return Tuple(D .* randn(T,Dim))
     else
         return D * randn(T)
+    end
+end
+
+function _get_inc(D,s::AbstractSpace{Dim,T,I}) where {Dim,T<:Integer,I<:IsFinite{false}}
+    if Dim > 1
+        return Tuple(round.(T,D .*randn(Float32,Dim)))
+    else
+        return round(D * randn(Float32))
     end
 end
 

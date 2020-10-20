@@ -7,6 +7,7 @@ mysegment = DiscreteSegment(1,10)
 mygraph = GraphSpace(SimpleGraph(10,10))
 real2d = RealSpace{2,Float64}()
 myline = RealSpace{1,Float16}()
+mydiscreteline = NaturalSpace{1,Int8}()
 mycontinuoussegment = ContinuousSegment(-1.,1.)
 myspace = (mysegment,mygraph,myline)
 myspace2 = (mysegment,mycontinuoussegment,real2d)
@@ -23,8 +24,11 @@ myspace2 = (mysegment,mycontinuoussegment,real2d)
 
     # increment on infinite spaces
     @test ABMEv._get_inc(0.,myline) ≈ (0.)
+    @test ABMEv._get_inc(0.,mydiscreteline) ≈ (0.)
     @test !(ABMEv._get_inc(1.,myline) ≈ 0.)
     @test !(get_inc(1,1.,myline) ≈ 0.)
+    @test !(get_inc(1,1.,mydiscreteline) ≈ 0.)
+
 
     @test typeof(ABMEv._get_inc([1.,0.],real2d)) == Tuple{Float64,Float64}
     @test typeof(get_inc([1.,0.],[1.,0.],real2d)) == Tuple{Float64,Float64}

@@ -22,7 +22,7 @@ module ABMEv
 
     @reexport using Distributions, DataFrames
 
-    export GraphSpace,ContinuousSegment,DiscreteSegment,RealSpace,
+    export GraphSpace,ContinuousSegment,DiscreteSegment,RealSpace,NaturalSpace,
         AbstractSpacesTuple,get_inc
     export update_rates!
     export AbstractAgent,Agent,get_fitness,get_x,get_t,get_dim,
