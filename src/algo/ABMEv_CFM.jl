@@ -27,19 +27,19 @@ DOI : 10.1016/j.tpb.2005.10.004
 """
 function updateWorld!(w::World{A,S,T},c::CFM) where {A,S,T}
     # total update world
-    @unpack Cbar,d,b = parameters(w)
+    @unpack d,b,bm,dm = parameters(w)
     alive = agents(w)
     # Total rate of events
     n = size(w)
-    ∑ = (n + 1)
-    dt = - log(rand(T))/(Cbar * ∑)
+    Cbar = bm + dm*n
+    dt = rand(Exponential(Cbar)) / n
     update_clock!(w,dt)
     i = rand(1:n)
     x = get_x(w[i])
     W = rand()
     if dt > 0.
-        deathprob = (sum(d.(get_x.(alive),Ref(x),w.t) .- d(x,x,w.t))) / (Cbar*(n+1))
-        birthprob = b(x,w.t) / (Cbar*(n+1))
+        deathprob = (sum(d.(get_x.(alive),Ref(x),w.t)) .- d(x,x,w.t)) / Cbar
+        birthprob = b(x,w.t) / Cbar
         if W <= deathprob
             updateDeathEvent!(w,c,i)
         elseif W <= deathprob + birthprob
