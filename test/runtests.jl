@@ -10,4 +10,5 @@ using ABMEv, Test, JLD2,Random
     include("space_agent.jl")
     include("world.jl")
     include("utils.jl")
+    include("dyn_land.jl")
 end

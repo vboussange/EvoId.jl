@@ -5,7 +5,8 @@ abstract type IsFinite{T} end
 #ife stands for is finite
 """
 $(TYPEDEF)
-`Dim` is the dimension of the space, `T` is the element type,
+`Dim` is the dimension of the space,
+`T` is the element type,
 `I` to indicate finiteness
 """
 abstract type AbstractSpace{Dim,T,I} end
@@ -19,14 +20,17 @@ Base.eltype(ss::AbstractSpacesTuple) where {Dim,T,I} = Tuple{eltype.(ss)...}
 
 SpaceType=Union{Nothing, AbstractSpace} # not sure what is this used for
 
+# Static spaces
+abstract type AbstractStatSpace{Dim,T,I} <: AbstractSpace{Dim,T,I} end
+
 """
 $(TYPEDEF)
 """
-struct GraphSpace{T} <: AbstractSpace{1,T,IsFinite{true}}
+struct GraphSpace{T} <: AbstractStatSpace{1,T,IsFinite{true}}
     g::AbstractGraph{T}
 end
 
-abstract type AbstractSegment{T<:Number}  <: AbstractSpace{1,T,IsFinite{true}} end
+abstract type AbstractSegment{T<:Number}  <: AbstractStatSpace{1,T,IsFinite{true}} end
 
 """
 $(TYPEDEF)
@@ -46,16 +50,26 @@ end
 
 """
 $(TYPEDEF)
-
 A real space with dimension N and type T
 """
-struct RealSpace{N,T} <: AbstractSpace{N,T,IsFinite{false}} end
-struct NaturalSpace{N,T} <: AbstractSpace{N,T,IsFinite{false}} end
+struct RealSpace{N,T} <: AbstractStatSpace{N,T,IsFinite{false}} end
+"""
+$(TYPEDEF)
+A natural space with dimension N and type T
+"""
+struct NaturalSpace{N,T} <: AbstractStatSpace{N,T,IsFinite{false}} end
 
-
+## Increments - specialised function
 # TODO: find a way to put a type on D in get_inc
 
-function _get_inc(D,s::AbstractSpace{Dim,T,I}) where {Dim,T<:AbstractFloat,I<:IsFinite{false}}
+"""
+$(SIGNATURES)
+Returns increment corresponding to space `s`
+"""
+get_inc(x,D,s::AbstractStatSpace,t) = get_inc(x,D,s) # this is defined to skip representation of t for following specialised methods
+get_inc(x,D,s::AbstractSpace{Dim,T,I}) where {Dim,T,I<:IsFinite{false}} = get_inc(D,s) # This is defined to skip representation of x for spaces which do not use reflections.
+
+function get_inc(D,s::AbstractSpace{Dim,T,I}) where {Dim,T<:AbstractFloat,I<:IsFinite{false}}
     if Dim > 1
         return Tuple(D .* randn(T,Dim))
     else
@@ -63,19 +77,13 @@ function _get_inc(D,s::AbstractSpace{Dim,T,I}) where {Dim,T<:AbstractFloat,I<:Is
     end
 end
 
-function _get_inc(D,s::AbstractSpace{Dim,T,I}) where {Dim,T<:Integer,I<:IsFinite{false}}
+function get_inc(D,s::AbstractSpace{Dim,T,I}) where {Dim,T<:Integer,I<:IsFinite{false}}
     if Dim > 1
         return Tuple(round.(T,D .*randn(Float32,Dim)))
     else
         return round(D * randn(Float32))
     end
 end
-
-"""
-$(SIGNATURES)
-Returns increment corresponding to space `s`
-"""
-get_inc(x,D,s::AbstractSpace{Dim,T,I}) where {Dim,T,I<:IsFinite{false}} = _get_inc(D,s)
 
 #TODO: there is probably a better way of dealing with those two functions
 function get_inc(x,D,s::ContinuousSegment{T}) where {T}
@@ -93,6 +101,41 @@ function get_inc(x,D,s::GraphSpace{T}) where {T}
     # here we add +1 since randomwalk(s.g,x,niter) returns x
     if niter > 0
         return last(randomwalk(s.g,x,niter)) - x
+    else
+        return 0
+    end
+end
+
+## Dynamic spaces
+abstract type AbstractDynSpace{Dim,T<:Number} <: AbstractSpace{Dim,T,IsFinite{true}} end
+"""
+$(TYPEDEF)
+A dynamic graph space.
+Function `f(t)` takes as argument time, and returns the index of the graph to pick at time `t` from array `g`
+"""
+struct DynGraphSpace{T<:Number} <: AbstractDynSpace{1,T}
+    g::Vector{AbstractGraph{T}}
+    f #update function
+end
+# This is surely not elegant, but we have not found an other way to do it yet
+function DynGraphSpace(g::Array{A},f) where A <: AbstractGraph
+     DynGraphSpace{eltype(g[1])}(g,f)
+ end
+
+"""
+$SIGNATURES
+Returns the graph correseponding to `d::DynGraphSpace` at time `t`
+"""
+get_graph(d::DynGraphSpace,t) = d.g[d.f(t)]
+
+
+## Increments - specialised functions
+
+function get_inc(x,D,d::DynGraphSpace{T},t) where {T}
+    niter = round(Int,abs(D*randn())) + 1
+    # here we add +1 since randomwalk(s.g,x,niter) returns x
+    if niter > 0
+        return last(randomwalk(get_graph(d,t),x,niter)) - x
     else
         return 0
     end

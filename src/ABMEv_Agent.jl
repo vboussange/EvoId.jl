@@ -177,7 +177,7 @@ function _get_xinc(a::AbstractAgent,s::AbstractSpacesTuple,p::Dict,t::Number)
     inc = zero(_x)
     for (i,ss) in enumerate(s)
         if rand() < mu[i]
-            inc[i] = get_inc(_x[i],D[i],ss)
+            inc[i] = get_inc(_x[i],D[i],ss,t)
         end
     end
     tuple((_x .+ inc)...)

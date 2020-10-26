@@ -23,17 +23,17 @@ myspace2 = (mysegment,mycontinuoussegment,real2d)
     @test eltype(myspace2) == Tuple{Int64,Float64,Tuple{Float64,Float64}}
 
     # increment on infinite spaces
-    @test ABMEv._get_inc(0.,myline) ≈ (0.)
-    @test ABMEv._get_inc(0.,mydiscreteline) ≈ (0.)
-    @test !(ABMEv._get_inc(1.,myline) ≈ 0.)
+    @test ABMEv.get_inc(0.,myline) ≈ (0.)
+    @test ABMEv.get_inc(0.,mydiscreteline) ≈ (0.)
+    @test !(ABMEv.get_inc(1.,myline) ≈ 0.)
     @test !(get_inc(1,1.,myline) ≈ 0.)
     @test !(get_inc(1,1.,mydiscreteline) ≈ 0.)
 
 
-    @test typeof(ABMEv._get_inc([1.,0.],real2d)) == Tuple{Float64,Float64}
+    @test typeof(ABMEv.get_inc([1.,0.],real2d)) == Tuple{Float64,Float64}
     @test typeof(get_inc([1.,0.],[1.,0.],real2d)) == Tuple{Float64,Float64}
-    @test typeof(ABMEv._get_inc([1.],real2d)) == Tuple{Float64,Float64}
-    @test typeof(ABMEv._get_inc(1.,real2d)) == Tuple{Float64,Float64}
+    @test typeof(ABMEv.get_inc([1.],real2d)) == Tuple{Float64,Float64}
+    @test typeof(ABMEv.get_inc(1.,real2d)) == Tuple{Float64,Float64}
     # ABMEv._get_inc([1.],real2d)
     # ABMEv.initpos(myspace2)
 
