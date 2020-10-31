@@ -37,11 +37,12 @@ gplot(g, collect(1:nodes), collect(1:nodes))
 ![delta_comp_pos](../assets/tutorials/line.png)
 
 ## Defining competition processes
-We propose that any individual have a constant birth rate, and competes with all the individuals present in the same patch. Let ``i \in \N``,``x_i \in \{1,2,\dots,9\}``.
-The competition pressure experience by individual ``i`` is such that
+We propose that any individual have a constant birth rate, and competes with all the individuals present in the same patch. Assume there are ``N_t`` individuals at time ``t``.
+Let ``i \in \{ 1,2,\dots,N_t\}``. ``x_{i,t} \in \{1,2,\dots,9\}`` denotes the position of the ``i``-th individual at time ``t``.
+The competition pressure experienced by individual ``i`` is such that
 
 ```math
-d(x_i) = \sum_j \delta(x_i-x_j)
+d(x_{i,t}) = \sum_j^{N(t)} \delta(x_{i,t}-x_{j,t})
 ```
 where ``\delta`` is the dirac function.
 
@@ -87,9 +88,6 @@ Let's verify that the population's growth is logistic. We will plot the populati
 To do so, one need to define `dt_saving` < `tend` to save every `dt_saving` time steps of the world.
 
 ```julia
-myagents = [Agent(wholespace,(5,),ancestors=true,rates=true) for i in 1:K0/nodes]
-w0 = World(myagents,wholespace,p,0.) # we need to reinitialise the world
-@time sim = run!(w0,Gillepsie(),tend,dt_saving=2.)
 wsize = [length(w) for w in sim[:]]
 using Plots
 Plots.plot(get_tspan(sim),wsize,
