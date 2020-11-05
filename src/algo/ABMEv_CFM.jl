@@ -31,15 +31,15 @@ function updateWorld!(w::World{A,S,T},c::CFM) where {A,S,T}
     alive = agents(w)
     # Total rate of events
     n = size(w)
-    Cbar = (bm + dm)*n
-    dt = rand(Exponential(Cbar)) / n
+    Cbar = (bm + dm)
+    dt = rand(Exponential(Cbar)) / (n*(n+1))
     update_clock!(w,dt)
     i = rand(1:n)
     x = get_x(w[i])
     W = rand()
     if dt > 0.
-        deathprob = (sum(d.(get_x.(alive),Ref(x),w.t)) .- d(x,x,w.t)) / Cbar
-        birthprob = b(x,w.t) / Cbar
+        deathprob = (sum(d.(get_x.(alive),Ref(x),w.t)) .- d(x,x,w.t)) / (Cbar*(n+1))
+        birthprob = b(x,w.t) / (Cbar*(n+1))
         if W <= deathprob
             updateDeathEvent!(w,c,i)
         elseif W <= deathprob + birthprob
