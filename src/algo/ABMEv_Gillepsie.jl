@@ -1,4 +1,5 @@
 # In this file lie the function for Gillepsie algorithm
+
 """
 $(TYPEDEF)
 """
@@ -9,28 +10,28 @@ export Gillepsie
 Used for Gillepsie setting
 """
 function give_birth(mum_idx::Int,w::World)
-    new_a = copy(w[mum_idx])
+    new_a = copyxt(w[mum_idx])
     increment_x!(new_a,space(w),parameters(w),time(w))
     return new_a
 end
 
-function updateBirthEvent!(w::World,::Gillepsie,mum_idx::Int)
+function updateBirthEvent!(w::World,::Gillepsie,mum_idx::Int,b,d)
     # updating competition only the two columns corresponding to agent idx
-    @unpack d,b = parameters(w)
     offspring = give_birth(mum_idx,w)
     x_offspring = get_x(offspring)
     _agents = agents(w)
     for a in _agents
-        a.d += d(get_x(a),x_offspring,w.t)
+        # Warning : symmetric competition
+        tmp = d(get_x(a),x_offspring,w.t)
+        a.d += tmp
+        offspring.d += tmp
     end
     # Now updating new agent
-    offspring.d = sum(d.(get_x.(_agents),Ref(x_offspring),w.t)) #- d(x_offspring,x_offspring)
     offspring.b = b(x_offspring,w.t)
     addAgent!(w,offspring)
 end
 
-function updateDeathEvent!(world::World,::Gillepsie,i_event::Int)
-    @unpack d = parameters(world)
+function updateDeathEvent!(world::World,::Gillepsie,i_event::Int,d)
     x_death = get_x(world[i_event])
     # updating death rate only the two columns corresponding to agent idx
     removeAgent!(world,i_event)
@@ -40,13 +41,12 @@ function updateDeathEvent!(world::World,::Gillepsie,i_event::Int)
 end
 
 """
-    update_rates_std!(world,p::Dict,t::Float64)
+    update_rates!(w::World,::Gillepsie,b,d)
 This standard updates takes
     - competition kernels of the form α(x,y) and
     - carrying capacity of the form K(x)
 """
-function  update_rates!(w::World,::Gillepsie)
-    @unpack b,d = parameters(w)
+function  update_rates!(w::World,::Gillepsie,b,d)
     _agents = agents(w)
     traits = get_x.(_agents)
     # traits = get_xhist.(world)
@@ -68,13 +68,11 @@ function  update_rates!(w::World,::Gillepsie)
 end
 
 """
-    function updateWorld_G!(world,t,p)
+    function updateWorld!(w::World{A,S,T},g::G,b,d)
 Updating rule for gillepsie setting.
-Returning dt drawn from an exponential distribution with parameter the total rates of events.
- # Args
- t is for now not used but might be used for dynamic landscape
+Returning `dt` drawn from an exponential distribution with parameter the total rates of events.
 """
-function updateWorld!(w::World{A,S,T},g::G) where {A,S,T,G <: Gillepsie}
+function updateWorld!(w::World{A,S,T},g::G,b,d) where {A,S,T,G <: Gillepsie}
     # total update world
     alive = agents(w)
     events_weights = ProbabilityWeights(vcat(get_d.(alive),get_b.(alive)))
@@ -89,11 +87,11 @@ function updateWorld!(w::World{A,S,T},g::G) where {A,S,T,G <: Gillepsie}
         if i_event <= n
             # DEATH EVENT
             # In this case i_event is also the index of the individual to die in the world_alive
-            updateDeathEvent!(w,g,i_event)
+            updateDeathEvent!(w,g,i_event,d)
         else
             # birth event
             # i_event - n is also the index of the individual to give birth in the world_alive
-            updateBirthEvent!(w,g,i_event-n)
+            updateBirthEvent!(w,g,i_event-n,b,d)
         end
         return dt
     else

@@ -1,7 +1,8 @@
 """
-    function run!(w::World{A,S,T},alg::L,tend::Number;dt_saving=nothing,cb=(names = String[],agg =nothing))
+    function run!(w::World{A,S,T},alg::L,tend::Number,b,d;dt_saving=nothing,cb=(names = String[],agg =nothing))
 
-Run `w` with algorithm `alg`, until `tend` is reached.
+Run `w` with algorithm `alg`, until `tend` is reached. User needs to provide `b` the birth function,
+which takes as arguments `X,t`, and provide `d` the death function, with arguments `X,Y,t`.
 Returns a `Simulation` type.
 - `worldall` stores the world every `p["dt_saving"]` time steps.
 If `dt_saving` not specified, `sim` contains an array of two elements,
@@ -9,10 +10,10 @@ first corresponding to initial conditions and last corresponding to world in the
 - `cb` correspond to callbacks function. Look at the documentation for more information
 - the run stops if the number of agents reaches`p["NMax"]`.
 """
-function run!(w::World{A,S,T},alg::L,tend::Number;
+function run!(w::World{A,S,T},alg::L,tend::Number,b,d;
                 dt_saving=nothing,
                 cb=(names = String[],agg =nothing)) where {A,S,T,L<:AbstractAlg}
-    _check_timedep(w.p)
+    _check_timedep(b,d)
     n=size(w);
     NMax = maxsize(w)
     t = .0
@@ -20,7 +21,7 @@ function run!(w::World{A,S,T},alg::L,tend::Number;
     isnothing(dt_saving) ? dt_saving =  tend + 1. : nothing
     sim = Simulation(w,cb=cb)
     if A <: AbstractAgent{AA,Rates{true}} where {AA}
-        update_rates!(w,alg)
+        update_rates!(w,alg,b,d)
     end
     while t<tend
         if dt < 0
@@ -36,7 +37,7 @@ function run!(w::World{A,S,T},alg::L,tend::Number;
             @info "saving world @ t = $(t)/ $(tend)"
             add_entry!(sim,w)
         end
-        dt = updateWorld!(w,alg)
+        dt = updateWorld!(w,alg,b,d)
         t +=  dt
         i += 1
     end
@@ -52,12 +53,11 @@ end
 checks time dependency of birth and death functions,
 and overloads the function if not provided
 """
-function _check_timedep(p::Dict)
-    @unpack d,b = p
-    if numargs(p["b"]) < 2
+function _check_timedep(b,d)
+    if numargs(b) < 2
         throw(ArgumentError("Birth function needs `X` and `t` arguments"))
     end
-    if numargs(p["d"]) < 3
+    if numargs(d) < 3
         throw(ArgumentError("Death function needs `X`, `Y` and `t` arguments"))
     end
 end

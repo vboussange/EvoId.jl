@@ -96,9 +96,11 @@ end
 
 import Base:copy,show
 Base.copy(a::A) where {A<:AbstractAgent} = A(copy(a.x_history),copy(a.t_history),copy(a.d),copy(a.b))
-
+# this function only copies the trait history and time (x,t), and set birth and death rates to 0.
+copyxt(a::Agent{A,R,T,U,V}) where {A,R,T,U,V<:Number} = Agent{A,R,T,U,V}(copy(a.x_history),copy(a.t_history),zero(V),zero(V))
+copyxt(a::Agent{A,R,T,U,Nothing}) where {A,R,T,U} = Agent{A,R,T,U,Nothing}(copy(a.x_history),copy(a.t_history),nothing,nothing)
+# this has to be overloaded for Base.copy(a::Agent) to work properly
 Base.copy(m::Missing) = missing
-
 Base.copy(n::Nothing) = nothing
 
 function Base.show(io::IO, a::Agent{A,R,T,U,V}) where {A,R,T,U,V}

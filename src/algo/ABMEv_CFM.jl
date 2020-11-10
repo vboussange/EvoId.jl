@@ -25,9 +25,9 @@ Updating rule for CFM setting.
 algorithm described in article
 DOI : 10.1016/j.tpb.2005.10.004
 """
-function updateWorld!(w::World{A,S,T},c::CFM) where {A,S,T}
+function updateWorld!(w::World{A,S,T},c::CFM,b,d) where {A,S,T}
     # total update world
-    @unpack d,b,bm,dm = parameters(w)
+    @unpack bm,dm = parameters(w)
     alive = agents(w)
     # Total rate of events
     n = size(w)
