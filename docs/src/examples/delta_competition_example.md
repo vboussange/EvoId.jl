@@ -38,11 +38,11 @@ gplot(g, collect(1:nodes), collect(1:nodes))
 
 ## Defining competition processes
 We propose that any individual have a constant birth rate, and competes with all the individuals present in the same patch. Assume there are ``N_t`` individuals at time ``t``.
-Let ``i \in \{ 1,2,\dots,N_t\}``. ``x_{i,t} \in \{1,2,\dots,9\}`` denotes the position of the ``i``-th individual at time ``t``.
+Let ``i \in \{ 1,2,\dots,N_t\}``. ``x_{i} \in \{1,2,\dots,9\}`` denotes the position of the ``i``-th individual.
 The competition pressure experienced by individual ``i`` is such that
 
 ```math
-d(x_{i,t}) = \sum_j^{N(t)} \delta(x_{i,t}-x_{j,t})
+d(x_{i},t) = \sum_j^{N(t)} \delta(x_{i}-x_{j})
 ```
 where ``\delta`` is the dirac function.
 

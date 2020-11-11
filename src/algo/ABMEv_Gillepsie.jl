@@ -5,15 +5,6 @@ $(TYPEDEF)
 """
 struct Gillepsie <: AbstractAlg end
 export Gillepsie
-"""
-    function give_birth(a::Agent,t,p::Dict)
-Used for Gillepsie setting
-"""
-function give_birth(mum_idx::Int,w::World)
-    new_a = copyxt(w[mum_idx])
-    increment_x!(new_a,space(w),parameters(w),time(w))
-    return new_a
-end
 
 function updateBirthEvent!(w::World,::Gillepsie,mum_idx::Int,b,d)
     # updating competition only the two columns corresponding to agent idx

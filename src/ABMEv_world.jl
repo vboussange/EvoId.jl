@@ -91,3 +91,14 @@ function get_xarray(world::World,geotrait::Bool=false)
     return xarray
 end
 @deprecate get_xarray(world,geotrait=false) get_x(world,Colon())
+
+"""
+    function give_birth(mum_idx::Int,w::World)
+Copies agent within index `mum_idx`, and increment it by dx.
+Return new agent (offspring).
+"""
+function give_birth(mum_idx::Int,w::World)
+    new_a = copyxt(w[mum_idx])
+    increment_x!(new_a,space(w),parameters(w),time(w))
+    return new_a
+end
