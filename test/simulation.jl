@@ -39,14 +39,14 @@ D = (1e-2,)
 mu = [.1]
 NMax = 10000
 tend = 1.5
-p = Dict{String,Any}();@pack! p = d,b,D,mu,NMax
+p = Dict{String,Any}();@pack! p = D,mu,NMax
 
 myagents = [Agent(myspace,(0,),ancestors=true,rates=true) for i in 1:K0]
 w0 = World(myagents,myspace,p,0.)
 w1 = copy(w0)
 cb = (names = ["gamma_div"], agg = Function[w -> var(Float64.(get_x(w,1)))])
 eltype(cb.agg)
-@time sim = run!(w1,Gillepsie(),tend,cb=cb,dt_saving = .1)
+@time sim = run!(w1,Gillepsie(),tend,b,d,cb=cb,dt_saving = .1)
 
 @test typeof(sim["gamma_div"]) <: Vector
 

@@ -17,13 +17,13 @@ NMax = 2000
 D = (5e-1,5e-2)
 # tend = 1.5
 tend = 1500
-p = Dict{String,Any}();@pack! p = d,b,NMax,mu,D
+p = Dict{String,Any}();@pack! p = NMax,mu,D
 
 myagents = [Agent(myspace,(Int8(5),Float16(5) + Float16(5e-2) * randn(Float16),),ancestors=true,rates=true) for i in 1:round(K0/nodes)]
 
 w0 = World(myagents,myspace,p,0.)
 
-s = run!(w0,Gillepsie(),tend,dt_saving=5);
+s = run!(w0,Gillepsie(),tend,b,d,dt_saving=5);
 Plots.plot(s, ylabel = "Adaptive trait",trait=2)
 savefig(joinpath(@__DIR__, "gradient_adaptive_trait.png"))
 

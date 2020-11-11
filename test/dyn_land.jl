@@ -35,11 +35,11 @@ D = (1e-2,)
 mu = [.1]
 NMax = 10000
 tend = 1.5
-p = Dict{String,Any}();@pack! p = d,b,D,mu,NMax
+p = Dict{String,Any}();@pack! p = D,mu,NMax
 myagents = [Agent(myspace,(1,),ancestors=true,rates=true) for i in 1:K0]
 w0 = World(myagents,myspace,p,0.)
 w1 = copy(w0)
 @info "Running simulation with Gillepsie algorithm"
-sim = run!(w1,Gillepsie(),tend)
+sim = run!(w1,Gillepsie(),tend,b,d)
 
 @test !(isnothing(sim))

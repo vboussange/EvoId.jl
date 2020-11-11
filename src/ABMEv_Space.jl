@@ -111,6 +111,9 @@ abstract type AbstractDynSpace{Dim,T<:Number} <: AbstractSpace{Dim,T,IsFinite{tr
 """
 $(TYPEDEF)
 A dynamic graph space.
+
+# Example
+`DynGraphSpace(g,f)`
 Function `f(t)` takes as argument time, and returns the index of the graph to pick at time `t` from array `g`
 """
 struct DynGraphSpace{T<:Number} <: AbstractDynSpace{1,T}

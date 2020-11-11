@@ -29,4 +29,4 @@ removeAgent!(w,11)
 @test size(get_x(w,:)) == (10,2)
 
 ##############  Testing world with Gillepsie
-@test !isnothing(updateWorld!(w,Gillepsie()))
+@test !isnothing(updateWorld!(w,Gillepsie(),b,d))

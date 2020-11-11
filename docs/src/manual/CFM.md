@@ -20,10 +20,10 @@ D = (1e-2,)
 mu = [.1]
 NMax = 2000
 tend = 1500
-p = Dict{String,Any}();@pack! p = d,b,D,mu,NMax,Cbar
+p = Dict{String,Any}();@pack! p = D,mu,NMax,Cbar
 myagents = [Agent(myspace,(1e-2 * randn(),)) for i in 1:K0]
 w0 = World(myagents,myspace,p,0.)
-@time sim = run!(w0,CFM(),tend,dt_saving = 4)
+@time sim = run!(w0,CFM(),tend, b, d, dt_saving = 4)
 ```
 
 !!! warning "Development"

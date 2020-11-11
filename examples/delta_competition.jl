@@ -1,33 +1,40 @@
-using Revise,ABMEv
+
+# Space as a discrete segement
+using UnPack,ABMEv
 nodes = 10
 mysegment = DiscreteSegment(1,nodes)
 
-using ABMEv, LightGraphs
+# other possibility: defining the space as a graph
 nodes = 10
-g = grid([nodes,1])
+g = LightGraphs.grid([nodes,1]) # cf LightGraphs.jl for options to generate a graph
 mysegmentgraph = GraphSpace(g)
 wholespace = (mysegmentgraph,)
 using GraphPlot
+# plotting the graph
 gplot(g, collect(1:nodes), collect(1:nodes))
 
+# Definition of birth and death rate
 K0 = 1000 # We will have in total 1000 individuals
 b(X,t) = 1 / nodes
 d(X,Y,t) = (X[1] ≈ Y[1]) / K0
+# Mutation / dispersal parameters
 mu = [1.]
 D = (1.5,)
-
-using UnPack
+# maximum size, tend
 NMax = 2000
 tend = 300.
-p = Dict{String,Any}();@pack! p = d,b,D,mu,NMax
+# wrapping up all the parameters
+p = Dict{String,Any}();@pack! p = D,mu,NMax
+
+# definining world 0 and running
 myagents = [Agent(wholespace,(5,),ancestors=true,rates=true) for i in 1:K0/nodes]
 w0 = World(myagents,wholespace,p,0.)
-@time sim = run!(w0,Gillepsie(),tend)
+@time sim = run!(w0,Gillepsie(),tend,b,d)
 
 ### Plotting size of the world
 myagents = [Agent(wholespace,(5,),ancestors=true,rates=true) for i in 1:K0/nodes]
 w0 = World(myagents,wholespace,p,0.) # we need to reinitialise the world
-@time sim = run!(w0,Gillepsie(),tend,dt_saving=2.)
+@time sim = run!(w0,Gillepsie(),tend,dt_saving=2.,b,d)
 wsize = [length(w) for w in sim[:]]
 using Plots
 Plots.plot(get_tspan(sim),wsize,

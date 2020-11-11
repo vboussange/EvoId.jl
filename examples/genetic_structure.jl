@@ -17,11 +17,11 @@ D = (3e-1,5e-1)
 NMax = 2000
 # tend = 1.5
 tend = 200
-p_default = Dict{String,Any}();@pack! p_default = d,b,NMax,mu,D
+p_default = Dict{String,Any}();@pack! p_default = NMax,mu,D
 myagents = [Agent(myspace,(Int8(5),initnode),ancestors=true,rates=true) for i in 1:round(K0/nodes)]
 w0 = World(myagents,myspace,p_default,0.)
 
-@time sim = run!(w0,Gillepsie(),tend,dt_saving=3.)
+@time sim = run!(w0,Gillepsie(),tend,b,d,dt_saving=3.)
 
 using GraphPlot,StatsBase
 

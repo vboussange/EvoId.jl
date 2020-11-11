@@ -15,10 +15,10 @@ d(X,Y,t) = 1/K0
 D = (5e-2,)
 mu = [1.]
 NMax = 2000
-p = Dict{String,Any}();@pack! p = d,b,D,mu,NMax
+p = Dict{String,Any}();@pack! p = D,mu,NMax
 myagents = [Agent(myspace,(0,),ancestors=true,rates=true) for i in 1:K0]
 w0 = World(myagents,myspace,p,0.)
-@time sim = run!(w0,Gillepsie(),tend,dt_saving=3.)
+@time sim = run!(w0,Gillepsie(),tend, b, d, dt_saving=3.)
 
 using Plots
 Plots.plot(sim, ylabel = "Adaptive trait")

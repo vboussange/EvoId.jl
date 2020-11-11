@@ -20,7 +20,7 @@ using ABMEv
 ```
 
 ## Tutorial
-We strongly advise to have a look at the tutorial section.
+We strongly advise to have a look at the tutorial section. All the scripts of the examples can be found [here](https://gitlab.ethz.ch/bvictor/abmev/-/tree/master/examples).
 ```@contents
 Pages = [
     "examples/delta_competition_example.md",
@@ -52,5 +52,5 @@ As of now, three types of simulation algorithm can be used:
 - [Champagnat and Ferriere founding article](https://linkinghub.elsevier.com/retrieve/pii/S0040580905001632)
 - [Champagnat and Ferriere second article - 2008](https://www.tandfonline.com/doi/full/10.1080/15326340802437710)
 
-## Similar packages:
-[Agents.jl](https://juliadynamics.github.io/Agents.jl/) This package is oriented towards general ABM modelling, and miss many of the specificities of ABMEv.jl , such as vector spaces operations, update algorithm, and analysis tools.
+## Similar packages
+[Agents.jl](https://juliadynamics.github.io/Agents.jl/) This package is oriented towards general ABM modelling, and thus is not as efficient and easy to deploy as ABMEv.jl for simulating stochastic models of structured populations.

@@ -16,13 +16,13 @@ D = (1e-2,)
 mu = [.1]
 NMax = 10000
 tend = 1.5
-p = Dict{String,Any}();@pack! p = d,b,D,mu,NMax
+p = Dict{String,Any}();@pack! p = D,mu,NMax
 
 myagents = [Agent(myspace,(0,),ancestors=true,rates=true) for i in 1:K0]
 w0 = World(myagents,myspace,p,0.)
 w1 = copy(w0)
 @info "Running simulation with Gillepsie algorithm"
-@time sim = run!(w1,Gillepsie(),tend)
+@time sim = run!(w1,Gillepsie(),tend,b,d)
 @test typeof(sim) <: Simulation
 
 # @save "gillepsie_test.jld2" world_alive
@@ -42,11 +42,11 @@ w1 = copy(w0)
         @testset "Testing update rates matrix" begin
                 @testset "birth event" begin
                         myagents = [Agent(myspace,(0,),ancestors=true,rates=true) for i in 1:K0]
-                        w1 = World(myagents,myspace,p,0.);update_rates!(w1,Gillepsie())
+                        w1 = World(myagents,myspace,p,0.);update_rates!(w1,Gillepsie(),b,d,)
                         mum_idx = 1
-                        updateBirthEvent!(w0,Gillepsie(),1)
+                        updateBirthEvent!(w0,Gillepsie(),1,b,d)
                         bs_end = get_b.(agents(w1));ds_end = get_d.(agents(w1))
-                        update_rates!(w1,Gillepsie());
+                        update_rates!(w1,Gillepsie(),b,d);
                         bs_recalculated = get_b.(agents(w1));ds_recalculated = get_d.(agents(w1))
                         @test prod(bs_end .≈ bs_recalculated)
                         @test prod(ds_end .≈ ds_recalculated)
@@ -55,11 +55,11 @@ w1 = copy(w0)
 
                 @testset "death event" begin
                         myagents = [Agent(myspace,(0,),ancestors=true,rates=true) for i in 1:K0]
-                        w1 = World(myagents,myspace,p,0.);update_rates!(w1,Gillepsie())
+                        w1 = World(myagents,myspace,p,0.);update_rates!(w1,Gillepsie(),b,d)
                         mum_idx = 1
-                        updateDeathEvent!(w0,Gillepsie(),1)
+                        updateDeathEvent!(w0,Gillepsie(),1,d)
                         bs_end = get_b.(agents(w1));ds_end = get_d.(agents(w1))
-                        update_rates!(w1,Gillepsie());
+                        update_rates!(w1,Gillepsie(),b,d);
                         bs_recalculated = get_b.(agents(w1));ds_recalculated = get_d.(agents(w1))
                         @test prod(bs_end .≈ bs_recalculated)
                         @test prod(ds_end .≈ ds_recalculated)

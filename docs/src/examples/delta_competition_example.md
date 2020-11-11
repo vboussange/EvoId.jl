@@ -74,12 +74,12 @@ We keep track of individuals' ancestors by setting `ancestors=true`. Because we 
 using UnPack# useful macro @pack!
 NMax = 2000
 tend = 300.
-p = Dict{String,Any}();@pack! p = d,b,D,mu,NMax
+p = Dict{String,Any}();@pack! p = D,mu,NMax
 myagents = [Agent(myspace,(5,),ancestors=true,rates=true) for i in 1:K0/nodes]
 w0 = World(myagents,myspace,p,0.)
-@time sim = run!(w0,Gillepsie(),tend)
+@time sim = run!(w0,Gillepsie(), b, d, tend)
 ```
-This is the simplest run you can do. Now time to more interesting things
+This is the simplest run you can do. Now is time for more interesting things
 
 ## Analysis
 

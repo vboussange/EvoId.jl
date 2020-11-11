@@ -1,8 +1,6 @@
 # [Modelling agents with a genetic structure](@id genetic_structure)
 
-In this example, we show how to model a population which evolve on a linear geographic space, and is defined by a genotype graph. Any two connected node in the genotype graph should be thought of as two neighbour genomes, i.e that are very similar in their alleles / nucleotide.
-
-The genotype space is inspired from the article [The architecture of an empirical genotype-phenotype map](http://doi.wiley.com/10.1111/evo.13487)
+In this example, we show how to model a population evolving over a linear geographic space. The population is also defined by a genotype, which corresponds to the node of a **genotype graph**. The concept of genotype graph is better explained in [The architecture of an empirical genotype-phenotype map](http://doi.wiley.com/10.1111/evo.13487). Any two connected nodes in the genotype graph should be thought of as two related genomes, i.e that are very similar in their alleles / nucleotide. As such, if the genotype of an offspring differs from its parent, it will be located in the neighbourhood of it parent's genotype node.
 
 ## Defining the space
 ```julia
@@ -29,7 +27,7 @@ The genotype space is inspired from the article [The architecture of an empirica
     NMax = 2000
     # tend = 1.5
     tend = 3000
-    p_default = Dict{String,Any}();@pack! p_default = d,b,NMax,mu
+    p_default = Dict{String,Any}();@pack! p_default = NMax,mu
     myagents = [Agent(myspace,(rand(Int8(1):Int8(nodes)),initnode),ancestors=true,rates=true) for i in 1:round(K0/nodes)]
     w0 = World(myagents,myspace,p_default,0.)
 ```

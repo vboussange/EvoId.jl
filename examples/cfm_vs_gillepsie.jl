@@ -1,6 +1,7 @@
 using Revise,ABMEv,UnPack
 
-myspace = (RealSpace{1,Float16}(),)
+# CFM algorithm
+myspace = (RealSpace{1,Float64}(),)
 sigma_K = .9;
 sigma_a = .7;
 K0 = 5000
@@ -10,16 +11,15 @@ D = (Float16(1e-1),)
 mu = [1.]
 NMax = 7000
 tend = 50
-Cbar= b([0],0.) + d([0],[0],0.)
-p = Dict{String,Any}();@pack! p = d,b,D,mu,NMax,Cbar
+bm= b([0],0.); dm = d([0],[0],0.)
+p = Dict{String,Any}();@pack! p = D,mu,NMax,bm,dm
 # myagents = [Agent(myspace,(- Float16(0.5) .+ .01 .* randn(Float16),)) for i in 1:K0]
 myagents = [Agent(myspace,(0.,)) for i in 1:K0]
 w0 = World(myagents,myspace,p,0.)
-@time mysim = run!(w0,CFM(),tend,dt_saving=1.)
+@time mysim = run!(w0,CFM(),tend,b,d,dt_saving=1.)
 
-x,t = get_xnt(mysim,trait=1)
 using Plots
-Plots.scatter(t,x,color =:blue,labels="" )
+Plots.plot(mysim)
 
 
 ########### GILLEPSIE
@@ -33,11 +33,9 @@ D = (1e-1,)
 mu = [1.]
 NMax = 10000
 tend = 100
-p = Dict{String,Any}();@pack! p = d,b,D,mu,NMax #,Cbar
+p = Dict{String,Any}();@pack! p = D,mu,NMax #,Cbar
 myagents = [Agent(myspace,(0,),ancestors=true,rates=true) for i in 1:K0]
 w0 = World(myagents,myspace,p,0.)
+@time mysim = run!(w0,Gillepsie(),tend,b,d,dt_saving=1.)
 
-@time mysim = run!(w0,Gillepsie(),tend,dt_saving=1.)
-x,t = get_xnt(sim,trait=1)
-using Plots
-Plots.scatter(t,x,color =:blue,labels="" )
+Plots.plot(mysim)
