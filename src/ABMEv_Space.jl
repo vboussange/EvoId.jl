@@ -96,6 +96,7 @@ function get_inc(x,D,s::DiscreteSegment{T}) where {T}
     return round(T,_reflect1D(x,inc,s))
 end
 
+# normal dispersal kernel that gets truncated
 function get_inc(x,D,s::GraphSpace{T}) where {T}
     niter = round(Int,abs(D*randn())) + 1
     # here we add +1 since randomwalk(s.g,x,niter) returns x
@@ -104,6 +105,10 @@ function get_inc(x,D,s::GraphSpace{T}) where {T}
     else
         return 0
     end
+end
+# short range dispersal kernel, jump to neighbour node
+function get_inc(x,D,s::GraphSpace{T}) where {T}
+    return last(randomwalk(s.g,x,2)) - x
 end
 
 ## Dynamic spaces
@@ -132,9 +137,9 @@ Returns the graph correseponding to `d::DynGraphSpace` at time `t`
 get_graph(d::DynGraphSpace,t) = d.g[d.f(t)]
 
 
-## Increments - specialised functions
-
-function get_inc(x,D,d::DynGraphSpace{T},t) where {T}
+## Increments - specialised functions for dynamic graphs
+# normal dispersal kernel that gets truncated
+function get_inc(x,D::Number,d::DynGraphSpace{T},t) where {T}
     niter = round(Int,abs(D*randn())) + 1
     # here we add +1 since randomwalk(s.g,x,niter) returns x
     if niter > 0
@@ -142,6 +147,11 @@ function get_inc(x,D,d::DynGraphSpace{T},t) where {T}
     else
         return 0
     end
+end
+
+# short range dispersal kernel, jump to neighbour node
+function get_inc(x,D::Nothing,d::DynGraphSpace{T},t) where {T}
+    return last(randomwalk(get_graph(d,t),x,2)) - x
 end
 
 """

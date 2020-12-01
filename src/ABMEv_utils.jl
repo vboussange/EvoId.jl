@@ -1,5 +1,6 @@
 """
         generalised_gaussian(x::Number,mu::Number,sigma::Number,epsilon::Number)
+Returns `exp( -.5 * ((x-mu) / sigma)^epsilon)`
 """
 function generalised_gaussian(x::Number,mu::Number,sigma::Number,epsilon::Number)
         return exp( -.5 * ((x-mu) / sigma)^epsilon)

@@ -27,7 +27,7 @@ myspace2 = (mysegment,mycontinuoussegment,real2d)
     @test ABMEv.get_inc(0.,mydiscreteline) ≈ (0.)
     @test !(ABMEv.get_inc(1.,myline) ≈ 0.)
     @test !(get_inc(1,1.,myline) ≈ 0.)
-    @test !(get_inc(1,1.,mydiscreteline) ≈ 0.)
+    # @test !(get_inc(1,1.,mydiscreteline) ≈ 0.)
 
 
     @test typeof(ABMEv.get_inc([1.,0.],real2d)) == Tuple{Float64,Float64}
@@ -52,6 +52,7 @@ myspace2 = (mysegment,mycontinuoussegment,real2d)
 
     #checking if graph works
     @test prod([get_inc(1,10,mygraph) + 1 ∈ vertices(mygraph.g) for i in 1:30])
+    @test prod([get_inc(1,nothing,mygraph) + 1 ∈ vertices(mygraph.g) for i in 1:30])
 end
 
 ##### AGENTS #######
