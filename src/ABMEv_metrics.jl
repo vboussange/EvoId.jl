@@ -128,7 +128,7 @@ function get_alpha_div(world::World,trait=1,average=true)
     if average
         return mean(h)
     else
-        return mean(h,dims=2)
+        return mean(h,dims=2)[:]
     end
 end
 
