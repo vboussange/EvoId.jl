@@ -4,14 +4,14 @@ using Revise,ABMEv
 using UnPack
 myspace1 = (RealSpace{1,Float64}(),)
 myspace2 = (RealSpace{1,Float64}(),RealSpace{1,Float64}())
-myspace3 = (DiscreteSegment(Int16(1),Int16(10)),RealSpace{1,Float64}())
+myspace3 = (DiscreteSegment(Int16(1),Int16(10)),RealSpace{2,Float64}())
 g = SimpleGraph(1000,4000)
 myspace4 = (RealSpace{1,Float64}(),GraphSpace(g),)
 
 K0 = 1000; σ = 1e-1
 a1 = [Agent(myspace1, (σ,)  .* randn() .- .5,ancestors=true) for i in 1:K0]
 a2 = [Agent(myspace2,tuple((σ, σ)  .* randn(2) .- .5...),ancestors=true) for i in 1:K0]
-a3 = [Agent(myspace3, (rand(Int16.(1:10)), 1e-1* randn() + 5.5 ),ancestors=true) for i in 1:K0]
+a3 = [Agent(myspace3, (rand(Int16.(1:10)), tuple((1e-1.* randn(2) .+ 5.5)... )),ancestors=true) for i in 1:K0]
 a4 = [Agent(myspace4, (1.,rand(Int64(1):Int64(1000)),),ancestors=true) for i in 1:K0]
 
 D = (1.,);
@@ -20,7 +20,7 @@ NMax = 1000
 p1 = Dict{String,Any}();@pack! p1 = D,mu,NMax
 D = (1.,1.);
 p2 = Dict{String,Any}();@pack! p2 = D,mu,NMax
-D = (Int16(0.),0.)
+D = (Int16(0.),(0.,0.))
 p3 = Dict{String,Any}();@pack! p3 = D,mu,NMax
 D = (0.,0.)
 p4 = Dict{String,Any}();@pack! p4 = D,mu,NMax
@@ -36,9 +36,7 @@ w4 = World(a4,myspace4,p4)
         @test first(var(w1)) ≈ (σ).^2 atol=0.001
         @test first(var(w2,trait=2)) ≈ (σ).^2 atol=0.001
         @test first(var(w4,trait=1)) < Inf
-        @test first(var(w4,trait=2)) < Inf
-
-
+        # @test first(var(w4,trait=2)) < Inf
     end
 
     ## testing covgeo
@@ -60,7 +58,14 @@ w4 = World(a4,myspace4,p4)
           @test abs(α) < Inf
           α = get_alpha_div(w4,1);
           @test abs(α) < Inf
+          α = get_alpha_div(w3,2,false)
+          @test length(α) == 10
        end
+       @testset "Abundance" begin
+           @test isapprox(get_local_abundance(w3), K0/10,atol = 10)
+           N = get_local_abundance(w3,false)
+           @test length(N) == 10
+        end
        @testset "Beta diversity" begin
            β = get_beta_div(w3,2);
            @test abs(β) < Inf

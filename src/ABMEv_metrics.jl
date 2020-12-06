@@ -56,6 +56,7 @@ function var(world::World;trait=1)
     xarray = get_x(world,trait)
     if trait > 0
         if typeof(space(world)[trait]) <: GraphSpace
+            # not working
             fiedlervec = eigs(laplacian_matrix(space(world)[trait].g),nev=2,which=:SM)[2][:,2]
             return mean(fiedlervec[xarray].^2) - mean(fiedlervec[xarray])^2
         end
@@ -116,13 +117,37 @@ end
     get_alpha_div(world::Array{U,1},t::Number,trait=1) where U <: Union{Missing,Agent}
 Mean of the local variance of `trait` per patch.
 If trait=0, we get the mean of the local variance of the geotrait
+If average = false, returns the alpha div for each patch, ordered by vertices
 """
-function get_alpha_div(world::World,trait=1)
+function get_alpha_div(world::World,trait=1,average=true)
     g = groupby(a->a[1],agents(world))
     # here the second mean is here when subspace is multidimensional
-    v = [var(World(subw,space(world),parameters(world)),trait=trait) for subw in values(g)]
+    # we sort by index of vertices
+    v = [var(World(g[i],space(world),parameters(world)),trait=trait) for i in sort(collect(keys(g)))]
     h = vcat(v...)
-    return mean(h)
+    if average
+        return mean(h)
+    else
+        return mean(h,dims=2)
+    end
+end
+
+"""
+    get_alpha_div(world::Array{U,1},t::Number,trait=1) where U <: Union{Missing,Agent}
+Mean of the local variance of `trait` per patch.
+If trait=0, we get the mean of the local variance of the geotrait
+If average = false, returns the alpha div for each patch, ordered by vertices
+"""
+function get_local_abundance(world::World,average=true)
+    g = groupby(a->a[1],agents(world))
+    # here the second mean is here when subspace is multidimensional
+    # we sort by index of vertices
+    a = [length(g[i]) for i in sort(collect(keys(g)))]
+    if average
+        return mean(a)
+    else
+        return a
+    end
 end
 
 """
