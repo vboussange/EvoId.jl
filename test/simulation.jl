@@ -42,7 +42,7 @@ tend = 1.5
 p = Dict{String,Any}();@pack! p = D,mu,NMax
 
 ## testing cb
-myagents = [Agent(myspace,(0,),ancestors=true,rates=true) for i in 1:K0]
+myagents = [Agent(myspace,[0.],ancestors=true,rates=true) for i in 1:K0]
 w0 = World(myagents,myspace,p,0.)
 w1 = copy(w0)
 cb = (names = ["gamma_div"], agg = Function[w -> var(Float64.(get_x(w,1)))])
@@ -55,7 +55,7 @@ eltype(cb.agg)
 @test typeof(sim[2]) <: Vector
 
 ##testing t_saving_cb
-myagents = [Agent(myspace,(0,),ancestors=true,rates=true) for i in 1:K0]
+myagents = [Agent(myspace,[0.],ancestors=true,rates=true) for i in 1:K0]
 w0 = World(myagents,myspace,p,0.)
 w1 = copy(w0)
 cb = (names = ["gamma_div"], agg = Function[w -> var(Float64.(get_x(w,1)))])

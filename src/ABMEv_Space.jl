@@ -14,7 +14,7 @@ AbstractSpacesTuple = Tuple{Vararg{AbstractSpace}}
 import Base:ndims,isfinite,eltype
 Base.ndims(x::AbstractSpace{Dim,T,I}) where {Dim,T,I} = Dim
 Base.isfinite(x::AbstractSpace{Dim,T,IsFinite{t}}) where {Dim,T,t} = t #not sure we need this
-Base.eltype(::AbstractSpace{Dim,T,I}) where {Dim,T,I} = Dim > 1 ? Tuple{Vararg{T,Dim}} : T
+Base.eltype(::AbstractSpace{Dim,T,I}) where {Dim,T,I} = Dim > 1 ? Vector{T} : T
 Base.ndims(ss::AbstractSpacesTuple) = length(ss)
 Base.eltype(ss::AbstractSpacesTuple) where {Dim,T,I} = Tuple{eltype.(ss)...}
 
@@ -71,7 +71,7 @@ get_inc(x,D,s::AbstractSpace{Dim,T,I}) where {Dim,T,I<:IsFinite{false}} = get_in
 
 function get_inc(D,s::AbstractSpace{Dim,T,I}) where {Dim,T<:AbstractFloat,I<:IsFinite{false}}
     if Dim > 1
-        return Tuple(D .* randn(T,Dim))
+        return D .* randn(T,Dim)
     else
         return D * randn(T)
     end
@@ -79,7 +79,7 @@ end
 
 function get_inc(D,s::AbstractSpace{Dim,T,I}) where {Dim,T<:Integer,I<:IsFinite{false}}
     if Dim > 1
-        return Tuple(round.(T,D .*randn(Float32,Dim)))
+        return round.(T,D .*randn(Float32,Dim))
     else
         return round(D * randn(Float32))
     end

@@ -12,13 +12,13 @@ sigma_a = .7;
 K0 = 1000;
 b(X,t) = gaussian(X[1],0.,sigma_K)
 d(X,Y,t) = gaussian(X[1],Y[1],sigma_a)/K0
-D = (1e-2,)
+D = [1e-2]
 mu = [.1]
 NMax = 10000
 tend = 1.5
 p = Dict{String,Any}();@pack! p = D,mu,NMax
 
-myagents = [Agent(myspace,(0,),ancestors=true,rates=true) for i in 1:K0]
+myagents = [Agent(myspace,[0.],ancestors=true,rates=true) for i in 1:K0]
 w0 = World(myagents,myspace,p,0.)
 w1 = copy(w0)
 @info "Running simulation with Gillepsie algorithm"
@@ -41,7 +41,7 @@ w1 = copy(w0)
 
         @testset "Testing update rates matrix" begin
                 @testset "birth event" begin
-                        myagents = [Agent(myspace,(0,),ancestors=true,rates=true) for i in 1:K0]
+                        myagents = [Agent(myspace,[0],ancestors=true,rates=true) for i in 1:K0]
                         w1 = World(myagents,myspace,p,0.);update_rates!(w1,Gillepsie(),b,d,)
                         mum_idx = 1
                         updateBirthEvent!(w0,Gillepsie(),1,b,d)
@@ -54,7 +54,7 @@ w1 = copy(w0)
                 end
 
                 @testset "death event" begin
-                        myagents = [Agent(myspace,(0,),ancestors=true,rates=true) for i in 1:K0]
+                        myagents = [Agent(myspace,[0],ancestors=true,rates=true) for i in 1:K0]
                         w1 = World(myagents,myspace,p,0.);update_rates!(w1,Gillepsie(),b,d)
                         mum_idx = 1
                         updateDeathEvent!(w0,Gillepsie(),1,d)

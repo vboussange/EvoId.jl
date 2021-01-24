@@ -10,7 +10,7 @@ $(TYPEDEF)
 """
 mutable struct Agent{A<:Ancestors,R<:Rates,T<:Tuple,U,V} <: AbstractAgent{A,R}
     # history of traits for geotraits
-    x_history::Array{T,1}
+    x_history::Array{Any,1}
     # birth time of ancestors
     t_history::Array{U,1}
     # death rate
@@ -26,12 +26,12 @@ eltype(a::Agent{A,R,T,U,V}) where {A,R,T,U,V} = T
 function initpos(s::S) where {S<:AbstractSpacesTuple}
     Eltype = eltype.(s)
     Dims = ndims.(s)
-    pos = tuple()
+    pos = []
     for i in 1:length(Eltype)
         if Dims[i] > 1
-            pos = (pos...,Eltype[i](ones(Dims[i])))
+            push!(pos,ones(eltype(Eltype[i]),Dims[i]))
         else
-            pos = (pos...,one(Eltype[i]))
+            pos = push!(pos,one(Eltype[i]))
         end
     end
     Tuple{Eltype...},pos
@@ -57,7 +57,7 @@ end
 $(SIGNATURES)
     Initialises agent with `pos` provided
 """
-function Agent(s::S, pos::P;ancestors=false,rates=false) where {P<:Tuple,S  <: AbstractSpacesTuple}
+function Agent(s::S, pos::P;ancestors=false,rates=false) where {P<:Vector,S  <: AbstractSpacesTuple}
     T = eltype.(s)
     for (i,p) in enumerate(pos)
         if typeof(p) !== T[i]
@@ -175,14 +175,13 @@ import Base.(+)
 
 function _get_xinc(a::AbstractAgent,s::AbstractSpacesTuple,p::Dict,t::Number)
     @unpack D,mu = p
-    _x = get_x(a)
-    inc = zero(_x)
+    _x = copy(get_x(a))
     for (i,ss) in enumerate(s)
         if rand() < mu[i]
-            inc[i] = get_inc(_x[i],D[i],ss,t)
+            _x[i] += get_inc(_x[i],D[i],ss,t)
         end
     end
-    tuple((_x .+ inc)...)
+    _x
 end
 
 ## Modifiers

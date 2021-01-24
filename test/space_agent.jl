@@ -20,7 +20,7 @@ myspace2 = (mysegment,mycontinuoussegment,real2d)
     @test ndims(real2d) ≈ 2
     @test isfinite(mycontinuoussegment) ≈ true
     @test typeof(myspace) <: AbstractSpacesTuple
-    @test eltype(myspace2) == Tuple{Int64,Float64,Tuple{Float64,Float64}}
+    @test eltype(myspace2) == Tuple{Int64,Float64,Vector{Float64}}
 
     # increment on infinite spaces
     @test ABMEv.get_inc(0.,myline) ≈ (0.)
@@ -30,10 +30,10 @@ myspace2 = (mysegment,mycontinuoussegment,real2d)
     # @test !(get_inc(1,1.,mydiscreteline) ≈ 0.)
 
 
-    @test typeof(ABMEv.get_inc([1.,0.],real2d)) == Tuple{Float64,Float64}
-    @test typeof(get_inc([1.,0.],[1.,0.],real2d)) == Tuple{Float64,Float64}
-    @test typeof(ABMEv.get_inc([1.],real2d)) == Tuple{Float64,Float64}
-    @test typeof(ABMEv.get_inc(1.,real2d)) == Tuple{Float64,Float64}
+    @test typeof(ABMEv.get_inc([1.,0.],real2d)) == Vector{Float64}
+    @test typeof(get_inc([1.,0.],[1.,0.],real2d)) == Vector{Float64}
+    @test typeof(ABMEv.get_inc([1.],real2d)) == Vector{Float64}
+    @test typeof(ABMEv.get_inc(1.,real2d)) == Vector{Float64}
     # ABMEv._get_inc([1.],real2d)
     # ABMEv.initpos(myspace2)
 
@@ -58,8 +58,8 @@ end
 ##### AGENTS #######
 a1 = Agent(myspace)
 a2 = Agent(myspace,ancestors = true)
-a3 = Agent(myspace,(1,1,1.))
-a4 = Agent(myspace2,(1,1,(1.,1)),rates=true)
+a3 = Agent(myspace,[1,1,1.])
+a4 = Agent(myspace2,[1,1.,[1.,1]],rates=true)
 a5 = Agent(myspace2,ancestors=true)
 
 @testset "Agent properties" begin
@@ -77,4 +77,5 @@ a5 = Agent(myspace2,ancestors=true)
     @test nancestors(increment_x!(a2,myspace,p_myspace,2.)) > 1
     @test !isnothing(increment_x!(a4,myspace2,p_myspace2,2.))
     @test !isnothing(increment_x!(a5,myspace2,p_myspace2,2.))
+    @test typeof(ABMEv._get_xinc(a2,myspace,p,0.)) == typeof(get_x(a2))
 end
