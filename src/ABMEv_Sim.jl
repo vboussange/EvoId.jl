@@ -53,6 +53,15 @@ function add_entry!(s::Simulation{A,S,T,F},w::World) where {A,S,T,F}
     return nothing
 end
 
+function add_entry_cb_only!(s::Simulation{A,S,T,F},w::World) where {A,S,T,F}
+    push!(s.agentarray,[Agent(w.space)]) # pushing NA agents
+    push!(s.tspan,w.t)
+    if !(F==Nothing)
+        push!(s.df_agg,Dict(s.cb.names .=> [f(w) for f in s.cb.agg]))
+    end
+    return nothing
+end
+
 #TODO : code it
 function get_xnt(s::Simulation;trait = 1)
     return [getindex.(wa,trait) for wa in s.agentarray],[fill(t,size(s[j])) for (j,t) in enumerate(s.tspan)]
