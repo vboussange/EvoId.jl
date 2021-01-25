@@ -15,7 +15,7 @@ This functionality is as of now only compatible with `dt_saving` not specified.
 function run!(w::World{A,S,T},alg::L,tend::Number,b,d;
                 dt_saving=nothing,
                 t_saving_cb=nothing,
-                cb=(names = String[],agg =nothing)) where {A,S,T,L<:AbstractAlg}
+                cb=nothing) where {A,S,T,L<:AbstractAlg}
     # argument check
     _check_timedep(b,d)
     (!isnothing(dt_saving) && !isnothing(dt_saving)) ? ArgumentError("For now, can not specify both `dt_saving` and `t_saving_cb`") : nothing
@@ -45,11 +45,11 @@ function run!(w::World{A,S,T},alg::L,tend::Number,b,d;
         end
         if  t - get_tend(sim) >= dt_saving
             @info "saving world @ t = $(t)/ $(tend)"
-            add_entry!(sim,w)
+            add_entry!(sim,w,cb)
         end
         if  t >= first(t_saving_cb)
             @info "saving callback only @ t = $(t)/ $(tend)"
-            add_entry_cb_only!(sim,w)
+            add_entry_cb_only!(sim,w,cb)
             popfirst!(t_saving_cb)
         end
         dt = updateWorld!(w,alg,b,d)
@@ -57,7 +57,7 @@ function run!(w::World{A,S,T},alg::L,tend::Number,b,d;
         i += 1
     end
     # Saving last time step
-    add_entry!(sim,w)
+    add_entry!(sim,w,cb)
     @info "simulation stopped at t=$(t), after $(i) generations"
     return sim
 end

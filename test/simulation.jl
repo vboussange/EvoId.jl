@@ -21,7 +21,7 @@ typeof(s)
 # adding an entry to sim
 newa = give_birth(1,w0)
 addAgent!(w0,newa)
-@test isnothing(add_entry!(s,w0))
+@test isnothing(add_entry!(s,w0,nothing))
 @test get_size(s) == 2
 
 #TODO: try with callbacks
@@ -45,8 +45,7 @@ p = Dict{String,Any}();@pack! p = D,mu,NMax
 myagents = [Agent(myspace,[0.],ancestors=true,rates=true) for i in 1:K0]
 w0 = World(myagents,myspace,p,0.)
 w1 = copy(w0)
-cb = (names = ["gamma_div"], agg = Function[w -> var(Float64.(get_x(w,1)))])
-eltype(cb.agg)
+cb(w) = Dict("gamma_div" => w -> var(Float64.(get_x(w,1))))
 @time sim = run!(w1,Gillepsie(),tend,b,d,cb=cb,dt_saving = .1)
 
 @test typeof(sim["gamma_div"]) <: Vector

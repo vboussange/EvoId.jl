@@ -1,11 +1,10 @@
 abstract type AbstractAlg end
 
 # this used to be  world
-mutable struct Simulation{A<:AbstractAgent, S<:AbstractSpacesTuple,T<:Number,F}
+mutable struct Simulation{A<:AbstractAgent, S<:AbstractSpacesTuple,T<:Number}
     agentarray::Vector{Vector{AbstractAgent}}
     space::S
     tspan::Vector{T}
-    cb::NamedTuple
     df_agg::Vector{Dict}
     p::Dict{String,Any}
 end
@@ -15,11 +14,11 @@ end
 """
 $(SIGNATURES)
 """
-function Simulation(w0::World{A,S,T};cb=(names = String[],agg =nothing)) where {A,S,T}
-    tspan = zeros(1);
+function Simulation(w0::World{A,S,T};cb = nothing) where {A,S,T}
+    tspan = zeros(1)
     #agentarray is of size 2 at the beginning
-    !isnothing(cb.agg) ? df_agg = [Dict(cb.names .=> [f(w0) for f in cb.agg])] : df_agg = [Dict()]
-    Simulation{A,S,T,typeof(cb.agg)}([copy.(agents(w0))],space(w0),tspan,cb,df_agg,parameters(w0))
+    isnothing(cb) ? df_agg = Dict[] : df_agg = [cb(w0)]
+    Simulation{A,S,T}([copy.(agents(w0))],space(w0),tspan,df_agg,parameters(w0))
  end
 
 get_tend(s::Simulation) = s.tspan[end]
@@ -33,7 +32,7 @@ Base.lastindex(s::Simulation) = get_size(s)
 Base.getindex(s::Simulation,measure::String) = [agg[measure] for agg in s.df_agg]
 
 
-function Base.show(io::IO, s::Simulation{A,S,T,F}) where {A,S,T,F}
+function Base.show(io::IO, s::Simulation{A,S,T}) where {A,S,T}
      println(io, "Simulation with agents of type", A)
  end
 # TODO: define two functions with signatures
@@ -44,20 +43,20 @@ function Base.show(io::IO, s::Simulation{A,S,T,F}) where {A,S,T,F}
 $(SIGNATURES)
 Add `w` with callbacks `s.cb` to `s` if provided
 """
-function add_entry!(s::Simulation{A,S,T,F},w::World) where {A,S,T,F}
+function add_entry!(s::Simulation{A,S,T},w::World,cb) where {A,S,T}
     push!(s.agentarray,copy.(agents(w)))
     push!(s.tspan,w.t)
-    if !(F==Nothing)
-        push!(s.df_agg,Dict(s.cb.names .=> [f(w) for f in s.cb.agg]))
+    if !isnothing(cb)
+        push!(s.df_agg,cb(w))
     end
     return nothing
 end
 
-function add_entry_cb_only!(s::Simulation{A,S,T,F},w::World) where {A,S,T,F}
+function add_entry_cb_only!(s::Simulation{A,S,T},w::World,cb) where {A,S,T}
     push!(s.agentarray,[Agent(w.space)]) # pushing NA agents
     push!(s.tspan,w.t)
-    if !(F==Nothing)
-        push!(s.df_agg,Dict(s.cb.names .=> [f(w) for f in s.cb.agg]))
+    if !isnothing(cb)
+        push!(s.df_agg,cb(w))
     end
     return nothing
 end
