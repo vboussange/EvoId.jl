@@ -44,11 +44,11 @@ function run!(w::World{A,S,T},alg::L,tend::Number,b,d;
             break
         end
         if  t - get_tend(sim) >= dt_saving
-            @info "saving world @ t = $(t)/ $(tend)"
+            # @info "saving world @ t = $(t)/ $(tend)"
             add_entry!(sim,w,cb)
         end
         if  t >= first(t_saving_cb)
-            @info "saving callback only @ t = $(t)/ $(tend)"
+            # @info "saving callback only @ t = $(t)/ $(tend)"
             add_entry_cb_only!(sim,w,cb)
             popfirst!(t_saving_cb)
         end
