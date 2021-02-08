@@ -37,10 +37,10 @@ function run!(w::World{A,S,T},alg::L,tend::Number,b,d;
         if dt < 0
             throw("We obtained negative time step dt = $dt at event $i")
         elseif size(w) == NMax
-            @info "All individuals have died :("
+            @info "We have reached the maximum number of individuals allowed"
             break
         elseif size(w) == 0
-            @info "We have reached the maximum number of individuals allowed"
+            @info "All individuals have died :("
             break
         end
         if  t - get_tend(sim) >= dt_saving
