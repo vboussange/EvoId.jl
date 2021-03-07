@@ -177,8 +177,12 @@ function _get_xinc(a::AbstractAgent,s::AbstractSpacesTuple,p::Dict,t::Number)
     @unpack D,mu = p
     _x = copy(get_x(a))
     for (i,ss) in enumerate(s)
-        if rand() < mu[i]
-            _x[i] += get_inc(_x[i],D[i],ss,t)
+        if ndims(ss) > 1
+            mut = rand(eltype(mu[i]),ndims(ss)) .< mu[i]
+            _x[i] .+= mut .* get_inc(_x[i],D[i],ss,t)
+        else
+            mut = rand(typeof(mu[i])) < mu[i]
+            _x[i] += mut * get_inc(_x[i],D[i],ss,t)
         end
     end
     _x
