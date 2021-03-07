@@ -71,11 +71,11 @@ a5 = Agent(myspace2,ancestors=true)
 
     # increment test
     p_myspace = Dict("D"=>[1,1,1],"mu" =>[1,1,1] )
-    p_myspace2 = Dict("D"=>[1,1,1],"mu" =>[1,1,1])
+    p_myspace2 = Dict("D"=>[1,1,[1,1]],"mu" =>[1,1,[1,1]])
     old_a1 = copy(a1)
     @test !prod((get_x(old_a1) .≈ get_x(increment_x!(a1,myspace,p_myspace,0.))))
     @test nancestors(increment_x!(a2,myspace,p_myspace,2.)) > 1
     @test !isnothing(increment_x!(a4,myspace2,p_myspace2,2.))
     @test !isnothing(increment_x!(a5,myspace2,p_myspace2,2.))
-    @test typeof(ABMEv._get_xinc(a2,myspace,p,0.)) == typeof(get_x(a2))
+    @test typeof(ABMEv._get_xinc(a2,myspace,p_myspace,0.)) == typeof(get_x(a2))
 end

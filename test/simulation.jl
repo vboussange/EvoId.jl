@@ -57,8 +57,8 @@ cb(w) = Dict("gamma_div" => w -> var(Float64.(get_x(w,1))))
 myagents = [Agent(myspace,[0.],ancestors=true,rates=true) for i in 1:K0]
 w0 = World(myagents,myspace,p,0.)
 w1 = copy(w0)
-cb = (names = ["gamma_div"], agg = Function[w -> var(Float64.(get_x(w,1)))])
-eltype(cb.agg)
+cb(w) = Dict("gamma_div" => var(Float64.(get_x(w,1))))
+# eltype(cb.agg)
 @time sim = run!(w1,Gillepsie(),tend,b,d,cb=cb,t_saving_cb = collect(1.0:0.1:1.5))
 @test typeof(sim["gamma_div"]) <: Vector
 @test get_size(sim) == length(sim["gamma_div"])
@@ -68,5 +68,5 @@ eltype(cb.agg)
 
 
 ## testing plot
-using Plots
-plot(get_tspan(sim),sim["gamma_div"])
+# using Plots
+# plot(get_tspan(sim),sim["gamma_div"])
