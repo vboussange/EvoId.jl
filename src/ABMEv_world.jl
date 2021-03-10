@@ -13,6 +13,10 @@ function World(w::Vector{A},s::S,p::Dict,t::T=0.) where {A<:AbstractAgent,S<:Abs
     # if typeof(p["D"]) != eltype(skipmissing(w)[1])
     #     throw(ArgumentError("Diffusion coefficient does not match with underlying space\n `D::Tuple`"))
     # end
+    if typeof(first(w)) !== A
+        throw(ArgumentError("eltype(w) should be equal to typeof(first(w)), which is not the case.\n
+                            Try to generate the array of Agents in an other way"))
+    end
     World{A,S,T}(w,s,p,t)
 end
 
