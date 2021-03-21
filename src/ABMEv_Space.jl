@@ -14,7 +14,7 @@ AbstractSpacesTuple = Tuple{Vararg{AbstractSpace}}
 import Base:ndims,isfinite,eltype
 Base.ndims(x::AbstractSpace{Dim,T,I}) where {Dim,T,I} = Dim
 Base.isfinite(x::AbstractSpace{Dim,T,IsFinite{t}}) where {Dim,T,t} = t #not sure we need this
-Base.eltype(::AbstractSpace{Dim,T,I}) where {Dim,T,I} = Dim > 1 ? Vector{T} : T
+Base.eltype(::AbstractSpace{Dim,T,I}) where {Dim,T,I} = T
 Base.ndims(ss::AbstractSpacesTuple) = length(ss)
 Base.eltype(ss::AbstractSpacesTuple) where {Dim,T,I} = Tuple{eltype.(ss)...}
 
@@ -97,7 +97,7 @@ function get_inc(x,D,s::DiscreteSegment{T}) where {T}
 end
 
 # normal dispersal kernel that gets truncated
-function get_inc(x,D,s::GraphSpace{T}) where {T}
+function get_inc(x,D::Number,s::GraphSpace{T}) where {T}
     niter = round(Int,abs(D*randn())) + 1
     # here we add +1 since randomwalk(s.g,x,niter) returns x
     if niter > 0
@@ -107,7 +107,7 @@ function get_inc(x,D,s::GraphSpace{T}) where {T}
     end
 end
 # short range dispersal kernel, jump to neighbour node
-function get_inc(x,D,s::GraphSpace{T}) where {T}
+function get_inc(x,D::Nothing,s::GraphSpace{T}) where {T}
     return last(randomwalk(s.g,x,2)) - x
 end
 

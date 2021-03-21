@@ -33,7 +33,7 @@ Base.getindex(s::Simulation,measure::String) = [agg[measure] for agg in s.df_agg
 
 
 function Base.show(io::IO, s::Simulation{A,S,T}) where {A,S,T}
-     println(io, "Simulation with agents of type", A)
+     println(io, "Simulation with agents of type ", A)
  end
 # TODO: define two functions with signatures
 # function add_entry!(s::Simulation{A,S,T,F},w::World) where {A,S,T,F<:Function}

@@ -19,7 +19,8 @@ mutable struct Agent{A<:Ancestors,R<:Rates,T<:Tuple,U,V} <: AbstractAgent{A,R}
     b::V
 end
 
-
+import Base:eltype
+# This definition of eltype is to be discussed
 eltype(a::Agent{A,R,T,U,V}) where {A,R,T,U,V} = T
 
 # infers position type and zeros
@@ -29,12 +30,13 @@ function initpos(s::S) where {S<:AbstractSpacesTuple}
     pos = []
     for i in 1:length(Eltype)
         if Dims[i] > 1
-            push!(pos,ones(eltype(Eltype[i]),Dims[i]))
+            push!(pos,ones(Eltype[i],Dims[i]))
         else
             pos = push!(pos,one(Eltype[i]))
         end
     end
-    Tuple{Eltype...},pos
+    _Type = eltype.(pos)
+    Tuple{_Type...},pos
 end
 
 # default initialiser
@@ -60,9 +62,9 @@ $(SIGNATURES)
 function Agent(s::S, pos::P;ancestors=false,rates=false) where {P<:Vector,S  <: AbstractSpacesTuple}
     T = eltype.(s)
     for (i,p) in enumerate(pos)
-        if typeof(p) !== T[i]
+        if eltype(p) !== T[i]
             try
-                p = convert(T[i],p)
+                p = convert.(T[i],p)
             catch e
                 throw(ArgumentError("Position provided does not match with underlying space"))
             end
@@ -175,7 +177,7 @@ import Base.(+)
 
 function _get_xinc(a::AbstractAgent,s::AbstractSpacesTuple,p::Dict,t::Number)
     @unpack D,mu = p
-    _x = copy(get_x(a))
+    _x = deepcopy(get_x(a))
     for (i,ss) in enumerate(s)
         if length(mu[i]) > 1
             mut = rand(eltype(mu[i]),ndims(ss)) .< mu[i]

@@ -17,6 +17,15 @@ function World(w::Vector{A},s::S,p::Dict,t::T=0.) where {A<:AbstractAgent,S<:Abs
         throw(ArgumentError("eltype(w) should be equal to typeof(first(w)), which is not the case.\n
                             Try to generate the array of Agents in an other way"))
     end
+    for _m in mu
+        if typeof(m) !<: Float
+            throw(ArgumentError("elements of mu should be of type AbstractFloat\n
+                                to decide if mutations occur from a uniform probability law"))
+        end
+    end
+    length(mu) == ndims(s) ? nothing : "Dimension of parameter mu should correspond to dimension of underlying space"
+    length(D) == ndims(s) ? nothing : "Dimension of parameter D should correspond to dimension of underlying space"
+
     World{A,S,T}(w,s,p,t)
 end
 
