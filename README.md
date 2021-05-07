@@ -98,17 +98,3 @@ src="https://github.com/vboussange/vboussange.github.io/blob/master/images/softw
 alt="" width="400"></img> </div>
 
 Population trait over time
-
-
-
-
-D = (1e-2,)
-mu = [.1]
-NMax = 2000
-tend = 1500
-dm = d([0],[0],0.);bm = 1.
-p = Dict{String,Any}();@pack! p = dm,bm,D,mu,NMax
-myagents = [Agent(myspace,(1e-2 * randn(Float64),)) for i in 1:K0]
-w0 = World(myagents,myspace,p,0.)
-sim = run!(w0,CFM(),tend,dt_saving = 10,b,d)
-```
