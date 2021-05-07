@@ -1,13 +1,19 @@
-# ABMEv.jl Documentation
+# ABMEv.jl: Agent Based Model for Evolutionary Dynamics
 
-This is a suite for simulating the evolutionary dynamics of a population in a multidimensional space. The population is modelled at the level of the individual - this suite hence falls in the realm of *Agent Based Modelling*.
-The purpose of this package is to provide a numerical laboratory for evolutionary dynamics, supplying
-- a flexible atomic structure of agents and underlying evolutionary space
-- algorithms and update rules for the simulations
-- analysis tools to investigate the simulations.
+ABMEv.jl is a package aimed at simulating the evolutionary dynamics of a population in a multidimensional space. The population is modelled at the individual level. Individuals experience four elementary events : birth, death, mutation and migration.
+
+- ABMEv.jl hence falls in the realm of *Agent Based Model*.
+ABMEv.jl provides a numerical laboratory for evolutionary dynamics, supplying
+- flexible types for individuals, which can
+    - evolve over any combination of space
+    - store ancestors trait,
+- flexible types for evolutionary spaces, comprising multidimensional discrete and continuous sets, as well as graphs,
+- the possibility for the user to provide any birth and death functions,
+- several algorithms for the simulations,
+- utility functions to analyse simulation results.
 
 ## Features
-Agents consist of sets of traits in some combination of vector spaces. A vector space can represent for example **a geographical landscape, a trait space, or genetic structure**. Spaces can be of any dimensions, discrete or continuous, bounded or unbounded. They can equally consist of graphs.
+Agents consist of sets of traits in some combination of evolutionary spaces. An evolutionary space can represent for example a geographical landscape, a trait space, or genetic structure. Spaces can be of any dimensions, discrete or continuous, bounded or unbounded. They can equally consist of graphs.
 Vector spaces are used to define birth and death processes, as well as mutation processes.
 
 ### Specificities
