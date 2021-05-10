@@ -2,3 +2,4 @@ docs/build
 docs/*.png
 docs/uploads
 *.jld2
+profiling/*
