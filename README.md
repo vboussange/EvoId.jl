@@ -16,8 +16,8 @@ The user can provide **any birth and death functions**, which should depend on t
 
 ABMEv.jl provides a **numerical laboratory** for eco-evolutionary dynamics, supplying
 
-- flexible types for **individuals**, which can 
-    - evolve over any combination of space, 
+- flexible types for **individuals**, which can
+    - evolve over any combination of space,
     - store ancestors trait,
 - flexible types for **evolutionary spaces**, that can consist of multidimensional **discrete or continuous domains**, as well as **graphs**,
 - the possibility to use **callback functions** to save the state of the system at any time step
@@ -42,9 +42,9 @@ Check out the documentation if you want to use the advanced features of ABMEv.jl
 
 -----
 ## A first tutorial
-We provide here a tutorial that sums up the 5 steps necessary to launch a simulation. For the sake of the tutorial, we propose to model a population that is structured over the vertices of a graph and characterised by a trait under selection. 
+We provide here a tutorial that sums up the 5 steps necessary to launch a simulation. For the sake of the tutorial, we propose to model a population that is structured over the vertices of a graph and characterised by a trait under selection.
 
-### 0. Import the relevant libraries 
+### 0. Import the relevant libraries
 Let's import ABMEv.jl, and LightGraphs.jl
 ```julia
 using ABMEv
@@ -52,7 +52,7 @@ using LightGraphs.jl
 ```
 
 ### 1. Define the evolutionary spaces
-We define the geographical space as star graph with 7 vertices (i.e. the abstraction of the landscape), and a continuous trait space. 
+We define the geographical space as star graph with 7 vertices (i.e. the abstraction of the landscape), and a continuous trait space.
 
 ```julia
 nodes = 7
@@ -71,10 +71,10 @@ K = 1000 # carrying capacity
 θ = [rand([-1,1]) for i in 1:nodes] # optimal trait values
 # X[1] is the geographical position
 # X[2] corresponds to the adaptive traits
-b(X,t) = 1 - 0.5 * (θ[X[1]] - X[2])^2
-d(X,Y,t) = (X[1] ≈ Y[1]) / K 
+b(X,t) = max(1 - 0.5 * (θ[X[1]] - X[2])^2,0.)
+d(X,Y,t) = (X[1] ≈ Y[1]) / K
 ```
-> :warning: birth and death functions should have the same number of 
+> :warning: birth and death functions should have the same number of
 arguments as above.
 
 ### 3. Define how individuals move over the evolutionary space
@@ -116,7 +116,7 @@ sim = run!(w0,
             tend,
             b,
             d,
-            cb = cb, 
+            cb = cb,
             t_saving_cb = t_saving_cb)
 ```
 ### Plotting

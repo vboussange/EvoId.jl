@@ -1,4 +1,4 @@
-using Revise,ABMEv,Plots,UnPack
+using ABMEv,Plots,UnPack
 
 
 nodes = 9
@@ -14,18 +14,17 @@ a = 1
 b(X,t) = gaussian(X[2],X[1] * a,sigma_K) / nodes
 d(X,Y,t) =  (X[1] ≈ Y[1]) * gaussian(X[2],Y[2],sigma_a) / K0
 NMax = 2000
-D = (5e-1,5e-2)
+D = [5e-1,5e-2]
 # tend = 1.5
 tend = 1500
 p = Dict{String,Any}();@pack! p = NMax,mu,D
 
 myagents = [Agent(myspace,(Int8(5),Float16(5) + Float16(5e-2) * randn(Float16),),ancestors=true,rates=true) for i in 1:round(K0/nodes)]
 
-w0 = World(myagents,myspace,p,0.)
+w0 = World(myagents,myspace,p)
 
 s = run!(w0,Gillepsie(),tend,b,d,dt_saving=5);
 Plots.plot(s, ylabel = "Adaptive trait",trait=2)
-savefig(joinpath(@__DIR__, "gradient_adaptive_trait.png"))
 
 using Printf
 anim = @animate for i in 1:get_size(s)
@@ -52,6 +51,3 @@ aplot = Plots.plot(thist,shistall,
             ylabel = "Lineages adaptive trait",
             ylims = (-0.5,10.5)
             )
-savefig(aplot,joinpath(@__DIR__, "gradient_lineages_adaptive_trait.png"))
-
-# Plotting lineages

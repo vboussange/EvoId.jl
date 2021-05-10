@@ -97,6 +97,11 @@ function get_inc(x,D,s::DiscreteSegment{T}) where {T}
     return round(T,_reflect1D(x,inc,s))
 end
 
+function get_inc(x,D::Nothing,s::DiscreteSegment{T}) where {T}
+    inc = rand([one(T),-one(T)])
+    return round(T,_reflect1D(x,inc,s))
+end
+
 # normal dispersal kernel that gets truncated
 function get_inc(x,D::Number,s::GraphSpace{T}) where {T}
     niter = round(T,abs(D*randn(Float32))) + 1

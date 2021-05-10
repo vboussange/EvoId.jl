@@ -28,12 +28,12 @@ p = Dict{String,Any}();@pack! p = D,mu,NMax
 
 # definining world 0 and running
 myagents = [Agent(wholespace,(5,),ancestors=true,rates=true) for i in 1:K0/nodes]
-w0 = World(myagents,wholespace,p,0.)
+w0 = World(myagents,wholespace,p)
 @time sim = run!(w0,Gillepsie(),tend,b,d)
 
 ### Plotting size of the world
 myagents = [Agent(wholespace,(5,),ancestors=true,rates=true) for i in 1:K0/nodes]
-w0 = World(myagents,wholespace,p,0.) # we need to reinitialise the world
+w0 = World(myagents,wholespace,p) # we need to reinitialise the world
 @time sim = run!(w0,Gillepsie(),tend,dt_saving=2.,b,d)
 wsize = [length(w) for w in sim[:]]
 using Plots
@@ -42,7 +42,7 @@ Plots.plot(get_tspan(sim),wsize,
                 ylabel = "Metapopulation size",
                 xlabel ="time",
                 grid = false)
-savefig(joinpath(@__DIR__, "delta_comp_wsize.png"))
+# savefig(joinpath(@__DIR__, "delta_comp_wsize.png"))
 
 ## plotting position through time
 using Plots
@@ -51,4 +51,4 @@ Plots.plot(sim,
         ylabel = "Geographical position",
         grid = false,
         markersize = 10)
-savefig(joinpath(@__DIR__, "delta_comp_pos.png"))
+# savefig(joinpath(@__DIR__, "delta_comp_pos.png"))

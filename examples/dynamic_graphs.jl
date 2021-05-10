@@ -33,5 +33,5 @@ p = Dict{String,Any}();@pack! p = D,mu,NMax
 
 # definining world 0 and running
 myagents = [Agent(wholespace,(5,),ancestors=true,rates=true) for i in 1:K0/nodes]
-w0 = World(myagents,wholespace,p,0.)
+w0 = World(myagents,wholespace,p)
 @time sim = run!(w0,Gillepsie(),tend,b,d)

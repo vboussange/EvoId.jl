@@ -19,7 +19,7 @@ NMax = 2000
 tend = 200
 p_default = Dict{String,Any}();@pack! p_default = NMax,mu,D
 myagents = [Agent(myspace,(Int8(5),initnode),ancestors=true,rates=true) for i in 1:round(K0/nodes)]
-w0 = World(myagents,myspace,p_default,0.)
+w0 = World(myagents,myspace,p_default)
 
 @time sim = run!(w0,Gillepsie(),tend,b,d,dt_saving=3.)
 

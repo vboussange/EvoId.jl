@@ -25,12 +25,26 @@ function World(w::Vector{A},s::S,p::Dict;t::T=0.) where {A<:AbstractAgent,S<:Abs
     length(D) == length(s) ? nothing : throw(ArgumentError("Length of parameter D should correspond to dimension of underlying space"))
     SS = eltype.(s)
     _SS = _get_types_dim(s)
+    for (i,_S) in enumerate(SS)
+        if _S <: Integer
+            # handling for discrete space is different
+            Di = D[i]
+            (isnothing(Di) || typeof(Di) <: AbstractFloat) ? nothing : throw(ArgumentError("`D` at dimension $i should be whether nothing or a float"))
+            _SS[i] = typeof(Di)
+        end
+    end
     D2 = Union{_SS...}[]
     for (i,Di) in enumerate(D)
-        try
-            push!(D2, convert(_SS[i],Di))
-        catch e
-            throw(ArgumentError("`D` at dimension $i does not match with underlying space"))
+        # making sure that we only modify D for continuous space
+        # for discrete space, D should be whether Nothing or AbstractFloat
+        if SS[i] <: AbstractFloat
+            try
+                push!(D2, convert(_SS[i],Di))
+            catch e
+                throw(ArgumentError("`D` at dimension $i does not match with underlying space"))
+            end
+        else
+            push!(D2, Di)
         end
     end
     p["D"] = D2
