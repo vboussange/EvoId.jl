@@ -24,28 +24,38 @@ import Base:eltype
 eltype(a::Agent{A,R,T,U,V}) where {A,R,T,U,V} = T
 
 # infers position type and zeros
-function initpos(s::S) where {S<:AbstractSpacesTuple}
-    Eltype = eltype.(s)
-    Dims = ndims.(s)
-    pos = []
-    for i in 1:length(Eltype)
-        if Dims[i] > 1
-            push!(pos,ones(Eltype[i],Dims[i]))
-        else
-            pos = push!(pos,one(Eltype[i]))
+function _initpos(s::S) where {S<:AbstractSpacesTuple}
+    T = collect(eltype.(s))
+    TT = collect(T)
+    _nd = ndims.(s)
+    for (i,n) in enumerate(_nd)
+        if n > 1
+            TT[i] = Vector{TT[i]}
         end
     end
-    _Type = eltype.(pos)
-    Tuple{_Type...},pos
+    pos = Union{TT...}[]
+    for i in 1:length(TT)
+        if _nd[i] > 1
+            push!(pos,ones(T[i],_nd[i]))
+        else
+            pos = push!(pos,one(T[i]))
+        end
+    end
+    Tuple{T...},pos
 end
 
 # default initialiser
 """
 $(SIGNATURES)
     Initialises agent with 0 values everywhere
+    # args
+    - `s` is the underlying space
+    - `ancestors=true` when agents fitness needs to be updated at each time step.
+    This is needed for the Gillepsie algorithm, but not for CFM algorithm
+    - `ancestors=true` when one wants to store ancestors traits.
 """
-function Agent(s::S;ancestors=false,rates=false) where {S  <: AbstractSpacesTuple}
-    T,pos = initpos(s)
+function Agent(s::S;ancestors=false,rates=true) where {S  <: AbstractSpacesTuple}
+    T,pos = _initpos(s)
     t = 0.
     U =  Float64
     d = rates ?  Float64(.0) : nothing
@@ -54,59 +64,66 @@ function Agent(s::S;ancestors=false,rates=false) where {S  <: AbstractSpacesTupl
     Agent{Ancestors{ancestors},Rates{rates},T,U,V}([pos],[t],d,b)
 end
 
-# here pos is provided
-"""
-$(SIGNATURES)
-    Initialises agent with `pos` provided
-"""
-function Agent(s::S, pos::P;ancestors=false,rates=false) where {P<:Vector,S  <: AbstractSpacesTuple}
+# here pos t should be provided
+# this allows to initilise agents from any time steps knowing ancestors traits
+function Agent(s::S,pos_t::Vector,t::Vector{U};ancestors=false,rates=true) where {S <: AbstractSpacesTuple, U <: AbstractFloat}
     T = eltype.(s)
-    for (i,p) in enumerate(pos)
-        if eltype(p) !== T[i]
+    TT = collect(T) # we need an array to convert thereafter position
+    _nd = ndims.(s)
+    for (i,n) in enumerate(_nd)
+        if n > 1
+            TT[i] = Vector{T[i]}
+        end
+    end
+    length(pos_t) == length(t) ? nothing : ArgumentError("length of `pos` should match length of `t`")
+    # we convert all
+    pos2_t = Vector{Union{TT...}}[]
+    for pos in pos_t
+        pos2 = Union{TT...}[]
+        for (i,p) in enumerate(pos)
             try
-                p = convert.(T[i],p)
+                push!(pos2,convert(TT[i],p))
             catch e
                 throw(ArgumentError("Position provided does not match with underlying space"))
             end
         end
+        push!(pos2_t,pos2)
     end
-    t = 0.
-    U =  Float64
+    # U =  Float64
     d = rates ?  Float64(.0) : nothing
     b = d
     V = rates ?  Float64 : Nothing
-    Agent{Ancestors{ancestors},Rates{rates},Tuple{T...},U,V}([pos],[t],d,b)
+    Agent{Ancestors{ancestors},Rates{rates},Tuple{T...},U,V}(pos2_t,t,d,b)
 end
 
-# TODO : to be modified
-function Agent(s::S,pos::Vector,t::Vector{U};ancestors=false,rates=false) where {S  <: AbstractSpacesTuple,U}
-    T = eltype.(s)
-    for (i,p) in enumerate(pos[1])
-        if typeof(p) !== T[i]
-            try
-                p = convert(T[i],p)
-            catch e
-                throw(ArgumentError("Position provided does not match with underlying space"))
-            end
-        end
-    end
-    d = rates ?  Float64(.0) : nothing
-    b = d
-    V = rates ?  Float64 : Nothing
-    Agent{Ancestors{ancestors},Rates{rates},Tuple{T...},U,V}(pos,t,d,b)
-end
+"""
+Agent(s, pos;ancestors=false,rates=true)
+    Initialises agent with initial position `pos` provided
+    # args
+    - `s` is the underlying space
+    - `ancestors=true` when agents fitness needs to be updated at each time step.
+    This is needed for the Gillepsie algorithm, but not for CFM algorithm
+    - `ancestors=true` when one wants to store ancestors traits.
+"""
+Agent(s, pos; ancestors=false, rates=true) = Agent(s, [pos], [0.],ancestors=ancestors, rates=rates)
+
 
 import Base:copy,show
+
 Base.copy(a::A) where {A<:AbstractAgent} = A(copy(a.x_history),copy(a.t_history),copy(a.d),copy(a.b))
+
 # this function only copies the trait history and time (x,t), and set birth and death rates to 0.
 copyxt(a::Agent{A,R,T,U,V}) where {A,R,T,U,V<:Number} = Agent{A,R,T,U,V}(copy(a.x_history),copy(a.t_history),zero(V),zero(V))
+
 copyxt(a::Agent{A,R,T,U,Nothing}) where {A,R,T,U} = Agent{A,R,T,U,Nothing}(copy(a.x_history),copy(a.t_history),nothing,nothing)
+
 # this has to be overloaded for Base.copy(a::Agent) to work properly
 Base.copy(m::Missing) = missing
+
 Base.copy(n::Nothing) = nothing
 
 function Base.show(io::IO, a::Agent{A,R,T,U,V}) where {A,R,T,U,V}
-     println(io, "Agent with indices of type", T)
+     println(io, "Agent with indices of type ", T)
 end
 
 Base.summary(A::AbstractAgent) = string(TYPE_COLOR,nameof(typeof(a)),NO_COLOR," with uType ",TYPE_COLOR,eltype(a.x_history))
@@ -179,12 +196,16 @@ function _get_xinc(a::AbstractAgent,s::AbstractSpacesTuple,p::Dict,t::Number)
     @unpack D,mu = p
     _x = deepcopy(get_x(a))
     for (i,ss) in enumerate(s)
+        E = eltype(mu[i])
+        S = eltype(ss)
         if length(mu[i]) > 1
-            mut = rand(eltype(mu[i]),ndims(ss)) .< mu[i]
+            mut = (rand(E,ndims(ss)) .< mu[i]) .|> S
             _x[i] .+= mut .* get_inc(_x[i],D[i],ss,t)
         else
-            mut = rand(eltype(mu[i])) < mu[i]
-            _x[i] += mut * get_inc(_x[i],D[i],ss,t)
+            mut = rand(E) < mu[i]
+            if mut
+                _x[i] += get_inc(_x[i],D[i],ss,t)
+            end
         end
     end
     _x

@@ -73,8 +73,8 @@ w4 = World(a4,myspace4,p4)
            @test abs(β) < Inf
        end
        @testset "Isolation by history - hamming distance" begin
-           a1 = Agent((DiscreteSegment(1,10),),[(1,),(2,),(3,)],[0,1,4],ancestors=true)
-           a2 = Agent((DiscreteSegment(1,10),),[(1,),(10,),(3,),(10,)],[0,3,4,5],ancestors=true)
+           a1 = Agent((DiscreteSegment(1,10),),[1,2,3],[0.,1.,4.],ancestors=true)
+           a2 = Agent((DiscreteSegment(1,10),),[1,10,3,10],[0.,3.,4.,5.],ancestors=true)
            @test get_dist_hist(a1,a2,(x,y)->y!=x,1) ≈ 3.0
        end
 end

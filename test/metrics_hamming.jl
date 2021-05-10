@@ -12,8 +12,8 @@ sigma_a = .7;
 K0 = 1000;
 b(X,t) = gaussian(X[1],0.,sigma_K)
 d(X,Y,t) = gaussian(X[1],Y[1],sigma_a)/K0
-D = (1e-2,)
-mu = [.1]
+D = [1e-2]
+mu = [1.]
 NMax = 10000
 tend = 1.5
 p = Dict{String,Any}();@pack! p = D,mu,NMax
@@ -25,6 +25,6 @@ w0 = World(myagents,myspace,p,0.)
 
 @testset "Hamming distances" begin
     @test typeof(get_xhist_mat(agents(w0))[1] )<: Array
-    @test get_pairwise_average_isolation(w0) >0
+    @test get_pairwise_average_isolation(w0) > 0
     @test get_local_pairwise_average_isolation(w0) > 0
 end

@@ -93,13 +93,13 @@ function get_inc(x,D,s::ContinuousSegment{T}) where {T}
 end
 
 function get_inc(x,D,s::DiscreteSegment{T}) where {T}
-    inc = D * randn()
+    inc = D * randn(Float32)
     return round(T,_reflect1D(x,inc,s))
 end
 
 # normal dispersal kernel that gets truncated
 function get_inc(x,D::Number,s::GraphSpace{T}) where {T}
-    niter = round(Int,abs(D*randn())) + 1
+    niter = round(T,abs(D*randn(Float32))) + 1
     # here we add +1 since randomwalk(s.g,x,niter) returns x
     if niter > 0
         return last(randomwalk(s.g,x,niter)) - x
