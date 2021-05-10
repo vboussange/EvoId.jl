@@ -102,7 +102,7 @@ w0 = World(myagents,evolspace,p) # the initial world, defined at time 0.
 Simulation time, and callback function
 
 ```
-tend = 200
+tend = 500
 t_saving_cb = collect(range(0.,tend,length=300))
 cb() = Dict("N" => size(w))
 ```
@@ -122,7 +122,7 @@ sim = run!(w0,
 ### Plotting
 ```julia
 using Plots
-plot(sim.tspan, sim["popsize"])
+plot(sim.tspan, sim["N"])
 ```
 
 ![](docs/src/assets/tutorials/delta_comp_wsize.png)
