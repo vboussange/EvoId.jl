@@ -63,10 +63,10 @@ function run!(w::World{A,S,T},alg::L,tend::Number,b,d;
 end
 
 """
-    function _correct_timedep!(p::Dict)
+    function _check_timedep(b,d)
 
-checks time dependency of birth and death functions,
-and overloads the function if not provided
+checks number of arguments of functions,
+and throws error if problem
 """
 function _check_timedep(b,d)
     if numargs(b) < 2

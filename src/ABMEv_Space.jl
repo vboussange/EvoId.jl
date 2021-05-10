@@ -53,6 +53,7 @@ $(TYPEDEF)
 A real space with dimension N and type T
 """
 struct RealSpace{N,T} <: AbstractStatSpace{N,T,IsFinite{false}} end
+RealSpace(N) = RealSpace{N,Float64}()
 """
 $(TYPEDEF)
 A natural space with dimension N and type T

@@ -10,9 +10,9 @@ $(TYPEDEF)
 """
 mutable struct Agent{A<:Ancestors,R<:Rates,T<:Tuple,U,V} <: AbstractAgent{A,R}
     # history of traits for geotraits
-    x_history::Array{Any,1}
+    x_history::Vector
     # birth time of ancestors
-    t_history::Array{U,1}
+    t_history::Vector{U}
     # death rate
     d::V
     #birth rate
