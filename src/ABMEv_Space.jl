@@ -169,3 +169,15 @@ function _reflect1D(x::Number,inc::Number,s::AbstractSegment)
     end
     _reflect1D(x,inc,s)
 end
+
+function _get_types_dim(s::S) where S<:AbstractSpacesTuple
+    T = eltype.(s)
+    TT = collect(T)
+    _nd = ndims.(s)
+    for (i,n) in enumerate(_nd)
+        if n > 1
+            TT[i] = Vector{TT[i]}
+        end
+    end
+    return TT
+end

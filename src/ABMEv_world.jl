@@ -1,6 +1,5 @@
 # this used to be the worldalive
 
-# TODO: do a constructor that ensures the parameters numerics are of the same type as the agents
 mutable struct World{A<:AbstractAgent, S<:AbstractSpacesTuple,T<:Number}
     agents::Vector{A}
     space::S
@@ -9,22 +8,32 @@ mutable struct World{A<:AbstractAgent, S<:AbstractSpacesTuple,T<:Number}
 end
 
 #constructor
-function World(w::Vector{A},s::S,p::Dict,t::T=0.) where {A<:AbstractAgent,S<:AbstractSpacesTuple,T}
+function World(w::Vector{A},s::S,p::Dict;t::T=0.) where {A<:AbstractAgent,S<:AbstractSpacesTuple,T}
     # if typeof(p["D"]) != eltype(skipmissing(w)[1])
     #     throw(ArgumentError("Diffusion coefficient does not match with underlying space\n `D::Tuple`"))
     # end
-    if typeof(first(w)) !== A
-        throw(ArgumentError("eltype(w) should be equal to typeof(first(w)), which is not the case.\n
-                            Try to generate the array of Agents in an other way"))
-    end
+    @unpack D,mu = p
+
     for _m in mu
-        if typeof(m) !<: Float
+        if !(typeof(_m) <: AbstractFloat)
             throw(ArgumentError("elements of mu should be of type AbstractFloat\n
                                 to decide if mutations occur from a uniform probability law"))
         end
     end
-    length(mu) == ndims(s) ? nothing : "Dimension of parameter mu should correspond to dimension of underlying space"
-    length(D) == ndims(s) ? nothing : "Dimension of parameter D should correspond to dimension of underlying space"
+
+    length(mu) == length(s) ? nothing : throw(ArgumentError("Length of parameter mu should correspond to dimension of underlying space"))
+    length(D) == length(s) ? nothing : throw(ArgumentError("Length of parameter D should correspond to dimension of underlying space"))
+    SS = eltype.(s)
+    _SS = _get_types_dim(s)
+    D2 = Union{_SS...}[]
+    for (i,Di) in enumerate(D)
+        try
+            push!(D2, convert(_SS[i],Di))
+        catch e
+            throw(ArgumentError("`D` at dimension $i does not match with underlying space"))
+        end
+    end
+    p["D"] = D2
 
     World{A,S,T}(w,s,p,t)
 end

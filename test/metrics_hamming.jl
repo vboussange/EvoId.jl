@@ -26,5 +26,4 @@ w0 = World(myagents,myspace,p,0.)
 @testset "Hamming distances" begin
     @test typeof(get_xhist_mat(agents(w0))[1] )<: Array
     @test get_pairwise_average_isolation(w0) > 0
-    @test get_local_pairwise_average_isolation(w0) > 0
 end

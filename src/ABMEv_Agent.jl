@@ -25,14 +25,9 @@ eltype(a::Agent{A,R,T,U,V}) where {A,R,T,U,V} = T
 
 # infers position type and zeros
 function _initpos(s::S) where {S<:AbstractSpacesTuple}
-    T = collect(eltype.(s))
-    TT = collect(T)
     _nd = ndims.(s)
-    for (i,n) in enumerate(_nd)
-        if n > 1
-            TT[i] = Vector{TT[i]}
-        end
-    end
+    T = eltype.(s)
+    TT = _get_types_dim(s)
     pos = Union{TT...}[]
     for i in 1:length(TT)
         if _nd[i] > 1
@@ -68,13 +63,7 @@ end
 # this allows to initilise agents from any time steps knowing ancestors traits
 function Agent(s::S,pos_t::Vector,t::Vector{U};ancestors=false,rates=true) where {S <: AbstractSpacesTuple, U <: AbstractFloat}
     T = eltype.(s)
-    TT = collect(T) # we need an array to convert thereafter position
-    _nd = ndims.(s)
-    for (i,n) in enumerate(_nd)
-        if n > 1
-            TT[i] = Vector{T[i]}
-        end
-    end
+    TT = _get_types_dim(s)
     length(pos_t) == length(t) ? nothing : ArgumentError("length of `pos` should match length of `t`")
     # we convert all
     pos2_t = Vector{Union{TT...}}[]
@@ -84,7 +73,7 @@ function Agent(s::S,pos_t::Vector,t::Vector{U};ancestors=false,rates=true) where
             try
                 push!(pos2,convert(TT[i],p))
             catch e
-                throw(ArgumentError("Position provided does not match with underlying space"))
+                throw(ArgumentError("Position at dimension $i provided does not match with underlying space"))
             end
         end
         push!(pos2_t,pos2)

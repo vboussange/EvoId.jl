@@ -14,15 +14,16 @@ a2 = [Agent(myspace2,σ  .* randn(2) .- .5,ancestors=true) for i in 1:K0]
 a3 = [Agent(myspace3, [rand(Int16.(1:10)), 1e-1.* randn(2) .+ 5.5 ],ancestors=true) for i in 1:K0]
 a4 = [Agent(myspace4, [1.,rand(Int64(1):Int64(1000))],ancestors=true) for i in 1:K0]
 
-D = (1.,);
-mu = [1.,1.]
+D = [1.];
+mu = [1.]
 NMax = 1000
 p1 = Dict{String,Any}();@pack! p1 = D,mu,NMax
-D = (1.,1.);
+D = [1.,1.];
+mu = [1.,1.]
 p2 = Dict{String,Any}();@pack! p2 = D,mu,NMax
-D = (Int16(0.),(0.,0.))
+D = [Int16(0.),[0.,0.]]
 p3 = Dict{String,Any}();@pack! p3 = D,mu,NMax
-D = (0.,0.)
+D = [0.,0.]
 p4 = Dict{String,Any}();@pack! p4 = D,mu,NMax
 
 w1 = World(a1,myspace1,p1)
@@ -91,7 +92,7 @@ multispace = (DiscreteSegment{Int8}(1,9),RealSpace{3,Float64}(),)
 K0 = 10000;
 multia = [Agent(multispace, [rand(Int8(1):Int8(10)),randn(3) ],ancestors=true) for i in 1:K0]
 D = [Int8(1),fill(1.,3)]
-mu = [1]
+mu = [1.,1.]
 NMax = 1000
 multip = Dict{String,Any}();@pack! multip = D,mu,NMax
 multiw = World(multia,multispace,multip)
