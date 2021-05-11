@@ -35,6 +35,7 @@ println("Running simulation with callback")
 Plots.plot(sim.tspan, sim["N"])
 
 println("Running simulation with `dt_saving`")
+myagents = [Agent(evolspace,[rand(1:nodes),randn() * D[2]]) for i in 1:K]
 w0 = World(myagents,evolspace,p)
 @time sim = run!(w0,Gillepsie(),tend,b,d,dt_saving=2.0)
 Plots.plot(sim,trait=2)

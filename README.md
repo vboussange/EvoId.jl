@@ -101,10 +101,10 @@ w0 = World(myagents,evolspace,p) # the initial world, defined at time 0.
 ### 5. Run
 Simulation time, and callback function
 
-```
+```julia
 tend = 500
 t_saving_cb = collect(range(0.,tend,length=300))
-cb() = Dict("N" => size(w))
+cb(w) = Dict("N" => size(w))
 ```
 
 
@@ -129,13 +129,6 @@ plot(sim.tspan, sim["N"])
 
 With a few more tricks, one can also plot the population trait density over time, for example the local trait density for individuals living on vertex 1.
 
-```julia
-sim = run!(w0,
-            Gillepsie(), # gillepsie algorithm
-            tend,
-            b,
-            d,
-            dt_saving = 2.0)
-```
-
 ![](docs/src/assets/ABM_local_trait_dens_adapt.png)
+
+Check out the folder `examples` in the git repo to see this tutorial in a julia file, as well as plenty others!
