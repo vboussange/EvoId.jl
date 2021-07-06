@@ -3,7 +3,7 @@ using Random
 Random.seed!(0)
 using LightGraphs
 using Test
-using Revise,EVOID
+using Revise,EvoId
 using UnPack,JLD2
 
 myspace = (RealSpace{1,Float64}(),)

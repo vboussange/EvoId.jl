@@ -3,7 +3,7 @@ using Random
 Random.seed!(0)
 using LightGraphs
 using Test
-using Revise,EVOID
+using Revise,EvoId
 using UnPack,JLD2
 
 g1 = LightGraphs.grid([9,1])
@@ -21,8 +21,8 @@ end
 update_g(t) = periodic_update_graph(10,t)
 dyng = DynGraphSpace(g,update_g)
 ## testing atomic methods
-@test  last(randomwalk(EVOID.get_graph(dyng,16.),1,10)) ≈ 1
-@test  !(last(randomwalk(EVOID.get_graph(dyng,1.),1,10)) ≈ 1)
+@test  last(randomwalk(EvoId.get_graph(dyng,16.),1,10)) ≈ 1
+@test  !(last(randomwalk(EvoId.get_graph(dyng,1.),1,10)) ≈ 1)
 
 ## simulations
 myspace = (dyng,)

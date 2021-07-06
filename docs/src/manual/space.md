@@ -1,6 +1,6 @@
 # Space
 
 ```@autodocs
-Modules = [EVOID]
-Pages   = ["EVOID_Space.jl"]
+Modules = [EvoId]
+Pages   = ["EvoId_Space.jl"]
 ```

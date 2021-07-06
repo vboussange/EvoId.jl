@@ -1,6 +1,6 @@
 __precompile__(false)
 
-module EVOID
+module EvoId
     using Distributions,LinearAlgebra,Reexport,StatsBase
     using LightGraphs
     using UnPack

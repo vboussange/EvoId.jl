@@ -1,4 +1,4 @@
-using EVOID,LightGraphs,UnPack
+using EvoId,LightGraphs,UnPack
 
 ##### Genotype space#####
 nodes = 9
@@ -67,7 +67,7 @@ end
 d_i = [ (_d_i .- minimum(_d_i)) ./ (maximum(_d_i) .- minimum(_d_i)) for _d_i in d_i ]
 anim  = @animate for i in 1:length(d_i)
         Plots.scatter(collect(1:nodes),ones(nodes),
-                markercolor=EVOID.eth_grad_small[d_i][i],
+                markercolor=EvoId.eth_grad_small[d_i][i],
                 markersize = 40,
                 grid = false,
                 xaxis = false,

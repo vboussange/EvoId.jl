@@ -1,4 +1,4 @@
-using EVOID,UnPack,Plots
+using EvoId,UnPack,Plots
 
 myspace = (RealSpace{1,Float64}(),)
 σ_b = .9;

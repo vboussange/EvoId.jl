@@ -1,6 +1,6 @@
 using Distributed;addprocs()
-@everywhere push!(LOAD_PATH,homedir()*"/ETHZ/projects/EVOID.jl/src")
-@everywhere using EVOID,BenchmarkTools,SharedArrays
+@everywhere push!(LOAD_PATH,homedir()*"/ETHZ/projects/EvoId.jl/src")
+@everywhere using EvoId,BenchmarkTools,SharedArrays
 
 ## Testing update_afterbirth_std!
 p= Dict("K0" => 1000.,
@@ -20,7 +20,7 @@ C = SharedArray{Float64}((Int(p["K0"]),Int(p["K0"])))
 @btime update_afterbirth_std!(skipmissing(world0),C,1,p)
 
 ## Testing get_inc_reflected
-using EVOID,BenchmarkTools
+using EvoId,BenchmarkTools
 a = Agent(rand(1))
 @btime get_inc_reflected(get_x(a)[1],.1 *randn())
 @btime rand()
@@ -33,7 +33,7 @@ a = Agent(rand(1))
 @btime get_xhist(a)[:,end]
 
 ##
-using EVOID,BenchmarkTools
+using EvoId,BenchmarkTools
 a = 0;
 sigma_K = .9;
 sigma_a = .7;
@@ -50,7 +50,7 @@ p_default = Dict(
 na_init = 1000
 world0 = new_world_G(na_init,p_default,spread = .01, offset = -.25)
 tspan=zeros(1)
-import EVOID:update_rates_std!,updateWorld_G!
+import EvoId:update_rates_std!,updateWorld_G!
 @btime update_rates_std!(skipmissing(world0),p_default,0.)
 @btime updateWorld_G!(world0,p_default,update_rates_std!,tspan,true)
 @btime update_afterbirth_std!(skipmissing(world0),1,p_default)
@@ -60,7 +60,7 @@ import EVOID:update_rates_std!,updateWorld_G!
 # For now Gillepsie can not really be parallelised
 using Distributed;addprocs(exeflags="--project")
 @everywhere begin
-        using EVOID
+        using EvoId
         sigma_a = 1.251;
         K0 = 1000;
         K(X) = 1 - 0.125 * sum(X.^2)
@@ -88,7 +88,7 @@ using Random
 Random.seed!(0)
 using LightGraphs
 using Test
-using Revise,EVOID
+using Revise,EvoId
 using UnPack,JLD2
 
 myspace = (RealSpace{1,Float64}(),)

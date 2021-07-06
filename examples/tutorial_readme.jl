@@ -1,4 +1,4 @@
-using EVOID
+using EvoId
 using LightGraphs
 using Plots
 

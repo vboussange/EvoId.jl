@@ -1,6 +1,6 @@
 using LightGraphs
 using Test
-using Revise,EVOID
+using Revise,EvoId
 using UnPack
 myspace = (GraphSpace(SimpleGraph(10,10)),RealSpace{1,Float64}())
 myagents = [Agent(myspace,ancestors=true,rates=true) for i in 1:10]

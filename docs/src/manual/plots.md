@@ -1,6 +1,6 @@
 # Plotting
 
-EVOID comes with Plot recipes.
+EvoId comes with Plot recipes.
 ```julia
 function plot(sim::Simulation;trait = 1)
 ```

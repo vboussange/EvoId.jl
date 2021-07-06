@@ -34,12 +34,12 @@ You have several options available concerning the resource implemented and compe
 You can run your script in parallel, which makes sense for large populations. To do so:
 ```julia
 using Distributed;addprocs()
-@everywhere using EVOID
+@everywhere using EvoId
 ```
 Parallelism only works with Wright Fisher model.
 
 
 ```@autodocs
-Modules = [EVOID]
-Pages   = ["EVOID_WF.jl"]
+Modules = [EvoId]
+Pages   = ["EvoId_WF.jl"]
 ```

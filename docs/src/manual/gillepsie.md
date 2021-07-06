@@ -15,6 +15,6 @@ A particular event, birth or death, is chosen at random with a probability equal
 
 
 ```@autodocs
-Modules = [EVOID]
-Pages   = ["EVOID_Gillepsie.jl"]
+Modules = [EvoId]
+Pages   = ["EvoId_Gillepsie.jl"]
 ```

@@ -1,6 +1,6 @@
 
 # Space as a discrete segement
-using UnPack,EVOID
+using UnPack,EvoId
 nodes = 10
 mysegment = DiscreteSegment(1,nodes)
 

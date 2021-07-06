@@ -1,9 +1,9 @@
-# EVOID.jl: Agent Based Model for Evolutionary Dynamics
+# EvoId.jl: Agent Based Model for Evolutionary Dynamics
 
-EVOID.jl is a package aimed at simulating the evolutionary dynamics of a population in a multidimensional space. The population is modelled at the individual level. Individuals experience four elementary events : birth, death, mutation and migration.
+EvoId.jl is a package aimed at simulating the evolutionary dynamics of a population in a multidimensional space. The population is modelled at the individual level. Individuals experience four elementary events : birth, death, mutation and migration.
 
-- EVOID.jl hence falls in the realm of *Agent Based Model*.
-EVOID.jl provides a numerical laboratory for evolutionary dynamics, supplying
+- EvoId.jl hence falls in the realm of *Agent Based Model*.
+EvoId.jl provides a numerical laboratory for evolutionary dynamics, supplying
 - flexible types for individuals, which can
     - evolve over any combination of space
     - store ancestors trait,
@@ -17,16 +17,16 @@ Agents consist of sets of traits in some combination of evolutionary spaces. An 
 Vector spaces are used to define birth and death processes, as well as mutation processes.
 
 ### Specificities
-- [EVOID.jl allows to keep track of agents' trait lineages](@ref lineages)
-- [EVOID.jl enables to run evolutionary dynamics on graphs!](@ref genetic_structure)
+- [EvoId.jl allows to keep track of agents' trait lineages](@ref lineages)
+- [EvoId.jl enables to run evolutionary dynamics on graphs!](@ref genetic_structure)
 
 ## Getting started
 ```@repl
-using EVOID
+using EvoId
 ```
 
 ## Tutorial
-We strongly advise to have a look at the tutorial section. All the scripts of the examples can be found [here](https://gitlab.ethz.ch/bvictor/EVOID/-/tree/master/examples).
+We strongly advise to have a look at the tutorial section. All the scripts of the examples can be found [here](https://gitlab.ethz.ch/bvictor/EvoId/-/tree/master/examples).
 ```@contents
 Pages = [
     "examples/delta_competition_example.md",
@@ -59,4 +59,4 @@ As of now, three types of simulation algorithm can be used:
 - [Champagnat and Ferriere second article - 2008](https://www.tandfonline.com/doi/full/10.1080/15326340802437710)
 
 ## Similar packages
-[Agents.jl](https://juliadynamics.github.io/Agents.jl/) This package is oriented towards general ABM modelling, and thus is not as efficient and easy to deploy as EVOID.jl for simulating stochastic models of structured populations.
+[Agents.jl](https://juliadynamics.github.io/Agents.jl/) This package is oriented towards general ABM modelling, and thus is not as efficient and easy to deploy as EvoId.jl for simulating stochastic models of structured populations.

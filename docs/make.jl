@@ -1,7 +1,7 @@
-using Documenter, EVOID
-# push!(LOAD_PATH,"/Users/victorboussange/ETHZ/projects/EVOID/") # not sure this is necessary
+using Documenter, EvoId
+# push!(LOAD_PATH,"/Users/victorboussange/ETHZ/projects/EvoId/") # not sure this is necessary
 pathsrc = joinpath(@__DIR__,"src")
-makedocs(sitename="EVOID.jl",
+makedocs(sitename="EvoId.jl",
         format = Documenter.HTML(prettyurls = false),
         authors = "Victor Boussange",
         pages = [
@@ -20,4 +20,4 @@ makedocs(sitename="EVOID.jl",
         # "contributing.md",
         ],)
 
-deploydocs(repo = "github.com/vboussange/EVOID.jl")
+deploydocs(repo = "github.com/vboussange/EvoId.jl")

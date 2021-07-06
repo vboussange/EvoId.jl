@@ -9,6 +9,6 @@ A `Simulation` object is returned by the function `run!`. It is a container for 
 
 
 ```@autodocs
-Modules = [EVOID]
-Pages   = ["EVOID_Sim.jl"]
+Modules = [EvoId]
+Pages   = ["EvoId_Sim.jl"]
 ```
