@@ -1,6 +1,6 @@
 using LightGraphs
 using Test
-using Revise,ABMEv
+using Revise,EVOID
 using UnPack
 myspace = (GraphSpace(SimpleGraph(10,10)),RealSpace{1,Float64}())
 myagents = [Agent(myspace,ancestors=true,rates=true) for i in 1:10]
@@ -16,7 +16,7 @@ p = Dict{String,Any}();@pack! p = d,b,D,mu,NMax
 @test eltype(myagents) <: AbstractAgentM
 @test typeof(myagents) <: Vector{A} where {A<:AbstractAgentM}
 
-w = ABMEv.World(myagents,myspace,p)
+w = EVOID.World(myagents,myspace,p)
 @test typeof(w.p["D"][1]) == Int64
 @test size(w) ≈ 10
 newa = give_birth(1,w)

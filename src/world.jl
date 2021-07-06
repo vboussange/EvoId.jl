@@ -15,7 +15,7 @@ function World(w::Vector{A},s::S,p::Dict;t::T=0.) where {A<:AbstractAgent,S<:Abs
     @unpack D,mu = p
 
     for _m in mu
-        if !(typeof(_m) <: AbstractFloat)
+        if !(eltype(_m) <: AbstractFloat)
             throw(ArgumentError("elements of mu should be of type AbstractFloat\n
                                 to decide if mutations occur from a uniform probability law"))
         end

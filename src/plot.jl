@@ -3,7 +3,7 @@ using Colors
 import KernelDensity:kde,pdf
 """
     function plot(sim::Simulation;trait = 1)
-Plot recipe for ABMEv.jl
+Plot recipe for EVOID.jl
 # ARGS
 - if `length(trait) == 1` then we scatter plot `trait` along time
 - if `2 <= length(trait) <= 3` then we project world of the

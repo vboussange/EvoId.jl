@@ -3,7 +3,7 @@ I recommend to first clone your branch in the directory you like best, and then 
 To develop, you ca
 ```julia
 using Pkg
-Pkg.dev("path_to_ABMEv_dir")
+Pkg.dev("path_to_EVOID_dir")
 ```
 You can also do the same trick with directly the gitlab address, cf [Pkg.jl](https://docs.julialang.org/en/v1/stdlib/Pkg/index.html)
 

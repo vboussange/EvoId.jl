@@ -21,7 +21,7 @@ p_default = Dict(
 na_init = K0
 world0 = new_world_G(na_init,p_default,spread = .01)
 ```
-![ABMEv_div_t4000](uploads/3a49ff4fe4db161bf360eea97694ff26/ABMEv_div_t4000.png)
+![EVOID_div_t4000](uploads/3a49ff4fe4db161bf360eea97694ff26/EVOID_div_t4000.png)
 ### Constant birth coefficient, Gaussian carrying capacity
 ```julia
 a = 0;
@@ -41,7 +41,7 @@ p_default = Dict(
         "dt_saving" => 20.0)
 na_init = K0
 ```
-![ABMEv_bis_div.ong](uploads/8e1f821923afd74902b3ec6567a1736d/ABMEv_bis_div.ong.png)
+![EVOID_bis_div.ong](uploads/8e1f821923afd74902b3ec6567a1736d/EVOID_bis_div.ong.png)
 > what you could do would be to plot the adaptive dynamics of the monomorphic populations
 
 ### Quadratic birth rate
@@ -67,7 +67,7 @@ na_init = K0
 #### Equivalence
 
 ![PDE_quad_termsol](uploads/c1f5c670a9d82df1349ed473b9954135/PDE_quad_termsol.png)
-![ABMEv_quad_time_average_distrib_deep_time](uploads/2613b1f5e919fdbc7ee3386c680a1908/ABMEv_quad_time_average_distrib_deep_time.png)
+![EVOID_quad_time_average_distrib_deep_time](uploads/2613b1f5e919fdbc7ee3386c680a1908/EVOID_quad_time_average_distrib_deep_time.png)
 
 ## No diversification
 ```Julia

@@ -55,7 +55,7 @@ The invasion fitness `` f(x,y) `` corresponds to the fitness of a mutant with tr
     f(x,y) &= b(y)\left( 1 - \frac{\alpha(x,y)K(x)}{K(y)} \right)
 \end{aligned}
 ```
-> :gun: Plot the fitness function in the case of the ABMEv
+> :gun: Plot the fitness function in the case of the EVOID
 ## Canonical equation for the Adaptive Dynamics
 ```math
 \frac{d\, x}{d \, t} = m(x) D(x)  \tag{2}

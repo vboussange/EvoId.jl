@@ -12,7 +12,7 @@ There are two ways of implementing a linear landscape. The first one uses a `Dis
 
 ### DiscreteSegment
 ```julia
-using ABMEv
+using EVOID
 nodes = 10
 mysegment = DiscreteSegment(1,nodes)
 wholespace = (mysegment,)
@@ -20,7 +20,7 @@ wholespace = (mysegment,)
 
 ### grid
 ```julia
-using ABMEv, LightGraphs
+using EVOID, LightGraphs
 nodes = 10
 g = grid([nodes,1])
 mysegmentgraph = GraphSpace(g)

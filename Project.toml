@@ -1,7 +1,7 @@
-name = "ABMEv"
+name = "EVOID"
 uuid = "837ac870-fb52-4b0c-9a0e-030f2f36f5ed"
 authors = ["Victor Boussange "]
-version = "3.4.0"
+version = "4.0.0"
 
 [deps]
 Arpack = "7d9fca2a-8960-54d3-9f78-7d1dccf2cb97"

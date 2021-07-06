@@ -8,7 +8,7 @@ In order to use it, you need to feed to the dictionary parameters `p` a constant
 
 ## An example on how to use it
 ```julia
-using ABMEv,UnPack,Plots
+using EVOID,UnPack,Plots
 myspace = (RealSpace{1,Float64}(),)
 σ_b = .9;
 σ_d = .7;
@@ -30,6 +30,6 @@ w0 = World(myagents,myspace,p,0.)
     CFM gives an approximate time step. As of now, we do not manage to obtain qualitatively the same results as the Gillepsie algorithm.
 
 ```@autodocs
-Modules = [ABMEv]
-Pages   = ["algo/ABMEv_CFM.jl"]
+Modules = [EVOID]
+Pages   = ["algo/EVOID_CFM.jl"]
 ```

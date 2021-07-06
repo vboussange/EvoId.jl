@@ -4,7 +4,7 @@ cd(@__DIR__)
 using Distributed;addprocs(exeflags="--project")
 using Test
 @everywhere begin
-        using ABMEv
+        using EVOID
         sigma_a = 1.251;
         K0 = 1000;
         K(X) = 1 - 0.125 * sum(X.^2)

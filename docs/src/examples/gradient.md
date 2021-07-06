@@ -10,7 +10,7 @@ Every colour stands for a different optimal trait.
 
 ## Run the world
 ```julia
-using Revise,ABMEv,Plots,UnPack
+using Revise,EVOID,Plots,UnPack
 
 
 nodes = 9
@@ -49,7 +49,7 @@ Here we show how to plot a cool animated scatter plot of the trait space through
 ![](../assets/tutorials/gradient_2Dtrait.gif)
 
 ## [Plotting lineages](@id lineages)
-A cool feature of ABMEv.jl is its ability to track agents ancestors traits (cf [Agent section](../manual/agent.md))
+A cool feature of EVOID.jl is its ability to track agents ancestors traits (cf [Agent section](../manual/agent.md))
 
 On can plot it, to get an idea of the coalescence of the population.
 

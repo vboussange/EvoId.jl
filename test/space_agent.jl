@@ -1,6 +1,6 @@
 using LightGraphs
 using Test
-using Revise,ABMEv
+using Revise,EVOID
 
 ##### SPACES #####
 mysegment = DiscreteSegment(1,10)
@@ -23,19 +23,19 @@ myspace2 = (mysegment,mycontinuoussegment,real2d)
     @test eltype(myspace2) == Tuple{Int64,Float64,Float64}
 
     # increment on infinite spaces
-    @test ABMEv.get_inc(0.,myline) ≈ (0.)
-    @test ABMEv.get_inc(0.,mydiscreteline) ≈ (0.)
-    @test !(ABMEv.get_inc(1.,myline) ≈ 0.)
+    @test EVOID.get_inc(0.,myline) ≈ (0.)
+    @test EVOID.get_inc(0.,mydiscreteline) ≈ (0.)
+    @test !(EVOID.get_inc(1.,myline) ≈ 0.)
     @test !(get_inc(1,1.,myline) ≈ 0.)
     # @test !(get_inc(1,1.,mydiscreteline) ≈ 0.)
 
 
-    @test typeof(ABMEv.get_inc([1.,0.],real2d)) == Vector{Float64}
+    @test typeof(EVOID.get_inc([1.,0.],real2d)) == Vector{Float64}
     @test typeof(get_inc([1.,0.],[1.,0.],real2d)) == Vector{Float64}
-    @test typeof(ABMEv.get_inc([1.],real2d)) == Vector{Float64}
-    @test typeof(ABMEv.get_inc(1.,real2d)) == Vector{Float64}
-    # ABMEv._get_inc([1.],real2d)
-    # ABMEv.initpos(myspace2)
+    @test typeof(EVOID.get_inc([1.],real2d)) == Vector{Float64}
+    @test typeof(EVOID.get_inc(1.,real2d)) == Vector{Float64}
+    # EVOID._get_inc([1.],real2d)
+    # EVOID.initpos(myspace2)
 
 
     # increment on finite spaces
@@ -44,10 +44,10 @@ myspace2 = (mysegment,mycontinuoussegment,real2d)
         @test mysegment.s - eps() < get_inc(5.,100.,mysegment) + 5. < mysegment.e + eps()
         @test mycontinuoussegment.s < get_inc(0.,100.,mycontinuoussegment) < mycontinuoussegment.e
         mysegment2 = DiscreteSegment(-1,1)
-        @test ABMEv._reflect1D(0.,2.0,mysegment2) ≈ .0
-        @test ABMEv._reflect1D(0.,-2.0,mysegment2) ≈ .0
-        @test ABMEv._reflect1D(0.,4.0,mysegment2) ≈ .0
-        @test ABMEv._reflect1D(0.,1.1,mysegment2) ≈ 1 - .1
+        @test EVOID._reflect1D(0.,2.0,mysegment2) ≈ .0
+        @test EVOID._reflect1D(0.,-2.0,mysegment2) ≈ .0
+        @test EVOID._reflect1D(0.,4.0,mysegment2) ≈ .0
+        @test EVOID._reflect1D(0.,1.1,mysegment2) ≈ 1 - .1
     end
 
     #checking if graph works
@@ -79,15 +79,15 @@ end
     @test nancestors(increment_x!(a2,myspace,p_myspace,2.)) > 1
     @test !isnothing(increment_x!(a4,myspace2,p_myspace2,2.))
     @test !isnothing(increment_x!(a5,myspace2,p_myspace2,2.))
-    @test typeof(ABMEv._get_xinc(a2,myspace,p_myspace,0.)) == typeof(get_x(a2))
+    @test typeof(EVOID._get_xinc(a2,myspace,p_myspace,0.)) == typeof(get_x(a2))
 
     # testing if get_xinc does not modify the value of a4
     a4 = Agent(myspace2,[1,1.,[1.,1]],rates=true)
-    _xinc = ABMEv._get_xinc(a4,myspace2,p_myspace2,0.)
+    _xinc = EVOID._get_xinc(a4,myspace2,p_myspace2,0.)
     @test get_x(a4) == [1,1.,[1.,1]]
 end
 
-# @show ABMEv._get_xinc(a4,myspace2,p_myspace2,0.)
+# @show EVOID._get_xinc(a4,myspace2,p_myspace2,0.)
 @testset "Multidimensional spaces" begin
     myspace = (RealSpace{10,Float64}(),)
     a1 = Agent(myspace)

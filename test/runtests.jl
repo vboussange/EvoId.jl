@@ -1,6 +1,6 @@
-using ABMEv, Test, JLD2,Random
+using EVOID, Test, JLD2,Random
 
-@testset "ABMEv" begin
+@testset "EVOID" begin
     include("gillepsie.jl")
     # include("wrightfisher.jl")
     include("metrics.jl")

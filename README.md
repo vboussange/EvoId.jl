@@ -1,20 +1,20 @@
-# ABMEv.jl
-<!-- [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://vboussange.github.io/ABMEv.jl/stable) -->
+# EVOID.jl
+<!-- [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://vboussange.github.io/EVOID.jl/stable) -->
 <!-- For now we only direct to dev documentation. In the future, one will need to deploy a ssh key to and use TagBot. -->
-[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://vboussange.github.io/ABMEv.jl/dev)
-[![pipeline status](https://gitlab.ethz.ch/bvictor/abmev/badges/master/pipeline.svg)](https://gitlab.ethz.ch/bvictor/abmev/-/commits/master)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://vboussange.github.io/EVOID.jl/dev)
+[![pipeline status](https://gitlab.ethz.ch/bvictor/EVOID/badges/master/pipeline.svg)](https://gitlab.ethz.ch/bvictor/EVOID/-/commits/master)
 
 <div align="center"> <img
 src="https://vboussange.github.io/images/research/conceptual_onlyadapt.png"
 alt="" width="400"></img> </div>
 
-ABMEv.jl is a package aimed at simulating the eco-evolutionary dynamics of a population in a multidimensional space, at the individual level.
+EVOID.jl is a package aimed at simulating the eco-evolutionary dynamics of a population in a multidimensional space, at the individual level.
 
 Individuals are characterised by **a set of traits** in some **combination of evolutionary spaces**. An evolutionary space can represent for example a geographical landscape, a trait space, or genetic structure. Individuals give birth at a rate given by the birth function `b`, and die at a rate given by the death function `d`. When an individual give birth, its offspring can move on the underlying evolutionary spaces. The movement can capture whether migration or mutation processes, and is characterised by a probability `m` and movement range `D`.
 
 The user can provide **any birth and death functions**, which should depend on the system state and the individuals' trait. Together with the **movement rate and movement range**, this defines the dynamics of the system.
 
-ABMEv.jl provides a **numerical laboratory** for eco-evolutionary dynamics, supplying
+EVOID.jl provides a **numerical laboratory** for eco-evolutionary dynamics, supplying
 
 - flexible types for **individuals**, which can
     - evolve over any combination of space,
@@ -29,25 +29,25 @@ Open Julia in your favorite REPL and type the following
 
 ```julia
 using Pkg;
-Pkg.add("https://gitlab.ethz.ch/bvictor/abmev.git")
+Pkg.add("https://gitlab.ethz.ch/bvictor/EVOID.git")
 ```
 
 This will download latest version from git repo and download all dependencies.
 
 ## Getting started
-Check out the documentation if you want to use the advanced features of ABMEv.jl. Otherwise, you can content yourself with the simple tutorial prodived below.
+Check out the documentation if you want to use the advanced features of EVOID.jl. Otherwise, you can content yourself with the simple tutorial prodived below.
 
 ## Similar packages
-[Agents.jl](https://juliadynamics.github.io/Agents.jl/) is a library oriented towards general ABM modelling, and thus is not as easy to deploy as ABMEv.jl for simulating stochastic models of structured populations.
+[Agents.jl](https://juliadynamics.github.io/Agents.jl/) is a library oriented towards general ABM modelling, and thus is not as easy to deploy as EVOID.jl for simulating stochastic models of structured populations.
 
 -----
 ## A first tutorial
 We provide here a tutorial that sums up the 5 steps necessary to launch a simulation. For the sake of the tutorial, we propose to model a population that is structured over the vertices of a graph and characterised by a trait under selection.
 
 ### 0. Import the relevant libraries
-Let's import ABMEv.jl, and LightGraphs.jl
+Let's import EVOID.jl, and LightGraphs.jl
 ```julia
-using ABMEv
+using EVOID
 using LightGraphs.jl
 ```
 

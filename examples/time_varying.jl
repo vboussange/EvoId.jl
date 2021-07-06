@@ -2,7 +2,7 @@
 # this example implements a birth rate that is time dependent
 ##############################
 
-using ABMEv,UnPack
+using EVOID,UnPack
 using Plots
 
 ω = 2* π / 150 # angular frequency

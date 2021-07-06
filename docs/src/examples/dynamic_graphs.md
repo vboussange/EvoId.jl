@@ -1,5 +1,5 @@
 # Dynamic graph
-in ABMEv.jl, individuals can evolve over graphs which connectivity can change over time.
+in EVOID.jl, individuals can evolve over graphs which connectivity can change over time.
 
 To define such a dynamic graph, one needs to use the constructor `DynGraphSpace`.
 
@@ -10,7 +10,7 @@ DynGraphSpace
 Here is an example
 
 ```julia
-using UnPack,ABMEv,LightGraphs
+using UnPack,EVOID,LightGraphs
 nodes = 10
 g1 = LightGraphs.grid(Int8[9,1])
 g2 = SimpleGraph(Int8(9))

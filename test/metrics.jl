@@ -1,6 +1,6 @@
 using LightGraphs
 using Test
-using Revise,ABMEv
+using Revise,EVOID
 using UnPack
 myspace1 = (RealSpace{1,Float64}(),)
 myspace2 = (RealSpace{1,Float64}(),RealSpace{1,Float64}())

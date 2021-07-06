@@ -1,6 +1,6 @@
 # Space
 
 ```@autodocs
-Modules = [ABMEv]
-Pages   = ["ABMEv_Space.jl"]
+Modules = [EVOID]
+Pages   = ["EVOID_Space.jl"]
 ```

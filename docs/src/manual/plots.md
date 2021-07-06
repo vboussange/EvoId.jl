@@ -1,6 +1,6 @@
 # Plotting
 
-ABMEv comes with Plot recipes.
+EVOID comes with Plot recipes.
 ```julia
 function plot(sim::Simulation;trait = 1)
 ```

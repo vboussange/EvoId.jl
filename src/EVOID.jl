@@ -1,23 +1,23 @@
 __precompile__(false)
 
-module ABMEv
+module EVOID
     using Distributions,LinearAlgebra,Reexport,StatsBase
     using LightGraphs
     using UnPack
     using DocStringExtensions
     using Arpack
 
-    include("ABMEv_Space.jl")
-    include("ABMEv_Agent.jl")
-    include("ABMEv_world.jl")
-    include("ABMEv_Sim.jl")
-    include("ABMEv_metrics.jl")
-    include("ABMEv_plot.jl")
-    include("ABMEv_utils.jl")
-    include("algo/ABMEv_WF.jl")
-    include("algo/ABMEv_Gillepsie.jl")
-    include("algo/ABMEv_CFM.jl")
-    include("ABMEv_runworld.jl")
+    include("Space.jl")
+    include("Agent.jl")
+    include("world.jl")
+    include("Sim.jl")
+    include("metrics.jl")
+    include("plot.jl")
+    include("utils.jl")
+    include("algo/WF.jl")
+    include("algo/Gillepsie.jl")
+    include("algo/CFM.jl")
+    include("runworld.jl")
 
 
     @reexport using Distributions, DataFrames

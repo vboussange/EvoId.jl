@@ -3,7 +3,7 @@ using Random
 Random.seed!(0)
 using LightGraphs
 using Test
-using Revise,ABMEv
+using Revise,EVOID
 using UnPack,JLD2
 
 myspace = (RealSpace{1,Float64}(),)
@@ -26,6 +26,6 @@ w1 = copy(w0)
 @info "Running simulation with CFM algorithm"
 @time sim = run!(w1,CFM(),tend,b,d,dt_saving=10.)
 
-# ABMEv.clean!(sim)
+# EVOID.clean!(sim)
 using Plots
 Plots.plot(sim)

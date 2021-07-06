@@ -1,6 +1,6 @@
 # Dynamic graph
 
-using UnPack,ABMEv,LightGraphs
+using UnPack,EVOID,LightGraphs
 nodes = 10
 g1 = LightGraphs.grid(Int8[9,1])
 g2 = SimpleGraph(Int8(9))

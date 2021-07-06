@@ -1,5 +1,5 @@
 # Utils
 ```@autodocs
-Modules = [ABMEv]
-Pages   = ["ABMEv_utils.jl"]
+Modules = [EVOID]
+Pages   = ["EVOID_utils.jl"]
 ```

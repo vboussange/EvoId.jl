@@ -1,6 +1,6 @@
 # Diversity measures
 
 ```@autodocs
-Modules = [ABMEv]
-Pages   = ["ABMEv_metrics.jl"]
+Modules = [EVOID]
+Pages   = ["EVOID_metrics.jl"]
 ```
