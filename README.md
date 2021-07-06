@@ -41,7 +41,7 @@ Check out the documentation if you want to use the advanced features of EVOID.jl
 [Agents.jl](https://juliadynamics.github.io/Agents.jl/) is a library oriented towards general ABM modelling, and thus is not as easy to deploy as EVOID.jl for simulating stochastic models of structured populations.
 
 -----
-## A first tutorial
+## Tutorial
 We provide here a tutorial that sums up the 5 steps necessary to launch a simulation. For the sake of the tutorial, we propose to model a population that is structured over the vertices of a graph and characterised by a trait under selection.
 
 ### 0. Import the relevant libraries
