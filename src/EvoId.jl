@@ -1,5 +1,3 @@
-__precompile__(false)
-
 module EvoId
     using Distributions,LinearAlgebra,Reexport,StatsBase
     using LightGraphs
