@@ -28,7 +28,7 @@ Open Julia in your favorite REPL and type the following
 
 ```julia
 using Pkg;
-Pkg.add("https://gitlab.ethz.ch/bvictor/EVOID.git")
+Pkg.add("https://github.com/vboussange/EVOID.jl")
 ```
 
 This will download latest version from git repo and download all dependencies.
@@ -47,7 +47,7 @@ We provide here a tutorial that sums up the 5 steps necessary to launch a simula
 Let's import EVOID.jl, and LightGraphs.jl
 ```julia
 using EVOID
-using LightGraphs.jl
+using LightGraphs
 ```
 
 ### 1. Define the evolutionary spaces
