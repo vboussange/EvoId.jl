@@ -1,6 +1,6 @@
-# EvoId.jl: Agent Based Model for Evolutionary Dynamics
+# EvoId.jl: Evolutionary Individual Based Model
 
-EvoId.jl is a package aimed at simulating the evolutionary dynamics of a population in a multidimensional space. The population is modelled at the individual level. Individuals experience four elementary events : birth, death, mutation and migration.
+EvoId.jl (for **Evo**lutionary **I**n**d**ividual based model) is a package aimed at simulating the evolutionary dynamics of a population in a multidimensional space. The population is modelled at the individual level. Individuals experience four elementary events : birth, death, mutation and migration.
 
 - EvoId.jl hence falls in the realm of *Agent Based Model*.
 EvoId.jl provides a numerical laboratory for evolutionary dynamics, supplying

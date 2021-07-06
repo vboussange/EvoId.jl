@@ -7,7 +7,7 @@
 src="https://vboussange.github.io/images/research/conceptual_onlyadapt.png"
 alt="" width="400"></img> </div>
 
-EvoId.jl is a package aimed at simulating the eco-evolutionary dynamics of a population in a multidimensional space, at the individual level.
+EvoId.jl (for **Evo**lutionary **I**n**d**ividual based model) is a package aimed at simulating the eco-evolutionary dynamics of a population in a multidimensional space, at the individual level.
 
 Individuals are characterised by **a set of traits** in some **combination of evolutionary spaces**. An evolutionary space can represent for example a geographical landscape, a trait space, or genetic structure. Individuals give birth at a rate given by the birth function `b`, and die at a rate given by the death function `d`. When an individual give birth, its offspring can move on the underlying evolutionary spaces. The movement can capture whether migration or mutation processes, and is characterised by a probability `m` and movement range `D`.
 
