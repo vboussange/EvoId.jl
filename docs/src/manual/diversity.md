@@ -2,5 +2,5 @@
 
 ```@autodocs
 Modules = [EvoId]
-Pages   = ["EvoId_metrics.jl"]
+Pages   = ["metrics.jl"]
 ```

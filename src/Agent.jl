@@ -41,15 +41,22 @@ end
 
 # default initialiser
 """
-$(SIGNATURES)
-    Initialises agent with 0 values everywhere
-    # args
-    - `s` is the underlying space
-    - `ancestors=true` when agents fitness needs to be updated at each time step.
-    This is needed for the Gillepsie algorithm, but not for CFM algorithm
-    - `ancestors=true` when one wants to store ancestors traits.
+Agent(s; ancestors=false,rates=true)
+Agent(s, pos;ancestors=false,rates=true)
+
+    # Arguments
+    *`s` is the underlying space
+    * `pos` is the initial agent position. If not provided, 
+    initialises agent with 0 values everywhere
+
+
+    # Keyword arguments
+    * `rates`. Set `rates=true` when agents fitness 
+    needs to be updated at each time step. This 
+    is required for the Gillepsie algorithm, but not for CFM algorithm
+    - `ancestors`. Set `ancestors=true` when you want to store ancestors traits.
 """
-function Agent(s::S;ancestors=false,rates=true) where {S  <: AbstractSpacesTuple}
+function Agent(s::S; ancestors=false,rates=true) where {S  <: AbstractSpacesTuple}
     T,pos = _initpos(s)
     t = 0.
     U =  Float64
@@ -85,15 +92,6 @@ function Agent(s::S,pos_t::Vector,t::Vector{U};ancestors=false,rates=true) where
     Agent{Ancestors{ancestors},Rates{rates},Tuple{T...},U,V}(pos2_t,t,d,b)
 end
 
-"""
-Agent(s, pos;ancestors=false,rates=true)
-    Initialises agent with initial position `pos` provided
-    # args
-    - `s` is the underlying space
-    - `ancestors=true` when agents fitness needs to be updated at each time step.
-    This is needed for the Gillepsie algorithm, but not for CFM algorithm
-    - `ancestors=true` when one wants to store ancestors traits.
-"""
 Agent(s, pos; ancestors=false, rates=true) = Agent(s, [pos], [0.],ancestors=ancestors, rates=rates)
 
 
@@ -121,13 +119,12 @@ Base.summary(A::AbstractAgent) = string(TYPE_COLOR,nameof(typeof(a)),NO_COLOR," 
 ###Agent accessors###
 #####################
 
+Base.getindex(a::Agent,i) = a.x_history[end][i]
+
 """
     get_x(a::Agent)
 Returns trait i of the agent
 """
-
-Base.getindex(a::Agent,i) = a.x_history[end][i]
-
 get_x(a::Agent) = a.x_history[end]
 @deprecate get_x(a) a[:]
 

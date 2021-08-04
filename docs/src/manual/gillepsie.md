@@ -1,4 +1,4 @@
-# Gillepsie algorithm
+# Gillsepie algorithm
 
 ## Mathematical foundations
 
@@ -16,5 +16,5 @@ A particular event, birth or death, is chosen at random with a probability equal
 
 ```@autodocs
 Modules = [EvoId]
-Pages   = ["EvoId_Gillepsie.jl"]
+Pages   = ["algo/Gillepsie.jl"]
 ```

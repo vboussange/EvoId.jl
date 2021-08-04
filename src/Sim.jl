@@ -13,6 +13,7 @@ end
 
 """
 $(SIGNATURES)
+    `Simulation` object, output by the method `run!`
 """
 function Simulation(w0::World{A,S,T};cb = nothing) where {A,S,T}
     tspan = zeros(1)

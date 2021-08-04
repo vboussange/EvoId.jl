@@ -31,5 +31,5 @@ w0 = World(myagents,myspace,p,0.)
 
 ```@autodocs
 Modules = [EvoId]
-Pages   = ["algo/EvoId_CFM.jl"]
+Pages   = ["algo/CFM.jl"]
 ```

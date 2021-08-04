@@ -41,5 +41,5 @@ Parallelism only works with Wright Fisher model.
 
 ```@autodocs
 Modules = [EvoId]
-Pages   = ["EvoId_WF.jl"]
+Pages   = ["algo/WF.jl"]
 ```

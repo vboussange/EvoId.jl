@@ -7,7 +7,45 @@ mutable struct World{A<:AbstractAgent, S<:AbstractSpacesTuple,T<:Number}
     t::T
 end
 
-#constructor
+"""
+$(SIGNATURES)
+    Constructs a world.
+
+        # Arguments
+    * `w` a vector of agents, 
+    * `s` a tuple of evolutionary spaces, 
+    * `p` a dictionary that contains 
+        - `"mu"`, a vector of same length as `s`, 
+        that contains the mutation rate. If `mu[i]`
+        has dimension greater than 1, 
+        then mutations happen independently at each dimension
+        of `s[i]`.
+        - `"sigma"`, a vector of same length as `s`, 
+        that contains the dispersal ranges. Only `nothing` is 
+        supported for `GraphSpace`, equivalent to a random walk of length 1.
+        - `"NMax"` the maximum number of individuals allowed during the simulation
+    
+        # Examples
+    ```julia
+
+    nodes = 7
+    g = star_graph(nodes)
+    landscape = GraphSpace(g)
+    θ = [rand([-1,1]) for i in 1:nodes]
+    traitspace = RealSpace(1)
+    evolspace = (landscape,traitspace)
+
+    D = [nothing,5e-2]
+    mu = [1f-1,1f-1]
+    p = Dict("NMax" => 2000,
+        "D" => D,
+        "mu" => mu)
+    myagents = [Agent(evolspace,[rand(1:nodes),randn() * D[2]]) for i in 1:K]
+    
+    w0 = World(myagents,evolspace,p)
+    ```
+
+"""
 function World(w::Vector{A},s::S,p::Dict;t::T=0.) where {A<:AbstractAgent,S<:AbstractSpacesTuple,T}
     # if typeof(p["D"]) != eltype(skipmissing(w)[1])
     #     throw(ArgumentError("Diffusion coefficient does not match with underlying space\n `D::Tuple`"))

@@ -7,7 +7,7 @@
 src="https://vboussange.github.io/images/research/conceptual_onlyadapt.png"
 alt="" width="400"></img> </div>
 
-EvoId.jl (for **Evo**lutionary **I**n**d**ividual-based model) is a package aimed at simulating the eco-evolutionary dynamics of a population in a multidimensional space, at the individual level.
+EvoId.jl (for **Evo**lutionary **I**n**d**ividual-based models) is a package aimed at simulating the eco-evolutionary dynamics of a population in a multidimensional space, at the individual level. The dynamics is specified under the framework of [stochastic models for structured populations](https://arxiv.org/abs/1506.04165).
 
 Individuals are characterised by **a set of traits** in some **combination of evolutionary spaces**. An evolutionary space can represent for example a geographical landscape, a trait space, or genetic structure. Individuals give birth at a rate given by the birth function `b`, and die at a rate given by the death function `d`. When an individual give birth, its offspring can move on the underlying evolutionary spaces. The movement can capture whether migration or mutation processes, and is characterised by a probability `m` and movement range `D`.
 
@@ -20,7 +20,7 @@ EvoId.jl provides a **numerical laboratory** for eco-evolutionary dynamics, supp
     - store ancestors trait,
 - flexible types for **evolutionary spaces**, that can consist of multidimensional **discrete or continuous domains**, as well as **graphs**,
 - the possibility to use **callback functions** to save the state of the system at any time step
-- several **algorithms** for the simulations (Gillepsie, Wright Fisher, etc...),
+- several **algorithms** for the simulations (Gillespie, Wright Fisher, etc...),
 - **utility functions** to analyse simulation results.
 
 ## Installation
@@ -34,10 +34,17 @@ Pkg.add("https://github.com/vboussange/EvoId.jl")
 This will download latest version from git repo and download all dependencies.
 
 ## Getting started
-Check out the documentation if you want to use the advanced features of EvoId.jl. Otherwise, you can content yourself with the simple tutorial prodived below.
+Check out the tutorial prodived below. You can also dive into the [documentation](https://vboussange.github.io/EvoId.jl/dev) if you want to use the advanced features of EvoId.jl. 
+
+## Related papers
+- [Topology and habitat assortativity drive neutral and adaptive diversification in spatial graphs](https://www.biorxiv.org/content/10.1101/2021.07.06.451404v2), Boussange et al. 2021.
 
 ## Similar packages
 [Agents.jl](https://juliadynamics.github.io/Agents.jl/) is a library oriented towards general ABM modelling, and thus is not as easy to deploy as EvoId.jl for simulating stochastic models of structured populations.
+
+## Contributing 
+Please feel free to contact me! :)
+
 
 -----
 ## Tutorial
@@ -82,6 +89,8 @@ Individual movements correspond to migration and mutation processes. On continuo
 ```julia
 D = [nothing,5e-1] # movement ranges
 mu = [1.,1.] # movement rates
+NMax = 2000 # maximum number of individuals allowed
+p = Dict("D"=> D, "mu" => mu, "NMax" => NMax) # storing above parameters
 ```
 
 ### 4. Define the initial population state
@@ -94,7 +103,7 @@ for i in 1:K
                         randn() * D[2]]) # random position on the trait space centered around 0
                         )
 end
-w0 = World(myagents,evolspace,p) # the initial world, defined at time 0.
+w0 = World(myagents, evolspace, p) # the initial world, defined at time 0.
 ```
 
 ### 5. Run

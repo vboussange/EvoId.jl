@@ -2,13 +2,10 @@
 
 abstract type IsFinite{T} end
 
-#ife stands for is finite
-"""
-$(TYPEDEF)
-`Dim` is the dimension of the space,
-`T` is the element type,
-`I` to indicate finiteness
-"""
+# `Dim` is the dimension of the space,
+# `T` is the element type,
+# `I` to indicate finiteness
+
 abstract type AbstractSpace{Dim,T,I} end
 AbstractSpacesTuple = Tuple{Vararg{AbstractSpace}}
 import Base:ndims,isfinite,eltype
@@ -25,6 +22,14 @@ abstract type AbstractStatSpace{Dim,T,I} <: AbstractSpace{Dim,T,I} end
 
 """
 $(TYPEDEF)
+    Creates a Graph Space.
+    # Example
+    ```julia
+    using LightGraphs
+    g = star_graph(7)
+    GraphSpace(g)
+    ```
+
 """
 struct GraphSpace{T} <: AbstractStatSpace{1,T,IsFinite{true}}
     g::AbstractGraph{T}
@@ -34,6 +39,14 @@ abstract type AbstractSegment{T<:Number}  <: AbstractStatSpace{1,T,IsFinite{true
 
 """
 $(TYPEDEF)
+    Creates a segment space, where individuals are reflected at both ends.
+        # Arguments
+    * `s` start of the segment
+    * `e` end of the segment
+        # Example
+    ```julia
+        ContinuousSegment(1., 2.)
+    ```
 """
 struct ContinuousSegment{T<:AbstractFloat} <:  AbstractSegment{T}
     s::T
@@ -42,6 +55,14 @@ end
 
 """
 $(TYPEDEF)
+    Creates a discrete segement space, where individuals are reflected at both ends.
+    # Arguments
+    * `s` start of the segment
+    * `e` end of the segment
+        # Example
+    ```julia
+        DiscreteSegment(1, 2)
+    ```
 """
 struct DiscreteSegment{T<:Integer} <: AbstractSegment{T}
     s::T
@@ -50,7 +71,10 @@ end
 
 """
 $(TYPEDEF)
-A real space with dimension N and type T
+    Creates a real space.
+    # Arguments
+    * `N` dimension of the space 
+    * `T` type of the underlying traits.
 """
 struct RealSpace{N,T} <: AbstractStatSpace{N,T,IsFinite{false}} end
 RealSpace(N) = RealSpace{N,Float64}()
@@ -121,11 +145,14 @@ end
 abstract type AbstractDynSpace{Dim,T<:Number} <: AbstractSpace{Dim,T,IsFinite{true}} end
 """
 $(TYPEDEF)
-A dynamic graph space.
+    A dynamic graph space.
+        # Arguments
+    * `g` the underlying graph
+    * `f` a function that takes as argument time,
+    and returns the index of the graph to pick at time `t` from array `g`
 
-# Example
-`DynGraphSpace(g,f)`
-Function `f(t)` takes as argument time, and returns the index of the graph to pick at time `t` from array `g`
+    # Example
+    `DynGraphSpace(g,f)`
 """
 struct DynGraphSpace{T<:Number} <: AbstractDynSpace{1,T}
     g::Vector{AbstractGraph{T}}
@@ -160,10 +187,8 @@ function get_inc(x,D::Nothing,d::DynGraphSpace{T},t) where {T}
     return last(randomwalk(get_graph(d,t),x,2)) - x
 end
 
-"""
-$(SIGNATURES)
-Here we increment the trajectory of trait 1 such that it follows a reflected brownian motion (1D)
-"""
+#increment the trajectory of trait 1 
+# such that it follows a reflected brownian motion (1D)
 function _reflect1D(x::Number,inc::Number,s::AbstractSegment)
     if x + inc < s.s
         inc = 2 * ( s.s - x ) - inc
