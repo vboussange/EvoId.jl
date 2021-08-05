@@ -2,6 +2,7 @@
 <!-- [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://vboussange.github.io/EvoId.jl/stable) -->
 <!-- For now we only direct to dev documentation. In the future, one will need to deploy a ssh key to and use TagBot. -->
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://vboussange.github.io/EvoId.jl/dev)
+[![Build Status](https://github.com/tbenst/Thunk.jl/workflows/CI/badge.svg)](https://github.com/tbenst/Thunks.jl/actions)
 
 <div align="center"> <img
 src="https://vboussange.github.io/images/research/conceptual_onlyadapt.png"
