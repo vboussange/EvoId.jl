@@ -3,6 +3,7 @@ module EvoId
     using UnPack
     using DocStringExtensions
     using Arpack
+    @reexport using LightGraphs
 
     include("Space.jl")
     include("Agent.jl")
@@ -17,7 +18,7 @@ module EvoId
     include("runworld.jl")
 
 
-    @reexport using Distributions, DataFrames, LightGraphs
+    @reexport using Distributions, DataFrames
 
     export
 
