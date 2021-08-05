@@ -41,20 +41,18 @@ end
 
 # default initialiser
 """
-Agent(s; ancestors=false,rates=true)
-Agent(s, pos;ancestors=false,rates=true)
+    Agent(s; ancestors=false,rates=true)
+    Agent(s, pos;ancestors=false,rates=true)
 
-    # Arguments
-    *`s` is the underlying space
-    * `pos` is the initial agent position. If not provided, 
-    initialises agent with 0 values everywhere
+Returns an `Agent` living on the underlying space `s` 
+with initial position `pos`. If `pos` not provided, 
+initialises agent with 0 values everywhere
 
-
-    # Keyword arguments
-    * `rates`. Set `rates=true` when agents fitness 
-    needs to be updated at each time step. This 
-    is required for the Gillepsie algorithm, but not for CFM algorithm
-    - `ancestors`. Set `ancestors=true` when you want to store ancestors traits.
+# Keyword arguments
+* `rates`. Set `rates=true` when agents fitness 
+needs to be updated at each time step. This 
+is required for the Gillepsie algorithm, but not for CFM algorithm
+- `ancestors`. Set `ancestors=true` when you want to store ancestors traits.
 """
 function Agent(s::S; ancestors=false,rates=true) where {S  <: AbstractSpacesTuple}
     T,pos = _initpos(s)
@@ -123,14 +121,14 @@ Base.getindex(a::Agent,i) = a.x_history[end][i]
 
 """
     get_x(a::Agent)
-Returns trait i of the agent
+Returns trait i of the agent.
 """
 get_x(a::Agent) = a.x_history[end]
 @deprecate get_x(a) a[:]
 
 """
 $(SIGNATURES)
-Returns geotrait of agent `a` at time `t`
+Returns geotrait of agent `a` at time `t`.
 """
 function get_geo(a::Agent{A,R,T,U,V},t::Number) where {A<:Ancestors{true},R,T,U,V}
     tarray = vcat(a.t_history[2:end],convert(U,t))

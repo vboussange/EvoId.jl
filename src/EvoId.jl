@@ -7,7 +7,7 @@ module EvoId
 
     include("Space.jl")
     include("Agent.jl")
-    include("world.jl")
+    include("World.jl")
     include("Sim.jl")
     include("metrics.jl")
     include("plot.jl")
