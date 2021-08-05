@@ -6,12 +6,14 @@ Gillespie algorithm.
 
 Denote by ``b_i`` and ``d_i`` the birth and death rates of 
 agent ``i``. The total rate is given by the sum of all individual rates
-``R(t) = \\left[ \\sum_i b_i(t) + d_i(t) \\right]``
-A particular event, birth or death, is chosen at random with a probability equal to the rate of this event divided by the total rate ``R``.
+``R(t) = \\left[ \\sum_i b_i(t) + d_i(t) \\right]``.
+A particular event, birth or death, 
+is chosen at random with a probability equal to the rate of this event divided by the total rate ``R``.
 
 
 # The original article by Gillsepie:
-[**A general method for numerically simulating the stochastic time evolution of coupled chemical reactions**](https://www.sciencedirect.com/science/article/pii/0021999176900413?via%3Dihub)
+[**A general method for numerically simulating the stochastic 
+time evolution of coupled chemical reactions**](https://www.sciencedirect.com/science/article/pii/0021999176900413?via%3Dihub)
 
 """
 struct Gillepsie <: AbstractAlg end

@@ -9,41 +9,44 @@ end
 
 """
 $(SIGNATURES)
-    Constructs a world.
 
-        # Arguments
-    * `w` a vector of agents, 
-    * `s` a tuple of evolutionary spaces, 
-    * `p` a dictionary that contains 
-        - `"mu"`, a vector of same length as `s`, 
-        that contains the mutation rate. If `mu[i]`
-        has dimension greater than 1, 
-        then mutations happen independently at each dimension
-        of `s[i]`.
-        - `"sigma"`, a vector of same length as `s`, 
-        that contains the dispersal ranges. Only `nothing` is 
-        supported for `GraphSpace`, equivalent to a random walk of length 1.
-        - `"NMax"` the maximum number of individuals allowed during the simulation
+Constructs a world.
+
+# Arguments
+
+* `w` a vector of agents, 
+* `s` a tuple of evolutionary spaces, 
+* `p` a dictionary that contains 
+    - `"mu"`, a vector of same length as `s`, 
+    that contains the mutation rate. If `mu[i]`
+    has dimension greater than 1, 
+    then mutations happen independently at each dimension
+    of `s[i]`.
+    - `"sigma"`, a vector of same length as `s`, 
+    that contains the dispersal ranges. Only `nothing` is 
+    supported for `GraphSpace`, equivalent to a random walk of length 1.
+    - `"NMax"` the maximum number of individuals allowed during the simulation
     
-        # Examples
-    ```julia
+# Examples
 
-    nodes = 7
-    g = star_graph(nodes)
-    landscape = GraphSpace(g)
-    θ = [rand([-1,1]) for i in 1:nodes]
-    traitspace = RealSpace(1)
-    evolspace = (landscape,traitspace)
+```julia
 
-    D = [nothing,5e-2]
-    mu = [1f-1,1f-1]
-    p = Dict("NMax" => 2000,
-        "D" => D,
-        "mu" => mu)
-    myagents = [Agent(evolspace,[rand(1:nodes),randn() * D[2]]) for i in 1:K]
-    
-    w0 = World(myagents,evolspace,p)
-    ```
+nodes = 7
+g = star_graph(nodes)
+landscape = GraphSpace(g)
+θ = [rand([-1,1]) for i in 1:nodes]
+traitspace = RealSpace(1)
+evolspace = (landscape,traitspace)
+
+D = [nothing,5e-2]
+mu = [1f-1,1f-1]
+p = Dict("NMax" => 2000,
+    "D" => D,
+    "mu" => mu)
+myagents = [Agent(evolspace,[rand(1:nodes),randn() * D[2]]) for i in 1:K]
+
+w0 = World(myagents,evolspace,p)
+```
 
 """
 function World(w::Vector{A},s::S,p::Dict;t::T=0.) where {A<:AbstractAgent,S<:AbstractSpacesTuple,T}
@@ -104,6 +107,7 @@ Base.copy(w::W) where {W<:World} = W(copy.(w.agents),w.space,w.p,copy(w.t))
 ## Accessors
 """
 $(SIGNATURES)
+
 Get x of world without geotrait.
 """
 Base.getindex(w::World,i) = w.agents[i]
@@ -132,6 +136,7 @@ get_geo(w::World) = map(a-> get_geo(a,time(w)), agents(w))
 
 """
 $(SIGNATURES)
+
 Returns trait of every agents of world in the form of an array which dimensions corresponds to the input.
 If `trait = 0` , we return the geotrait.
 !!! warning "Warning"
@@ -151,6 +156,7 @@ end
 
 """
 $(SIGNATURES)
+
 Returns every traits of every agents of `world` in the form **of a one dimensional array** (in contrast to `get_x`).
 If `geotrait=true` the geotrait is also added to the set of trait, in the last column.
 If you do not want to specify `t` (only useful for geotrait), it is also possible to use `get_xarray(world::Array{T,1}) where {T <: Agent}`.
@@ -167,7 +173,7 @@ end
 @deprecate get_xarray(world,geotrait=false) get_x(world,Colon())
 
 """
-    function give_birth(mum_idx::Int,w::World)
+    give_birth(mum_idx::Int,w::World)
 Copies agent within index `mum_idx`, and increment it by dx.
 Return new agent (offspring).
 """

@@ -9,7 +9,7 @@ alt="" width="400"></img> </div>
 
 EvoId.jl (for **Evo**lutionary **I**n**d**ividual-based models) is a package aimed at simulating the eco-evolutionary dynamics of a population in a multidimensional space, at the individual level. The dynamics is specified under the framework of [stochastic models for structured populations](https://arxiv.org/abs/1506.04165).
 
-Individuals are characterised by **a set of traits** in some **combination of evolutionary spaces**. An evolutionary space can represent for example a geographical landscape, a trait space, or genetic structure. Individuals give birth at a rate given by the birth function `b`, and die at a rate given by the death function `d`. When an individual give birth, its offspring can move on the underlying evolutionary spaces. The movement can capture whether migration or mutation processes, and is characterised by a probability `m` and movement range `D`.
+Individuals are characterised by **a set of traits** in some **combination of evolutionary spaces**. An evolutionary space can represent for example a geographical landscape, a trait space, or genetic structure. Spaces can be of any dimensions, discrete or continuous, bounded or unbounded. They can equally consist of graphs. Individuals give birth at a rate given by the birth function `b`, and die at a rate given by the death function `d`. When an individual give birth, its offspring can move on the underlying evolutionary spaces. The movement can capture whether migration or mutation processes, and is characterised by a probability `m` and movement range `D`.
 
 The user can provide **any birth and death functions**, which should depend on the system state and the individuals' trait. Together with the **movement rate and movement range**, this defines the dynamics of the system.
 
@@ -17,10 +17,10 @@ EvoId.jl provides a **numerical laboratory** for eco-evolutionary dynamics, supp
 
 - flexible types for **individuals**, which can
     - evolve over any combination of space,
-    - store ancestors trait,
+    - [store ancestors trait](https://vboussange.github.io/EvoId.jl/dev/examples/gradient.html#lineages),
 - flexible types for **evolutionary spaces**, that can consist of multidimensional **discrete or continuous domains**, as well as **graphs**,
 - the possibility to use **callback functions** to save the state of the system at any time step
-- several **algorithms** for the simulations (Gillespie, Wright Fisher, etc...),
+- several **algorithms** for the simulations ([Gillespie](https://en.wikipedia.org/wiki/Gillespie_algorithm),[Wright-Fisher](https://en.wikipedia.org/wiki/Moran_process), etc...),
 - **utility functions** to analyse simulation results.
 
 ## Installation
@@ -34,7 +34,7 @@ Pkg.add("https://github.com/vboussange/EvoId.jl")
 This will download latest version from git repo and download all dependencies.
 
 ## Getting started
-Check out the tutorial prodived below. You can also dive into the [documentation](https://vboussange.github.io/EvoId.jl/dev) if you want to use the advanced features of EvoId.jl. 
+Check out the tutorial prodived below. You can also look at the `example` folder, or dive into the [documentation](https://vboussange.github.io/EvoId.jl/dev) if you want to use the advanced features of EvoId.jl. 
 
 ## Related papers
 - [Topology and habitat assortativity drive neutral and adaptive diversification in spatial graphs](https://www.biorxiv.org/content/10.1101/2021.07.06.451404v2), Boussange et al. 2021.
@@ -54,7 +54,6 @@ We provide here a tutorial that sums up the 5 steps necessary to launch a simula
 Let's import EvoId.jl, and LightGraphs.jl
 ```julia
 using EvoId
-using LightGraphs
 ```
 
 ### 1. Define the evolutionary spaces
@@ -69,7 +68,7 @@ evolspace = (landscape,traitspace)
 ```
 
 ### 2. Define birth and death function
-Birth and death functions depend on agents position in the combination of spaces defined above, i.e. position on the graph and the adaptive trait.
+Birth and death functions depend on individuals position in the combination of spaces defined above, i.e. position on the graph and the adaptive trait.
 We decide that each vertex selects for an optimal trait value $`\theta_i \in \{-1,1\}`$.
 
 ```julia

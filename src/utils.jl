@@ -7,7 +7,8 @@ function generalised_gaussian(x::Number,mu::Number,sigma::Number,epsilon::Number
 end
 
 """
-    function tin(t::Number,a::Number,b::Number)
+    tin(t::Number,a::Number,b::Number)
+
 if t in [a,b) returns 1. else returns 0
 """
 
@@ -17,7 +18,7 @@ end
 
 
 """
-        gaussian(x::Number,mu::Number,sigma::Number) = generalised_gaussian(x,mu,sigma,2)
+    gaussian(x::Number,mu::Number,sigma::Number) = generalised_gaussian(x,mu,sigma,2)
 """
 gaussian(x::Number,mu::Number,sigma::Number) = generalised_gaussian(x,mu,sigma,2.)
 
@@ -33,7 +34,7 @@ function ma(x::Array{T},f) where T <: Number
 end
 
 """
-    function geomsmooth(x,smooth)
+    geomsmooth(x,smooth)
 Geometric smoothing, cf `https://en.wikipedia.org/wiki/Exponential_smoothing`
 
 """
@@ -42,28 +43,36 @@ function geomsmooth(x,smooth)
 end
 
 """
-    function geomsmooth(x,y,smooth)
+    geomsmooth(x,y,smooth)
+
+Returning a tuple
+
+# Arguments
 -`x` is the shifted x-axis vector, due to smoothing
 -`y` is the smoothed value
-Returning a tuple
 """
 function geomsmooth(x,y,smooth)
     idx = Int((smooth-1)/2)+1:length(x)- Int((smooth-1)/2)
     return x[idx],[prod(y[i-smooth + 1:i])^(1/smooth) for i in smooth:length(y)]
 end
+
 """
-    function arithsmooth(x,smooth)
+    arithsmooth(x,smooth)
 arithmetic smoothing
 
 """
 function arithsmooth(x,smooth)
     return [sum(x[i-smooth+1:i])/smooth for i in smooth:length(x)]
 end
+
 """
-    function arithsmooth(x,y,smooth)
+    arithsmooth(x,y,smooth)
+Returning a tuple
+
+# Arguments
+
 -`x` is the shifted x-axis vector, due to smoothing
 -`y` is the smoothed value
-Returning a tuple
 """
 function arithsmooth(x,y,smooth)
     idx = Int((smooth-1)/2)+1:length(x)- Int((smooth-1)/2)
@@ -72,19 +81,21 @@ end
 
 # This is all about interpolations
 import Interpolations:interpolate,Gridded,Linear
-"""
-$(TYPEDEF)
-"""
+
+# used for interpolations
 struct DiversityFunction
     x
     y
     itp
 end
+
 """
-    function geomsmooth2D(xa,ya,itp,smooth)
-Return xas,yas,A where A is an interpolated matrix with geometric smooth,
-whose axis are xas, yas
-# ARGS
+    geomsmooth2D(xa,ya,itp,smooth)
+
+Returns `xas, yas, A` where `A` is an interpolated matrix with geometric smooth,
+whose axis are `xas`, `yas`.
+
+# Arguments
 `xa` xaxis values, `ya` yaxis values,  `itp` interpolation function, `smooth` smoothing function
 """
 function geomsmooth2D(xa,ya,itp,smooth)
@@ -97,10 +108,12 @@ function geomsmooth2D(xa,ya,itp,smooth)
 end
 
 """
-    function arithsmooth2D(xa,ya,itp,smooth)
-Return xas,yas,A where A is an interpolated matrix with arithmetic smooth,
-whose axis are xas, yas
-# ARGS
+    arithsmooth2D(xa,ya,itp,smooth)
+
+Returns `xas, yas, A` where `A` is an interpolated matrix with arithmetic smooth,
+whose axis are `xas, yas`
+
+# Arguments
 `xa` xaxis values, `ya` yaxis values,  `itp` interpolation function, `smooth` smoothing function
 """
 function arithsmooth2D(xa,ya,itp,smooth)
@@ -113,7 +126,7 @@ function arithsmooth2D(xa,ya,itp,smooth)
 end
 
 """
-    function interpolate_df(df,xlab,ylab,zlab)
+    interpolate_df(df,xlab,ylab,zlab)
 returns an interpolated function itp(x,y) -> z, as well as its axis `xa` and `ya`
 """
 function interpolate_df(df,xlab,ylab,zlab)
@@ -129,7 +142,7 @@ end
 
 import DataFrames.groupby
 """
-    function groupby(f, list::Array)
+    groupby(f, list::Array)
 returns a dictionary that group `list` elements by value of function `f`
 """
 groupby(f, list::Array{T}) where {T}= begin
@@ -142,6 +155,8 @@ end
 
 """
 $(SIGNATURES)
+    numargs(f)
+
 returns the number of arguments of function `f`
 """
 

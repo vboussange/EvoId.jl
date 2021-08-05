@@ -22,13 +22,15 @@ abstract type AbstractStatSpace{Dim,T,I} <: AbstractSpace{Dim,T,I} end
 
 """
 $(TYPEDEF)
-    Creates a Graph Space.
-    # Example
-    ```julia
-    using LightGraphs
-    g = star_graph(7)
-    GraphSpace(g)
-    ```
+
+Creates a Graph Space.
+
+# Example
+```julia
+using LightGraphs
+g = star_graph(7)
+GraphSpace(g)
+```
 
 """
 struct GraphSpace{T} <: AbstractStatSpace{1,T,IsFinite{true}}
@@ -39,14 +41,16 @@ abstract type AbstractSegment{T<:Number}  <: AbstractStatSpace{1,T,IsFinite{true
 
 """
 $(TYPEDEF)
-    Creates a segment space, where individuals are reflected at both ends.
-        # Arguments
-    * `s` start of the segment
-    * `e` end of the segment
-        # Example
-    ```julia
-        ContinuousSegment(1., 2.)
-    ```
+
+Creates a segment space, where individuals are reflected at both ends.
+
+# Arguments
+* `s` start of the segment
+* `e` end of the segment
+# Example
+```julia
+ContinuousSegment(1., 2.)
+```
 """
 struct ContinuousSegment{T<:AbstractFloat} <:  AbstractSegment{T}
     s::T
@@ -55,14 +59,18 @@ end
 
 """
 $(TYPEDEF)
-    Creates a discrete segement space, where individuals are reflected at both ends.
-    # Arguments
-    * `s` start of the segment
-    * `e` end of the segment
-        # Example
-    ```julia
-        DiscreteSegment(1, 2)
-    ```
+
+Creates a discrete segement space, where individuals are reflected at both ends.
+
+# Arguments
+* `s` start of the segment
+* `e` end of the segment
+
+# Example
+
+```julia
+    DiscreteSegment(1, 2)
+```
 """
 struct DiscreteSegment{T<:Integer} <: AbstractSegment{T}
     s::T
@@ -71,10 +79,12 @@ end
 
 """
 $(TYPEDEF)
-    Creates a real space.
-    # Arguments
-    * `N` dimension of the space 
-    * `T` type of the underlying traits.
+
+Creates a real space.
+
+# Arguments
+* `N` dimension of the space 
+* `T` type of the underlying traits.
 """
 struct RealSpace{N,T} <: AbstractStatSpace{N,T,IsFinite{false}} end
 RealSpace(N) = RealSpace{N,Float64}()
@@ -89,6 +99,7 @@ struct NaturalSpace{N,T} <: AbstractStatSpace{N,T,IsFinite{false}} end
 
 """
 $(SIGNATURES)
+
 Returns increment corresponding to space `s`
 """
 get_inc(x,D,s::AbstractStatSpace,t) = get_inc(x,D,s) # this is defined to skip representation of t for following specialised methods
@@ -145,14 +156,16 @@ end
 abstract type AbstractDynSpace{Dim,T<:Number} <: AbstractSpace{Dim,T,IsFinite{true}} end
 """
 $(TYPEDEF)
-    A dynamic graph space.
-        # Arguments
-    * `g` the underlying graph
-    * `f` a function that takes as argument time,
-    and returns the index of the graph to pick at time `t` from array `g`
 
-    # Example
-    `DynGraphSpace(g,f)`
+A dynamic graph space.
+
+# Arguments
+* `g` the underlying graph
+* `f` a function that takes as argument time,
+and returns the index of the graph to pick at time `t` from array `g`
+
+# Example
+`DynGraphSpace(g,f)`
 """
 struct DynGraphSpace{T<:Number} <: AbstractDynSpace{1,T}
     g::Vector{AbstractGraph{T}}
@@ -165,6 +178,7 @@ function DynGraphSpace(g::Array{A},f) where A <: AbstractGraph
 
 """
 $SIGNATURES
+
 Returns the graph correseponding to `d::DynGraphSpace` at time `t`
 """
 get_graph(d::DynGraphSpace,t) = d.g[d.f(t)]

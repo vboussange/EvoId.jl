@@ -7,6 +7,12 @@ export AbstractAgentM
 
 """
 $(TYPEDEF)
+
+!!! note "Specificities"
+    The type `Agent` has two important composite types
+
+    - `Ancestors{bool}` : when `bool = true`, the ancestors traits are stored,
+    - `Rates{bool}` : when `bool = true`, the rates `d` and `b` of agents are updated at each time step. This is needed in e.g. `Gillepsie` algorithm.
 """
 mutable struct Agent{A<:Ancestors,R<:Rates,T<:Tuple,U,V} <: AbstractAgent{A,R}
     # history of traits for geotraits
@@ -49,10 +55,9 @@ with initial position `pos`. If `pos` not provided,
 initialises agent with 0 values everywhere
 
 # Keyword arguments
-* `rates`. Set `rates=true` when agents fitness 
-needs to be updated at each time step. This 
+* `rates`. Set `rates=true` when agents fitness needs to be updated at each time step. This 
 is required for the Gillepsie algorithm, but not for CFM algorithm
-- `ancestors`. Set `ancestors=true` when you want to store ancestors traits.
+* `ancestors`. Set `ancestors=true` when you want to store ancestors traits.
 """
 function Agent(s::S; ancestors=false,rates=true) where {S  <: AbstractSpacesTuple}
     T,pos = _initpos(s)

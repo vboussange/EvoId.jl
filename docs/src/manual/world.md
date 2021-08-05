@@ -1,5 +1,5 @@
 # World
 ```@autodocs
 Modules = [EvoId]
-Pages   = ["world.jl"]
+Pages   = ["World.jl"]
 ```

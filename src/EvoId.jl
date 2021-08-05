@@ -1,6 +1,5 @@
 module EvoId
     using Distributions,LinearAlgebra,Reexport,StatsBase
-    using LightGraphs
     using UnPack
     using DocStringExtensions
     using Arpack
@@ -18,7 +17,7 @@ module EvoId
     include("runworld.jl")
 
 
-    @reexport using Distributions, DataFrames
+    @reexport using Distributions, DataFrames, LightGraphs
 
     export
 

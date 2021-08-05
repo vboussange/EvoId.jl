@@ -5,6 +5,7 @@ run!
 ```
 
 For now three algorithms
+
 ```@docs
 Gillepsie
 CFM

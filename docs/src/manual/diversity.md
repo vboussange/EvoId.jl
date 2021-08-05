@@ -1,4 +1,4 @@
-# Diversity measures
+# Metrics
 
 ```@autodocs
 Modules = [EvoId]

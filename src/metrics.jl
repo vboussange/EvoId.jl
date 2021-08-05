@@ -6,7 +6,7 @@ hamming(k::Array, l::Array) = sum(k .!= l)
 
 """
     H_discrete(s)
-Interconnectedness measure as in Nordbotten 2018 for discrete setup
+Interconnectedness measure as in Nordbotten 2018 for discrete setup.
 """
 function H_discrete(s)
     N = length(s)
@@ -22,9 +22,7 @@ end
 
 """
     findclusters(v::Vector,allextrema =true)
-Returns a tuple with the cluster mean and its associated weight
-# Arguments
-
+Returns a tuple with the cluster mean and its associated weight.
 """
 function findclusters(v::Vector,allextrema =true)
     # this function fits a histogram to some distribution and extracts its local maxima
@@ -44,7 +42,7 @@ end
 import Statistics:var,mean
 # TODO: rename this to gamma diversity
 """
-    function var(world::World;trait=1)
+    var(world::World;trait=1)
 Return the variance of the `world`'s `trait` distribution.
 If trait = 0, returns the variance of the geotrait,
 knowing that by default it is associated with position trait 1.
@@ -65,7 +63,7 @@ function var(world::World;trait=1)
 end
 
 """
-    function mean(world::World;trait=1)
+    mean(world::World;trait=1)
 Returns the mean of the `world`'s `trait` distribution.
 If trait = 0, returns the variance of the geotrait,
 """
@@ -98,7 +96,7 @@ function covgeo(world::World,trait = 0)
 end
 
 """
-    function hamming(world::Array{Agent,1})
+    hamming(world::Array{Agent,1})
 Returns a matrix H where H_ij = hamming(a_i,a_j).
 The hamming distance is taken through the whole history
 and functional space of the agents.
@@ -164,13 +162,14 @@ end
 
 """
 $(SIGNATURES)
+    get_xhist_mat(agentarray, trait=1, time = 0) where {A<:AbstractAgent}
 returns `xhist,ttot`, where `xhist` is a matrix with dimension `lenght(world)` x `length(thist)+1`,
 which consists of geographical history of ancestors at every time step.
 If `time` is specified and is higher that the highest time step in world,
 then the last column of xhist corresponds to actual position of agents
 """
 
-function get_xhist_mat(agentarray::Vector{A},trait=1,time = 0) where {A<:AbstractAgent}
+function get_xhist_mat(agentarray::Vector{A}, trait=1, time = 0) where {A<:AbstractAgent}
         thist = vcat(get_thist.(agentarray)...)
         ttot = sort!(unique(thist))
         xhist = zeros(length(agentarray),length(ttot))
