@@ -82,7 +82,7 @@ function updateWorld!(w::World{A,S,T}, g::G, b, d) where {A,S,T,G <: Gillepsie}
     events_weights = ProbabilityWeights(vcat(get_d.(alive),get_b.(alive)))
     # Total rate of events
     ∑ = sum(events_weights)
-    dt = - log(rand(eltype(T)))/∑
+    dt = - log(rand(T))/∑
     update_clock!(w,dt)
     if dt > 0.
         i_event = sample(events_weights)
