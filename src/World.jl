@@ -144,11 +144,7 @@ If `trait = 0` , we return the geotrait.
 """
 function get_x(w::World,trait)
     if !(trait == 0)
-        if ndims(space(w)[trait]) > 1
-            return hcat(collect.(getindex.(agents(w),trait))...)'
-        else
-            return collect(getindex.(agents(w),trait))
-        end
+        return hcat(collect.(getindex.(agents(w),trait))...)'
     else
         return collect(get_geo(w))
     end

@@ -6,6 +6,7 @@ using Dates
 using JLD2
 using EvoId
 using LightGraphs, UnPack
+using Revise, BenchmarkTools
 
 ######################
 ##### param def ######
@@ -18,7 +19,7 @@ dim_neutr = 300
 neutralspace = RealSpace{dim_neutr,Tf}()
 K1 = 150
 # good definition
-d(X, Y, t) = (X[1][] ≈ Y[1][]) ? 1f0 / Tf(K1) : 0f0
+@inbounds d(X, Y, t) = (X[1][] ≈ Y[1][]) ? 1f0 / Tf(K1) : 0f0
 # bad writing
 # d(X, Y, t) = (X[1] ≈ Y[1]) / K1
 NMax = 2000

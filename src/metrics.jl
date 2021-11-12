@@ -118,10 +118,10 @@ If trait=0, we get the mean of the local variance of the geotrait
 If average = false, returns the alpha div for each patch, ordered by vertices
 """
 function get_alpha_div(world::World,trait=1,average=true)
-    g = groupby(a->a[1],agents(world))
+    g = groupby(a->a[1][],agents(world))
     # here the second mean is here when subspace is multidimensional
     # we sort by index of vertices
-    v = [var(World(g[i],space(world),parameters(world)),trait=trait) for i in sort(collect(keys(g)))]
+    v = [var(World(g[i],space(world),get_D(world),get_mu(world),maxsize(world)),trait=trait) for i in sort(collect(keys(g)))]
     h = vcat(v...)
     if average
         return mean(h)
@@ -137,7 +137,7 @@ If trait=0, we get the mean of the local variance of the geotrait
 If average = false, returns the alpha div for each patch, ordered by vertices
 """
 function get_local_abundance(world::World,average=true)
-    g = groupby(a->a[1],agents(world))
+    g = groupby(a->a[1][],agents(world))
     # here the second mean is here when subspace is multidimensional
     # we sort by index of vertices
     a = [length(g[i]) for i in sort(collect(keys(g)))]
@@ -154,8 +154,8 @@ Variance of the mean of `trait` per patch
 # Arguments
 """
 function get_beta_div(world::World,trait=1)
-    g = groupby(a->a[1],agents(world))
-    m = [mean(World(subw,space(world),parameters(world)),trait=trait) for subw in values(g)]
+    g = groupby(a->a[1][],agents(world))
+    m = [mean(World(subw,space(world),get_D(world),get_mu(world),maxsize(world)),trait=trait) for subw in values(g)]
     h=vcat(m...)
     return mean(var(h,dims=1,corrected=false))
 end
@@ -251,12 +251,12 @@ Similar to `get_pairwise_average_isolation`, but the pairwise distance is calcul
 An average of this metrics by deme is return.
 """
 function get_local_pairwise_average_isolation(world::World;trait=1,trunc=false)
-        f(a) = a[1]
+        f(a) = a[1][]
         groups = groupby(f,agents(world))
         smallworlds = []
         for v in values(groups)
             myagents = [a for a in v]
-            push!(smallworlds,World(myagents,world.space,world.p,world.t))
+            push!(smallworlds,World(myagents,world.space,get_D(world),get_mu(world),maxsize(world),world.t))
         end
         d = get_pairwise_average_isolation.(smallworlds,trait=trait,trunc=trunc)
         mean(d)
