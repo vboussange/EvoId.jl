@@ -21,7 +21,7 @@ SpaceType=Union{Nothing, AbstractSpace} # not sure what is this used for
 abstract type AbstractStatSpace{Dim,T,I} <: AbstractSpace{Dim,T,I} end
 
 """
-$(TYPEDEF)
+    GraphSpace(g)
 
 Creates a Graph Space.
 
@@ -40,7 +40,7 @@ end
 abstract type AbstractSegment{T<:Number}  <: AbstractStatSpace{1,T,IsFinite{true}} end
 
 """
-$(TYPEDEF)
+    ContinuousSegment(s, e)
 
 Creates a segment space, where individuals are reflected at both ends.
 
@@ -58,7 +58,7 @@ struct ContinuousSegment{T<:AbstractFloat} <:  AbstractSegment{T}
 end
 
 """
-$(TYPEDEF)
+    DiscreteSegment(s, e)
 
 Creates a discrete segement space, where individuals are reflected at both ends.
 
@@ -78,7 +78,7 @@ struct DiscreteSegment{T<:Integer} <: AbstractSegment{T}
 end
 
 """
-$(TYPEDEF)
+    RealSpace{N,T}()
 
 Creates a real space.
 
@@ -88,9 +88,10 @@ Creates a real space.
 """
 struct RealSpace{N,T} <: AbstractStatSpace{N,T,IsFinite{false}} end
 RealSpace(N) = RealSpace{N,Float64}()
+
 """
-$(TYPEDEF)
-A natural space with dimension N and type T
+    NaturalSpace{N,T}
+A natural space with dimension `N` and type `T`
 """
 struct NaturalSpace{N,T} <: AbstractStatSpace{N,T,IsFinite{false}} end
 
@@ -98,64 +99,59 @@ struct NaturalSpace{N,T} <: AbstractStatSpace{N,T,IsFinite{false}} end
 # TODO: find a way to put a type on D in get_inc
 
 """
-$(SIGNATURES)
+    get_inc(x, D, s)
 
 Returns increment corresponding to space `s`
 """
-get_inc(x,D,s::AbstractStatSpace,t) = get_inc(x,D,s) # this is defined to skip representation of t for following specialised methods
-get_inc(x,D,s::AbstractSpace{Dim,T,I}) where {Dim,T,I<:IsFinite{false}} = get_inc(D,s) # This is defined to skip representation of x for spaces which do not use reflections.
+get_inc(x, D, s::AbstractStatSpace,t) = get_inc(x,D,s) # this is defined to skip representation of t for following specialised methods
+get_inc(x, D, s::AbstractSpace{Dim,T,I}) where {Dim,T,I<:IsFinite{false}} = get_inc(D,s) # This is defined to skip representation of x for spaces which do not use reflections.
 
-function get_inc(D,s::AbstractSpace{Dim,T,I}) where {Dim,T<:AbstractFloat,I<:IsFinite{false}}
-    if Dim > 1
-        return D .* randn(T,Dim)
-    else
-        return D * randn(T)
-    end
+function get_inc(D::DType, s::AbstractSpace{Dim,T,I}) where {DType, Dim,T<:AbstractFloat,I<:IsFinite{false}}
+    return D .* randn(eltype(DType),Dim)
 end
 
-function get_inc(D,s::AbstractSpace{Dim,T,I}) where {Dim,T<:Integer,I<:IsFinite{false}}
-    if Dim > 1
-        return round.(T,D .*randn(Float32,Dim))
-    else
-        return round(D * randn(Float32))
-    end
+
+function get_inc(D::DType, s::AbstractSpace{Dim,T,I}) where {DType, Dim, T<:Integer, I<:IsFinite{false}}
+    return round.(D .*randn(eltype(DType),Dim))
 end
 
 #TODO: there is probably a better way of dealing with those two functions
-function get_inc(x,D,s::ContinuousSegment{T}) where {T}
-    inc = D * randn(T)
+function get_inc(x,D::DType,s::ContinuousSegment{T}) where {T, DType}
+    inc = D .* randn(T,1)
     return _reflect1D(x,inc,s)
 end
 
-function get_inc(x,D,s::DiscreteSegment{T}) where {T}
-    inc = D * randn(Float32)
-    return round(T,_reflect1D(x,inc,s))
+function get_inc(x,D::DType,s::DiscreteSegment{T}) where {T,DType}
+    inc = D .* randn(eltype(DType),1)
+    return round.(_reflect1D(x,inc,s))
 end
 
 function get_inc(x,D::Nothing,s::DiscreteSegment{T}) where {T}
     inc = rand([one(T),-one(T)])
-    return round(T,_reflect1D(x,inc,s))
+    return round.(T,_reflect1D(x,inc,s))
 end
 
 # normal dispersal kernel that gets truncated
-function get_inc(x,D::Number,s::GraphSpace{T}) where {T}
-    niter = round(T,abs(D*randn(Float32))) + 1
+function get_inc(x::xType, D::DType, s::GraphSpace{T}) where {xType, T, DType}
+    niter = round(T,abs(D[1] * randn(eltype(DType)))) + 1
     # here we add +1 since randomwalk(s.g,x,niter) returns x
     if niter > 0
-        return last(randomwalk(s.g,x,niter)) - x
+        inc = [last(randomwalk(s.g, convert(T,x[]), niter))] - x
+        return  inc
     else
-        return 0
+        return zero(x)
     end
 end
 # short range dispersal kernel, jump to neighbour node
-function get_inc(x,D::Nothing,s::GraphSpace{T}) where {T}
-    return last(randomwalk(s.g,x,2)) - x
+function get_inc(x::xType, D::Nothing, s::GraphSpace{T}) where {xType,T}
+    inc = [last(randomwalk(s.g, convert(T,x[]), 2))] - x
+    return  convert(xType,inc) 
 end
 
 ## Dynamic spaces
 abstract type AbstractDynSpace{Dim,T<:Number} <: AbstractSpace{Dim,T,IsFinite{true}} end
 """
-$(TYPEDEF)
+    DynGraphSpace(g, f)
 
 A dynamic graph space.
 
@@ -177,7 +173,7 @@ function DynGraphSpace(g::Array{A},f) where A <: AbstractGraph
  end
 
 """
-$SIGNATURES
+    get_graph(d, t)
 
 Returns the graph correseponding to `d::DynGraphSpace` at time `t`
 """
@@ -186,13 +182,14 @@ get_graph(d::DynGraphSpace,t) = d.g[d.f(t)]
 
 ## Increments - specialised functions for dynamic graphs
 # normal dispersal kernel that gets truncated
-function get_inc(x,D::Number,d::DynGraphSpace{T},t) where {T}
-    niter = round(Int,abs(D*randn())) + 1
+function get_inc(x, D::DType, d::DynGraphSpace{T},t) where {DType, T}
+    niter = round(T,abs(D*randn(eltype(DType)))) + 1
     # here we add +1 since randomwalk(s.g,x,niter) returns x
     if niter > 0
-        return last(randomwalk(get_graph(d,t),x,niter)) - x
+        inc = [last(randomwalk(get_graph(d,t), convert(T,x[]), niter))] - x
+        return inc
     else
-        return 0
+        return zero(x)
     end
 end
 
@@ -203,15 +200,18 @@ end
 
 #increment the trajectory of trait 1 
 # such that it follows a reflected brownian motion (1D)
-function _reflect1D(x::Number,inc::Number,s::AbstractSegment)
-    if x + inc < s.s
-        inc = 2 * ( s.s - x ) - inc
-    elseif  x + inc > s.e
-        inc = 2 * ( s.e - x ) - inc
+function _reflect1D(x, inc, s::AbstractSegment)
+    @assert length(x) == 1 "Only 1D spaces supported"
+    _x = x[]
+    _inc = inc[] 
+    if _x + _inc < s.s
+        _inc = 2 * ( s.s - _x ) - _inc
+    elseif  _x + _inc > s.e
+        _inc = 2 * ( s.e - _x ) - _inc
     else
-        return inc
+        return [_inc]
     end
-    _reflect1D(x,inc,s)
+    _reflect1D(x,[_inc],s)
 end
 
 function _get_types_dim(s::S) where S<:AbstractSpacesTuple
