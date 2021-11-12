@@ -103,7 +103,7 @@ get_mu(w::World) = w.mu
 # this throws agents of an abstract array of size size(world)
 import Base:size,getindex
 Base.length(world::World) = length(world.agents)
-Base.copy(w::W) where {W<:World} = W(copy.(w.agents), w.space, copy(w.D), copy(w.mu) ,copy(w.t))
+Base.deepcopy(w::W) where {W<:World} = W(deepcopy.(w.agents), w.space, copy(w.D), copy(w.mu), w.NMax, w.t)
 ## Accessors
 """
     Base.getindex(w::World,i) 

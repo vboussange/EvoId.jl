@@ -1,12 +1,11 @@
 abstract type AbstractAlg end
 
 # this used to be  world
-mutable struct Simulation{A<:AbstractAgent, S<:AbstractSpacesTuple,T<:Number}
+mutable struct Simulation{A<:AbstractAgent, S<:AbstractSpacesTuple, T}
     agentarray::Vector{Vector{AbstractAgent}}
     space::S
     tspan::Vector{T}
     df_agg::Vector{Dict}
-    p::Dict{String,Any}
 end
 
 # callbacks has to be of the form (names" => String[],"aggregates" => Function)
@@ -18,16 +17,16 @@ $(SIGNATURES)
 See `run!` documentation for more insights.
 """
 function Simulation(w0::World{A,S,T};cb = nothing) where {A,S,T}
-    tspan = zeros(1)
+    tspan = zeros(T,1)
     #agentarray is of size 2 at the beginning
     isnothing(cb) ? df_agg = Dict[] : df_agg = [cb(w0)]
-    Simulation{A,S,T}([copy.(agents(w0))],space(w0),tspan,df_agg,parameters(w0))
+    Simulation{A,S,T}([deepcopy.(agents(w0))],space(w0),tspan,df_agg)
  end
 
 get_tend(s::Simulation) = s.tspan[end]
 get_size(s::Simulation) = length(s.tspan)
 get_tspan(s::Simulation) = s.tspan
-get_world(s::Simulation,i) = World(s.agentarray[i],s.space,s.p,s.tspan[i])
+
 Base.getindex(s::Simulation,i) = s.agentarray[i]
 import Base.lastindex
 Base.lastindex(s::Simulation) = get_size(s)
@@ -47,7 +46,7 @@ $(SIGNATURES)
 Add `w` with callbacks `s.cb` to `s` if provided
 """
 function add_entry!(s::Simulation{A,S,T},w::World,cb) where {A,S,T}
-    push!(s.agentarray,copy.(agents(w)))
+    push!(s.agentarray,deepcopy.(agents(w)))
     push!(s.tspan,w.t)
     if !isnothing(cb)
         push!(s.df_agg,cb(w))

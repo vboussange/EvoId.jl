@@ -39,7 +39,7 @@ module EvoId
     run!,give_birth,updateWorld!,update_clock!,updateBirthEvent!,
     updateDeathEvent!,#,runWorld_G!,runWorld_WF!,
 
-    Simulation,add_entry!,get_tend,get_size,get_tspan,get_world,get_xnt,
+    Simulation,add_entry!,get_tend,get_size,get_tspan,get_xnt,
 
     H_discrete,findclusters,var,covgeo,hamming,get_beta_div, get_alpha_div,
     get_local_abundance,get_dist_hist,get_pairwise_average_isolation,
