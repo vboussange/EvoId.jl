@@ -5,6 +5,8 @@ module EvoId
     using Arpack
     @reexport using LightGraphs
 
+    import Base:ndims,isfinite,eltype
+
     include("Space.jl")
     include("Agent.jl")
     include("World.jl")
@@ -32,7 +34,7 @@ module EvoId
     get_thist,get_geo,get_b,get_d,increment_x!,get_inc_reflected,world2df,
     split_move,split_merge_move,tin,new_world_G,
 
-    World,parameters,time,space,agents,size,maxsize,addAgent!,removeAgent!,
+    World,parameters,time,space,agents,size,maxsize,get_D,get_mu,addAgent!,removeAgent!,
 
     run!,give_birth,updateWorld!,update_clock!,updateBirthEvent!,
     updateDeathEvent!,#,runWorld_G!,runWorld_WF!,

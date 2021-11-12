@@ -8,7 +8,6 @@ abstract type IsFinite{T} end
 
 abstract type AbstractSpace{Dim,T,I} end
 AbstractSpacesTuple = Tuple{Vararg{AbstractSpace}}
-import Base:ndims,isfinite,eltype
 Base.ndims(x::AbstractSpace{Dim,T,I}) where {Dim,T,I} = Dim
 Base.isfinite(x::AbstractSpace{Dim,T,IsFinite{t}}) where {Dim,T,t} = t #not sure we need this
 Base.eltype(::AbstractSpace{Dim,T,I}) where {Dim,T,I} = T

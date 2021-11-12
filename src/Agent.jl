@@ -1,4 +1,5 @@
 abstract type AbstractAgent{X} end # tc for time contingency, fit for fitness coeff
+Base.eltype(::AbstractAgent{X}) where X = X
 
 mutable struct AgentwithAncestors{X} <: AbstractAgent{X}
     # history of traits for geotraits

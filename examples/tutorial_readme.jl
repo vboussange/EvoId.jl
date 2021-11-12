@@ -19,7 +19,7 @@ mu = [1f-1,1f-1]
 
 tend = 200.
 t_saving_cb = collect(range(0.,tend,length=300))
-cb(w) = Dict("N" => size(w))
+cb(w) = Dict("N" => length(w))
 
 p = Dict("NMax" => 2000,
         "D" => D,

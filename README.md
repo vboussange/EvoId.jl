@@ -112,7 +112,7 @@ Simulation time, and callback function
 ```julia
 tend = 500
 t_saving_cb = collect(range(0.,tend,length=300))
-cb(w) = Dict("N" => size(w))
+cb(w) = Dict("N" => length(w))
 ```
 
 
