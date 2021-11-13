@@ -1,6 +1,3 @@
-using Random
-length(ARGS) > 0 ? seed = (parse(Int,ARGS[1])) : seed = 1
-Random.seed!(seed)
 cd(@__DIR__)
 using Dates
 using JLD2
@@ -24,7 +21,7 @@ K1 = 150
 # d(X, Y, t) = (X[1] ≈ Y[1]) / K1
 NMax = 2000
 # tend = Tf(500.)
-tend = Tf(20.)
+tend = Tf(10.)
 D = [nothing, fill(Tf(5e-2), dim_neutr)]
 b(X,t) = Tf(1.)
 t_saving_cb = collect(range(0, tend, length=300))
@@ -35,3 +32,5 @@ p_default = Dict{String,Any}();
 myagents = [Agent(myspace,Any[[rand(Ti(1):Ti(nodes))], D[2].* randn(Tf,dim_neutr)]) for i in 1:nodes*K1]
 w0 = World(myagents, myspace, D, mu, NMax)
 @time s = run!(w0, Gillepsie(), tend, b, d);
+# [ Info: simulation stopped at t=10.00007397495025, after 26223 steps
+# 7.381335 seconds (220.67 M allocations: 3.920 GiB, 3.90% gc time, 1.78% compilation time)
