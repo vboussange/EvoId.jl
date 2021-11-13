@@ -1,24 +1,24 @@
 abstract type AbstractAgent{X} end # tc for time contingency, fit for fitness coeff
 Base.eltype(::AbstractAgent{X}) where X = X
 
-mutable struct AgentwithAncestors{X} <: AbstractAgent{X}
+mutable struct AgentwithAncestors{X,T,R} <: AbstractAgent{X}
     # history of traits for geotraits
     x_history::Vector{Vector{Vector{X}}}
     # birth time of ancestors
-    t_history::Vector{X}
+    t_history::Vector{T}
     # death rate
-    d::X
+    d::R
     #birth rate
-    b::X
+    b::R
 end
 
-mutable struct Agent{X} <: AbstractAgent{X}
+mutable struct Agent{X,R} <: AbstractAgent{X}
     # traits
     x::Vector{Vector{X}}
     # death rate
-    d::X
+    d::R
     # birth rate
-    b::X
+    b::R
 end
 
 # infers position type and zeros
@@ -34,11 +34,18 @@ end
 # default initialiser
 """
     Agent(s; ancestors=false)
-    Agent(s, pos; ancestors=false)
+    Agent(s, pos, Rtype=Float32; ancestors=false)
+    Agent(s, pos_t, t, Rtype=Float32; ancestors=false)
 
 Returns an `Agent` living on the underlying space `s` 
 with initial position `pos`. If `pos` not provided, 
 initialises agent with 0 values everywhere
+# Arguments
+* `s`
+* `pos`
+* `pos_t`
+* `Rtype`: type of rate. Should correspond to the type 
+of the output birth and death function for code optimisation.
 
 # Keyword arguments
 is required for the Gillepsie algorithm, but not for CFM algorithm
@@ -49,34 +56,34 @@ function Agent(s::S; ancestors=false) where {S  <: AbstractSpacesTuple}
     # promoting b, d, t_history to position
     _zero = zero(T)
     if ancestors
-        return AgentwithAncestors([pos], [_zero], _zero, _zero)
+        return AgentwithAncestors([pos], [_zero], zero(Float32), zero(Float32))
     else
-        return Agent(pos, _zero, _zero)
+        return Agent(pos, zero(Float32), zero(Float32))
     end
 end
 
-function Agent(s::S, pos_t::Vector, t::Vector{U}; ancestors=false) where {S <: AbstractSpacesTuple, U <: AbstractFloat}
-    T = eltype.(s)
-    Tprom = eltype(promote_type(T...))
+function Agent(s::AbstractSpacesTuple, pos_t::Vector, t::Vector{<:Real}, Rtype::DataType=Float32; ancestors=false)
+    X = eltype.(s)
+    Xprom = eltype(promote_type(X...)) 
     @assert (length(pos_t) == length(t)) "length of `pos` should match length of `t`"
     @assert (length(pos_t[1]) == length(s)) "number of traits does not match with number of spaces"
     @assert all(length.(pos_t[1]) .== ndims.(s)) "number of traits does not match with number of dimension spaces"
 
     # it should be clear that if ancestors is false, pos_t has only one element
-    ancestors ? nothing : @assert length(pos_t) == 1
+    ancestors ? nothing : @assert length(pos_t) == 1 "Cannot provide time to Agents where `ancestors=false`"
     # pos_t[1] is trait at t[1]
     # pos_t[1][1] are the traits on space s[1]
     # pos_t[1][1][1] is the trait value at dim 1
-    pos2_t = convert(Vector{Vector{Vector{Tprom}}}, pos_t)
-    _zero = zero(eltype(promote_type(T...)))
+    pos2_t = convert(Vector{Vector{Vector{Xprom}}}, pos_t)
+    _zero = zero(Xprom)
     if ancestors
-        return AgentwithAncestors(pos2_t, t, _zero, _zero)
+        return AgentwithAncestors(pos2_t, t, zero(Rtype), zero(Rtype))
     else
-        return Agent(pos2_t[1], _zero, _zero)
+        return Agent(pos2_t[1], zero(Rtype), zero(Rtype))
     end
 end
 
-Agent(s, pos; ancestors=false) = Agent(s, [pos], [0.], ancestors=ancestors)
+Agent(s, pos, Rtype=Float32; ancestors=false) = Agent(s, [pos], [0.], Rtype, ancestors=ancestors)
 
 
 import Base:copy,show
@@ -86,8 +93,8 @@ Base.deepcopy(a::Agent) = Agent(deepcopy(a.x),copy(a.d),copy(a.b))
 
 # this function only copies the trait history and time (x,t), and set birth and death rates to 0.
 # useful for birth events
-copyxt(a::Agent{X}) where {X} = Agent(copy(a.x), zero(X), zero(X))
-copyxt(a::AgentwithAncestors{X}) where {X} = AgentwithAncestors(copy(a.x_history),copy(a.t_history),zero(X),zero(X))
+copyxt(a::Agent{X,R}) where {X,R} = Agent(copy(a.x), zero(R), zero(R))
+copyxt(a::AgentwithAncestors{X,T,R}) where {X,T,R} = AgentwithAncestors(copy(a.x_history),copy(a.t_history),zero(R),zero(R))
 
 # this has to be overloaded for Base.copy(a::Agent) to work properly
 # TODO: not sure this is required anymore

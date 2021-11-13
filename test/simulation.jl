@@ -6,8 +6,8 @@ myspace = (GraphSpace(SimpleGraph(10,10)),RealSpace{1,Float64}())
 myagents = [Agent(myspace,ancestors=true) for i in 1:10]
 d(X,Y,t) = gaussian(X[1][],Y[1][],1)
 b(X,t) = gaussian(X[1],0,1)
-D = (Int64(1),Float64(1.))
-mu = [1,1]
+D = (Float64(1),Float64(1.))
+mu = [1.,1.]
 NMax = 100
 
 w0 = World(myagents,myspace,D,mu,NMax,0.)

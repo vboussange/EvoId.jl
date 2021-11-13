@@ -40,8 +40,8 @@ w1 = deepcopy(w0)
 
         @testset "Testing update rates matrix" begin
                 @testset "birth event" begin
-                        myagents = [Agent(myspace,[0],ancestors=true,rates=true) for i in 1:K0]
-                        w1 = World(myagents,myspace,p,0.);update_rates!(w1,Gillepsie(),b,d,)
+                        myagents = [Agent(myspace,[[0]],ancestors=true) for i in 1:K0]
+                        w1 = World(myagents,myspace,D,mu,NMax,0.);update_rates!(w1,Gillepsie(),b,d,)
                         mum_idx = 1
                         updateBirthEvent!(w0,Gillepsie(),1,b,d)
                         bs_end = get_b.(agents(w1));ds_end = get_d.(agents(w1))
@@ -53,8 +53,8 @@ w1 = deepcopy(w0)
                 end
 
                 @testset "death event" begin
-                        myagents = [Agent(myspace,[0],ancestors=true,rates=true) for i in 1:K0]
-                        w1 = World(myagents,myspace,p,0.);update_rates!(w1,Gillepsie(),b,d)
+                        myagents = [Agent(myspace,[[0]]) for i in 1:K0]
+                        w1 = World(myagents,myspace,D,mu,NMax,0.);update_rates!(w1,Gillepsie(),b,d)
                         mum_idx = 1
                         updateDeathEvent!(w0,Gillepsie(),1,d)
                         bs_end = get_b.(agents(w1));ds_end = get_d.(agents(w1))

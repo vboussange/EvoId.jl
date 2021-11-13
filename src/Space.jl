@@ -194,7 +194,7 @@ end
 
 # short range dispersal kernel, jump to neighbour node
 function get_inc(x,D::Nothing,d::DynGraphSpace{T},t) where {T}
-    return last(randomwalk(get_graph(d,t),x,2)) - x
+    return [last(randomwalk(get_graph(d,t), convert(T,x[]), 2))] - x
 end
 
 #increment the trajectory of trait 1 

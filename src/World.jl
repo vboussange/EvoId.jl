@@ -46,7 +46,7 @@ w0 = World(myagents,evolspace,p)
 ```
 
 """
-function World(w::Vector{A}, s::S, D, mu, NMax; t=0.) where {A <:AbstractAgent, S<:AbstractSpacesTuple}
+function World(w::Vector{A}, s::AbstractSpacesTuple, D::Vector, mu::Vector, NMax::Real; t=0.::Real) where {A <:AbstractAgent}
     # if typeof(p["D"]) != eltype(skipmissing(w)[1])
     #     throw(ArgumentError("Diffusion coefficient does not match with underlying space\n `D::Tuple`"))
     # end
@@ -60,6 +60,11 @@ function World(w::Vector{A}, s::S, D, mu, NMax; t=0.) where {A <:AbstractAgent, 
 
     @assert length(mu) == length(s) "Length of parameter `mu` should correspond to dimension of underlying space"
     @assert length(D) == length(s) "Length of parameter `D` should correspond to dimension of underlying space"
+    if A <: AgentwithAncestors
+        for a in w
+            @assert a.t_history[1] <= t "Agents must be initialised at times preciding simulation starting time, which is tsart = $t"
+        end
+    end
     SS = eltype.(s)
     _SS = _get_types_dim(s)
     # checking that eltypes of D are nothing or abstractfloat

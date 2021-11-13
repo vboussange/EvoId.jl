@@ -121,7 +121,7 @@ function get_alpha_div(world::World,trait=1,average=true)
     g = groupby(a->a[1][],agents(world))
     # here the second mean is here when subspace is multidimensional
     # we sort by index of vertices
-    v = [var(World(g[i],space(world),get_D(world),get_mu(world),maxsize(world)),trait=trait) for i in sort(collect(keys(g)))]
+    v = [var(World(g[i], space(world), get_D(world), get_mu(world), maxsize(world)), trait=trait) for i in sort(collect(keys(g)))]
     h = vcat(v...)
     if average
         return mean(h)
@@ -189,16 +189,16 @@ function get_xhist_mat(agentarray::Vector{A}, trait=1, time = 0) where {A<:Abstr
             k = 0
             _l = length(_thist)
             for j in 1:(_l - 1)
-                    xhist[i,j+k] = _xhist[j]
+                    xhist[i,j+k] = _xhist[j][]
                             while _thist[j+1] > ttot[j+k+1]
                                     k+=1
-                                    xhist[i,j+k] = _xhist[j]
+                                    xhist[i,j+k] = _xhist[j][]
                                     if j+k == length(ttot)
                                             break
                                     end
                             end
             end
-            xhist[i,_l+k:end] .= _xhist[end]
+            xhist[i,_l+k:end] .= _xhist[end][]
         end
         tt = 0
         time > ttot[end] ? ttot = vcat(ttot,time) : tt = 1
