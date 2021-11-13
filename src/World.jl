@@ -1,4 +1,4 @@
-mutable struct World{A<:AbstractAgent, S<:AbstractSpacesTuple,T} 
+mutable struct World{A<:AbstractAgent, S<:AbstractSpacesTuple,T<:Real} 
     agents::Vector{A}
     space::S
     D #increment range
@@ -46,7 +46,7 @@ w0 = World(myagents,evolspace,p)
 ```
 
 """
-function World(w::Vector{<:AbstractAgent{X}}, s::S, D, mu, NMax; t=0.) where {X, S<:AbstractSpacesTuple}
+function World(w::Vector{A}, s::S, D, mu, NMax; t=0.) where {A <:AbstractAgent, S<:AbstractSpacesTuple}
     # if typeof(p["D"]) != eltype(skipmissing(w)[1])
     #     throw(ArgumentError("Diffusion coefficient does not match with underlying space\n `D::Tuple`"))
     # end
@@ -86,8 +86,7 @@ function World(w::Vector{<:AbstractAgent{X}}, s::S, D, mu, NMax; t=0.) where {X,
             push!(D2, Di)
         end
     end
-    # TODO: how not having to use this horrible thing?
-    World(w, s, D2, mu, NMax, convert(X,t))
+    World(w, s, D2, mu, NMax, t)
 end
 
 # this throws an iterators of agents in the world
