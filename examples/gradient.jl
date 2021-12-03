@@ -39,6 +39,7 @@ anim = @animate for i in 1:get_size(s)
 end
 gif(anim,joinpath(@__DIR__, "gradient_2Dtrait.gif"),fps = 13)
 
+# deprecated
 world = get_world(s,get_size(s))
 shistall = get_xhist.(world[:],2)
 thist = get_thist.(world[:])

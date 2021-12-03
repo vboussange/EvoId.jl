@@ -14,21 +14,22 @@ using GraphPlot
 gplot(g, collect(1:nodes), collect(1:nodes))
 
 # Definition of birth and death rate
-K0 = 1000 # We will have in total 1000 individuals
-b(X,t) = 1 / nodes
-d(X,Y,t) = (X[1] ≈ Y[1]) / K0
+K1 = 200 # We will have in total 1000 individuals
+b(X,t) = 1
+d(X,Y,t) = (X[1][] ≈ Y[1][]) / K1
+d(X,Y,t) = (abs(X[1][] - Y[1][]) < eps()) / K1
+
 # Mutation / dispersal parameters
-mu = [1.]
-D = (1.5,)
+mu = [.5]
+D = [nothing]
 # maximum size, tend
 NMax = 2000
 tend = 300.
 # wrapping up all the parameters
-p = Dict{String,Any}();@pack! p = D,mu,NMax
 
 # definining world 0 and running
-myagents = [Agent(wholespace,(5,),ancestors=true,rates=true) for i in 1:K0/nodes]
-w0 = World(myagents,wholespace,p)
+myagents = [Agent(wholespace,[[5.]]) for i in 1:K1]
+w0 = World(myagents,wholespace,D,mu,NMax)
 @time sim = run!(w0,Gillepsie(),tend,b,d)
 
 ### Plotting size of the world

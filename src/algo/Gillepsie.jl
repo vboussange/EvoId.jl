@@ -54,7 +54,7 @@ function  update_rates!(w::World,::Gillepsie,b,d)
     _agents = agents(w)
     traits = get_x.(_agents)
     # traits = get_xhist.(world)
-    n = size(w)
+    n = length(w)
     D = zeros(n)
     # Here you should do a shared array to compute in parallel
     for i in 1:(n-1)
@@ -72,11 +72,11 @@ function  update_rates!(w::World,::Gillepsie,b,d)
 end
 
 """
-    function updateWorld!(w::World{A,S,T},g::G,b,d)
+    function updateWorld!(w, g, b, d)
 Updating rule for gillepsie setting.
 Returning `dt` drawn from an exponential distribution with parameter the total rates of events.
 """
-function updateWorld!(w::World{A,S,T},g::G,b,d) where {A,S,T,G <: Gillepsie}
+function updateWorld!(w::World{A,S,T}, g::G, b, d) where {A,S,T,G <: Gillepsie}
     # total update world
     alive = agents(w)
     events_weights = ProbabilityWeights(vcat(get_d.(alive),get_b.(alive)))
@@ -87,7 +87,7 @@ function updateWorld!(w::World{A,S,T},g::G,b,d) where {A,S,T,G <: Gillepsie}
     if dt > 0.
         i_event = sample(events_weights)
         # This is ok since size is a multiple of 2
-        n = size(w)
+        n = length(w)
         if i_event <= n
             # DEATH EVENT
             # In this case i_event is also the index of the individual to die in the world_alive

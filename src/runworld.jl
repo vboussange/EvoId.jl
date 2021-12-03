@@ -66,7 +66,11 @@ using Plots
 plot(get_tspan(sim),sim["gamma_div"])
 ```
 """
-function run!(w::World{A,S,T},alg::L,tend::Number,b,d;
+function run!(w::World{A,S,T},
+                alg::L,
+                tend::Number,
+                b,
+                d;
                 dt_saving=nothing,
                 t_saving_cb=nothing,
                 cb=nothing) where {A,S,T,L<:AbstractAlg}
@@ -77,12 +81,12 @@ function run!(w::World{A,S,T},alg::L,tend::Number,b,d;
     isnothing(t_saving_cb) ? t_saving_cb =  [tend + 1.] : nothing
 
     # var init
-    n=size(w);
+    n=length(w);
     NMax = maxsize(w)
     t = .0
     i = 1;j=1;dt = 0.
     sim = Simulation(w,cb=cb)
-    if A <: AbstractAgent{AA,Rates{true}} where {AA}
+    if L <: Gillepsie
         update_rates!(w,alg,b,d)
     end
 
@@ -90,10 +94,10 @@ function run!(w::World{A,S,T},alg::L,tend::Number,b,d;
     while t<tend
         if dt < 0
             throw("We obtained negative time step dt = $dt at event $i")
-        elseif size(w) == NMax
+        elseif length(w) == NMax
             @info "We have reached the maximum number of individuals allowed"
             break
-        elseif size(w) == 0
+        elseif length(w) == 0
             @info "All individuals have died :("
             break
         end

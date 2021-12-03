@@ -64,7 +64,7 @@ function updateWorld!(w::World{A,S,T},c::CFM,b,d) where {A,S,T}
     @unpack bm,dm = parameters(w)
     alive = agents(w)
     # Total rate of events
-    n = size(w)
+    n = length(w)
     CbarI = bm + dm*(n+1)
     dt = rand(Exponential(CbarI)) / n
     update_clock!(w,dt)

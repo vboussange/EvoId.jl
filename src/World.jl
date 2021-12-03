@@ -1,14 +1,14 @@
-# this used to be the worldalive
-
-mutable struct World{A<:AbstractAgent, S<:AbstractSpacesTuple,T<:Number}
+mutable struct World{A<:AbstractAgent, S<:AbstractSpacesTuple,T<:Real} 
     agents::Vector{A}
     space::S
-    p::Dict
-    t::T
+    D #increment range
+    mu #increment probability
+    NMax #maximum number of individuals
+    t::T #time
 end
 
 """
-$(SIGNATURES)
+World(agents, s, D, mu, NMax; t=0.)
 
 Constructs a world.
 
@@ -16,16 +16,13 @@ Constructs a world.
 
 * `w` a vector of agents, 
 * `s` a tuple of evolutionary spaces, 
-* `p` a dictionary that contains 
-    - `"mu"`, a vector of same length as `s`, 
-    that contains the mutation rate. If `mu[i]`
+* `mu` a vector that contains the increment rate. If `mu[i]`
     has dimension greater than 1, 
     then mutations happen independently at each dimension
     of `s[i]`.
-    - `"sigma"`, a vector of same length as `s`, 
-    that contains the dispersal ranges. Only `nothing` is 
+* `D`, a vector that contains the increment ranges. Only `nothing` is 
     supported for `GraphSpace`, equivalent to a random walk of length 1.
-    - `"NMax"` the maximum number of individuals allowed during the simulation
+* `NMax` the maximum number of individuals allowed during the simulation
     
 # Examples
 
@@ -49,31 +46,37 @@ w0 = World(myagents,evolspace,p)
 ```
 
 """
-function World(w::Vector{A},s::S,p::Dict;t::T=0.) where {A<:AbstractAgent,S<:AbstractSpacesTuple,T}
+function World(w::Vector{A}, s::AbstractSpacesTuple, D::Vector, mu::Vector, NMax::Real; t=0.::Real) where {A <:AbstractAgent}
     # if typeof(p["D"]) != eltype(skipmissing(w)[1])
     #     throw(ArgumentError("Diffusion coefficient does not match with underlying space\n `D::Tuple`"))
     # end
-    @unpack D,mu = p
 
     for _m in mu
         if !(eltype(_m) <: AbstractFloat)
-            throw(ArgumentError("elements of mu should be of type AbstractFloat\n
+            throw(ArgumentError("elements of `mu` should be of type AbstractFloat\n
                                 to decide if mutations occur from a uniform probability law"))
         end
     end
 
-    length(mu) == length(s) ? nothing : throw(ArgumentError("Length of parameter mu should correspond to dimension of underlying space"))
-    length(D) == length(s) ? nothing : throw(ArgumentError("Length of parameter D should correspond to dimension of underlying space"))
+    @assert length(mu) == length(s) "Length of parameter `mu` should correspond to dimension of underlying space"
+    @assert length(D) == length(s) "Length of parameter `D` should correspond to dimension of underlying space"
+    if A <: AgentwithAncestors
+        for a in w
+            @assert a.t_history[1] <= t "Agents must be initialised at times preciding simulation starting time, which is tsart = $t"
+        end
+    end
     SS = eltype.(s)
     _SS = _get_types_dim(s)
+    # checking that eltypes of D are nothing or abstractfloat
     for (i,_S) in enumerate(SS)
         if _S <: Integer
             # handling for discrete space is different
             Di = D[i]
-            (isnothing(Di) || typeof(Di) <: AbstractFloat) ? nothing : throw(ArgumentError("`D` at dimension $i should be whether nothing or a float"))
+            @assert (isnothing(Di) || typeof(Di) <: AbstractFloat) "type`D` at dimension $i should be whether nothing or a float"
             _SS[i] = typeof(Di)
         end
     end
+    # converting internally D ranges to align with subspaces eltype
     D2 = Union{_SS...}[]
     for (i,Di) in enumerate(D)
         # making sure that we only modify D for continuous space
@@ -88,9 +91,7 @@ function World(w::Vector{A},s::S,p::Dict;t::T=0.) where {A<:AbstractAgent,S<:Abs
             push!(D2, Di)
         end
     end
-    p["D"] = D2
-
-    World{A,S,T}(w,s,p,t)
+    World(w, s, D2, mu, NMax, t)
 end
 
 # this throws an iterators of agents in the world
@@ -98,15 +99,18 @@ agents(world::World) = world.agents
 parameters(world::World) = world.p
 time(w::World) = w.t
 space(w::World) = w.space
-maxsize(w::World) = w.p["NMax"]
+maxsize(w::World) = w.NMax
+get_D(w::World) = w.D
+get_mu(w::World) = w.mu
+
 # this throws indices that are occupied by agents
 # this throws agents of an abstract array of size size(world)
 import Base:size,getindex
-Base.size(world::World) = length(world.agents)
-Base.copy(w::W) where {W<:World} = W(copy.(w.agents),w.space,w.p,copy(w.t))
+Base.length(world::World) = length(world.agents)
+Base.deepcopy(w::W) where {W<:World} = W(deepcopy.(w.agents), w.space, copy(w.D), copy(w.mu), w.NMax, w.t)
 ## Accessors
 """
-$(SIGNATURES)
+    Base.getindex(w::World,i) 
 
 Get x of world without geotrait.
 """
@@ -124,13 +128,13 @@ removeAgent!(w::World,i::Int) = begin
 end
 
 update_clock!(w::World{A,S,T},dt) where {A,S,T} = begin
-    w.t = convert(T,sum(w.t + dt))
+    w.t = w.t + dt
     return nothing
 end
 
 
 """
-$(SIGNATURES)
+    get_geo(w)
 """
 get_geo(w::World) = map(a-> get_geo(a,time(w)), agents(w))
 
@@ -144,11 +148,7 @@ If `trait = 0` , we return the geotrait.
 """
 function get_x(w::World,trait)
     if !(trait == 0)
-        if ndims(space(w)[trait]) > 1
-            return hcat(collect.(getindex.(agents(w),trait))...)'
-        else
-            return collect(getindex.(agents(w),trait))
-        end
+        return hcat(collect.(getindex.(agents(w),trait))...)'
     else
         return collect(get_geo(w))
     end
@@ -179,6 +179,6 @@ Return new agent (offspring).
 """
 function give_birth(mum_idx::Int,w::World)
     new_a = copyxt(w[mum_idx])
-    increment_x!(new_a,space(w),parameters(w),time(w))
+    increment_x!(new_a,space(w),get_D(w), get_mu(w),time(w))
     return new_a
 end
