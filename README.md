@@ -4,9 +4,7 @@
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://vboussange.github.io/EvoId.jl/dev)
 <!-- [![Build Status](https://github.com/vboussange/EvoId.jl/workflows/CI/badge.svg)](https://github.com/vboussange/EvoId.jl/actions) -->
 
-<div align="center"> <img
-src="https://vboussange.github.io/images/research/gif_evoid.gif"
-alt="" width="400"></img> </div>
+<div align="center"><img src="https://vboussange.github.io/images/research/gif_evoid.gif" width="400"></img> </div>
 
 EvoId.jl (for **Evo**lutionary **I**n**d**ividual-based models) is a package aimed at simulating the eco-evolutionary dynamics of a population in a multidimensional space, at the individual level. The dynamics is specified under the framework of [stochastic models for structured populations](https://arxiv.org/abs/1506.04165).
 
