@@ -59,7 +59,7 @@ function var(world::World;trait=1)
             return mean(fiedlervec[xarray].^2) - mean(fiedlervec[xarray])^2
         end
     end
-    return var(Float64.(xarray),dims=1,corrected=false)
+    return var(Float64.(xarray),dims=1,corrected=true)
 end
 
 """
@@ -112,7 +112,7 @@ function hamming(world::World) where T <: Int
     return H
 end
 """
-    get_alpha_div(world::Array{U,1},t::Number,trait=1) where U <: Union{Missing,Agent}
+    get_alpha_div(world::World,trait=1,average=true)
 Mean of the local variance of `trait` per patch.
 If trait=0, we get the mean of the local variance of the geotrait
 If average = false, returns the alpha div for each patch, ordered by vertices
